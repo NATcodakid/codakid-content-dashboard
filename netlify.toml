@@ -1,0 +1,57 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/content-snapshot"
+  to = "/.netlify/functions/content-snapshot"
+  status = 200
+
+[[redirects]]
+  from = "/api/competitors"
+  to = "/.netlify/functions/competitors"
+  status = 200
+
+[[redirects]]
+  from = "/api/ai-insights"
+  to = "/.netlify/functions/ai-insights"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/me"
+  to = "/.netlify/functions/auth-me"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/login"
+  to = "/.netlify/functions/auth-login"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/logout"
+  to = "/.netlify/functions/auth-logout"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/invite"
+  to = "/.netlify/functions/auth-invite"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/accept-invite"
+  to = "/.netlify/functions/auth-accept-invite"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/users"
+  to = "/.netlify/functions/auth-users"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
