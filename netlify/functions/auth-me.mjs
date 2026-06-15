@@ -19,6 +19,8 @@ export async function handler(event) {
       authenticated: Boolean(user),
       user: user ? publicUser(user) : null,
       bootstrapConfigured: Boolean(process.env.DASHBOARD_ADMIN_EMAIL && process.env.DASHBOARD_ADMIN_PASSWORD),
+      adminEmailConfigured: Boolean(process.env.DASHBOARD_ADMIN_EMAIL),
+      adminPasswordConfigured: Boolean(process.env.DASHBOARD_ADMIN_PASSWORD),
       databaseConfigured: database.configured,
       database,
     });

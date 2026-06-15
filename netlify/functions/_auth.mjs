@@ -104,7 +104,7 @@ export async function ensureAuthSchema() {
 
   await sql`create index if not exists dashboard_sessions_user_id_idx on dashboard_sessions(user_id)`;
   await sql`create index if not exists dashboard_sessions_expires_at_idx on dashboard_sessions(expires_at)`;
-  await bootstrapAdmin(sql);
+  await syncEnvAdmin(sql);
   schemaReady = true;
 }
 
@@ -249,20 +249,28 @@ export function publicUser(user) {
   };
 }
 
-async function bootstrapAdmin(sql) {
-  const countRows = await sql`select count(*)::int as count from dashboard_users`;
-  if (countRows[0]?.count > 0) return;
-
+async function syncEnvAdmin(sql) {
   const email = normalizeEmail(process.env.DASHBOARD_ADMIN_EMAIL);
   const password = process.env.DASHBOARD_ADMIN_PASSWORD;
   if (!email || !password) return;
   validatePassword(password);
 
   const { salt, hash } = hashPassword(password);
-  await sql`
+  const users = await sql`
     insert into dashboard_users (id, email, name, role, status, password_hash, password_salt, accepted_at)
     values (${randomUUID()}, ${email}, 'Admin', 'admin', 'active', ${hash}, ${salt}, now())
+    on conflict (email) do update
+      set role = 'admin',
+          status = 'active',
+          password_hash = excluded.password_hash,
+          password_salt = excluded.password_salt,
+          accepted_at = coalesce(dashboard_users.accepted_at, now())
+    returning id
   `;
+
+  if (users[0]?.id) {
+    await sql`delete from dashboard_sessions where user_id = ${users[0].id}`;
+  }
 }
 
 function getCookie(event, name) {
