@@ -2,6 +2,10 @@ import { requireUser } from './_auth.mjs';
 
 const WP_BASE = process.env.VITE_WORDPRESS_BASE || 'https://codakid.com';
 const WP_API = `${WP_BASE.replace(/\/$/, '')}/wp-json/wp/v2`;
+const WP_HEADERS = {
+  accept: 'application/json',
+  'user-agent': 'CodaKidContentDashboard/1.0 (+https://codakidblogdashboard.netlify.app)',
+};
 
 const evergreenSignals = [
   'ultimate guide',
@@ -187,13 +191,13 @@ async function buildSnapshot() {
 }
 
 async function fetchCategories() {
-  const response = await fetch(`${WP_API}/categories?per_page=100&_fields=id,name,slug,count,link,parent`);
-  if (!response.ok) throw new Error(`Categories request failed: ${response.status}`);
+  const response = await wpFetch(`${WP_API}/categories?per_page=100&_fields=id,name,slug,count,link,parent`);
+  if (!response.ok) return [];
   return response.json();
 }
 
 async function fetchTotalPages() {
-  const response = await fetch(`${WP_API}/posts?per_page=100&page=1&_fields=id`);
+  const response = await wpFetch(`${WP_API}/posts?per_page=100&page=1&_fields=id`);
   if (!response.ok) throw new Error(`Posts head request failed: ${response.status}`);
   return Number(response.headers.get('x-wp-totalpages') || '1');
 }
@@ -202,11 +206,17 @@ async function fetchPosts(totalPages) {
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
   const requests = pages.map(async (page) => {
     const fields = 'id,link,slug,title,date,modified,categories,content,excerpt';
-    const response = await fetch(`${WP_API}/posts?per_page=100&page=${page}&_fields=${fields}`);
+    const response = await wpFetch(`${WP_API}/posts?per_page=100&page=${page}&_fields=${fields}`);
     if (!response.ok) throw new Error(`Posts page ${page} failed: ${response.status}`);
     return response.json();
   });
   return (await Promise.all(requests)).flat();
+}
+
+async function wpFetch(url) {
+  return fetch(url, {
+    headers: WP_HEADERS,
+  });
 }
 
 function normalizePost(post, categoryMap) {
