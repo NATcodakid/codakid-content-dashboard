@@ -9,6 +9,17 @@ import {
 
 const SESSION_COOKIE = 'ck_content_session';
 const SESSION_DAYS = 30;
+const DATABASE_ENV_KEYS = [
+  'NETLIFY_DATABASE_URL',
+  'DATABASE_URL',
+  'NEON_DATABASE_URL',
+  'POSTGRES_URL',
+  'POSTGRES_PRISMA_URL',
+  'POSTGRES_URL_NON_POOLING',
+  'POSTGRES_URL_NO_SSL',
+  'POSTGRES_URL_UNPOOLED',
+  'NEON_DATABASE_URL_UNPOOLED',
+];
 
 let schemaReady = false;
 let sqlClient;
@@ -21,12 +32,30 @@ export class HttpError extends Error {
 }
 
 export function getSql() {
-  const url = process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
+  const url = getDatabaseUrl();
   if (!url) {
-    throw new HttpError(500, 'Neon database URL is not configured.');
+    const present = DATABASE_ENV_KEYS.filter((key) => Boolean(process.env[key]));
+    const error = new HttpError(500, 'Neon database URL is not configured.');
+    error.meta = {
+      expectedKeys: DATABASE_ENV_KEYS,
+      presentExpectedKeys: present,
+    };
+    throw error;
   }
   if (!sqlClient) sqlClient = neon(url);
   return sqlClient;
+}
+
+export function getDatabaseUrl() {
+  return DATABASE_ENV_KEYS.map((key) => process.env[key]).find(Boolean);
+}
+
+export function databaseEnvStatus() {
+  return {
+    configured: Boolean(getDatabaseUrl()),
+    expectedKeys: DATABASE_ENV_KEYS,
+    presentExpectedKeys: DATABASE_ENV_KEYS.filter((key) => Boolean(process.env[key])),
+  };
 }
 
 export async function ensureAuthSchema() {
@@ -171,6 +200,7 @@ export function errorResponse(error) {
   return json(statusCode, {
     error: statusCode === 500 ? 'Server error' : error.message,
     detail: statusCode === 500 && error instanceof Error ? error.message : undefined,
+    diagnostic: error?.meta,
   });
 }
 

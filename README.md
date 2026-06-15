@@ -27,6 +27,7 @@ VITE_WORDPRESS_BASE=https://codakid.com
 DATABASE_URL=
 NETLIFY_DATABASE_URL=
 NEON_DATABASE_URL=
+POSTGRES_URL=
 DASHBOARD_ADMIN_EMAIL=
 DASHBOARD_ADMIN_PASSWORD=
 ```
@@ -51,6 +52,7 @@ Set one of these database URLs:
 NETLIFY_DATABASE_URL=
 DATABASE_URL=
 NEON_DATABASE_URL=
+POSTGRES_URL=
 ```
 
 If Netlify's Neon integration is enabled, it may provide `NETLIFY_DATABASE_URL` automatically.
