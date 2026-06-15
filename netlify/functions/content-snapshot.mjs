@@ -8,6 +8,8 @@ const WP_HEADERS = {
   'user-agent': 'CodaKidContentDashboard/1.0 (+https://codakidblogdashboard.netlify.app)',
 };
 const fallbackSnapshot = readFallbackSnapshot();
+const seoGameplan = readJsonFile('./seo-gameplan.json');
+const confirmedPillarUrls = new Set((seoGameplan?.confirmedPillars || []).map((pillar) => normalizeUrl(pillar.url)));
 
 const evergreenSignals = [
   'ultimate guide',
@@ -122,12 +124,13 @@ export async function buildSnapshot() {
       health,
       freshnessDays,
       status: getStatus(health),
+      confirmedPillar: confirmedPillarUrls.has(post.normalizedUrl),
     };
   });
 
   const inferredPillars = enriched
-    .filter((post) => starterPillarSlugs.has(post.slug) || post.pillarScore >= 52)
-    .sort((a, b) => b.pillarScore - a.pillarScore)
+    .filter((post) => post.confirmedPillar || starterPillarSlugs.has(post.slug) || post.pillarScore >= 52)
+    .sort((a, b) => Number(b.confirmedPillar) - Number(a.confirmedPillar) || b.pillarScore - a.pillarScore)
     .slice(0, 18);
 
   const pillarUrls = new Set(inferredPillars.map((post) => post.normalizedUrl));
@@ -177,6 +180,10 @@ export async function buildSnapshot() {
       orphanPosts: orphanPosts.length,
       linkGaps: linkGaps.length,
       postsUpdatedRecently,
+      confirmedPillars: seoGameplan?.summary?.confirmedPillars || 0,
+      quickWins: seoGameplan?.summary?.quickWins || 0,
+      keywordTargets: seoGameplan?.summary?.keywordTargets || 0,
+      plannedContent: seoGameplan?.summary?.plannedContent || 0,
     },
     categories: categories
       .filter((category) => category.count > 0)
@@ -195,12 +202,13 @@ export async function buildSnapshot() {
       outboundCount,
     })),
     recommendations: buildRecommendations(inferredPillars, underlinkedPillars, linkGaps, orphanPosts),
+    gameplan: seoGameplan,
     integrationStatus: [
       { name: 'WordPress REST API', status: 'connected', detail: `${enriched.length} posts crawled` },
+      { name: 'SEO Gameplan', status: 'connected', detail: `${seoGameplan?.summary?.quickWins || 0} quick wins imported` },
       { name: 'Google Search Console', status: 'pending', detail: 'Connect API to add rankings, CTR, and query movement' },
       { name: 'GA4', status: 'pending', detail: 'Connect Data API to add sessions, engagement, and conversions' },
       { name: 'OpenAI', status: process.env.OPENAI_API_KEY ? 'connected' : 'pending', detail: 'Add OPENAI_API_KEY for generated strategy briefs' },
-      { name: 'Meta Ads', status: 'pending', detail: 'Connect later to compare paid landing page support' },
     ],
   };
 }
@@ -442,9 +450,13 @@ function json(statusCode, body, headers = {}) {
 }
 
 function readFallbackSnapshot() {
+  return readJsonFile('./content-snapshot-fallback.json');
+}
+
+function readJsonFile(relativePath) {
   try {
-    const snapshotPath = new URL('./content-snapshot-fallback.json', import.meta.url);
-    return JSON.parse(readFileSync(snapshotPath, 'utf8'));
+    const filePath = new URL(relativePath, import.meta.url);
+    return JSON.parse(readFileSync(filePath, 'utf8'));
   } catch {
     return null;
   }

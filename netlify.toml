@@ -5,7 +5,10 @@
 
 [functions]
   node_bundler = "esbuild"
-  included_files = ["netlify/functions/content-snapshot-fallback.json"]
+  included_files = [
+    "netlify/functions/content-snapshot-fallback.json",
+    "netlify/functions/seo-gameplan.json"
+  ]
 
 [[redirects]]
   from = "/api/content-snapshot"

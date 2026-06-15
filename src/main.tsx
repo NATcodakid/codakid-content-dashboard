@@ -5,6 +5,7 @@ import {
   AlertTriangle,
   BarChart3,
   Bot,
+  ClipboardList,
   ExternalLink,
   FileText,
   GitBranch,
@@ -17,6 +18,7 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  Target,
   UserPlus,
 } from 'lucide-react';
 import './styles.css';
@@ -34,6 +36,10 @@ type Snapshot = {
     orphanPosts: number;
     linkGaps: number;
     postsUpdatedRecently: number;
+    confirmedPillars?: number;
+    quickWins?: number;
+    keywordTargets?: number;
+    plannedContent?: number;
   };
   clusters: Cluster[];
   pillars: Pillar[];
@@ -42,6 +48,7 @@ type Snapshot = {
   orphanPosts: Array<{ title: string; url: string; cluster: string; date: string; inboundCount: number; outboundCount: number }>;
   recommendations: Array<{ priority: string; title: string; detail: string }>;
   integrationStatus: Array<{ name: string; status: Status; detail: string }>;
+  gameplan?: SeoGameplan;
 };
 
 type Pillar = {
@@ -57,6 +64,31 @@ type Pillar = {
   pillarScore: number;
   health: number;
   status: string;
+  confirmedPillar?: boolean;
+};
+
+type GameplanRow = Record<string, string | number | null | undefined>;
+
+type SeoGameplan = {
+  confirmedPillars: Array<{ title: string; url: string; cluster: string; status: string; notes?: string }>;
+  technicalAudit: GameplanRow[];
+  keywordTargets: GameplanRow[];
+  contentCalendar: GameplanRow[];
+  metaTags: GameplanRow[];
+  internalLinks: GameplanRow[];
+  schemaChecklist: GameplanRow[];
+  quickWins: GameplanRow[];
+  competitorIntel: GameplanRow[];
+  summary: {
+    confirmedPillars: number;
+    technicalIssues: number;
+    keywordTargets: number;
+    plannedContent: number;
+    metaTasks: number;
+    internalLinkTasks: number;
+    schemaTasks: number;
+    quickWins: number;
+  };
 };
 
 type Cluster = {
@@ -236,6 +268,7 @@ function App() {
         <nav className="nav-list" aria-label="Dashboard navigation">
           <NavItem icon={<BarChart3 />} label="Overview" active />
           <NavItem icon={<FileText />} label="Pillars" />
+          <NavItem icon={<ClipboardList />} label="Gameplan" />
           <NavItem icon={<GitBranch />} label="Links" />
           <NavItem icon={<Globe2 />} label="Competitors" />
           <NavItem icon={<Bot />} label="AI Insights" />
@@ -286,10 +319,12 @@ function App() {
 
             <section className="kpi-grid" aria-label="Dashboard KPIs">
               <KpiCard icon={<FileText />} label="Posts Crawled" value={snapshot.kpis.postsCrawled} note="from WordPress REST" />
-              <KpiCard icon={<Search />} label="Inferred Pillars" value={snapshot.kpis.inferredPillars} note="starter watchlist" />
+              <KpiCard icon={<Search />} label="Tracked Pillars" value={snapshot.kpis.inferredPillars} note={`${snapshot.kpis.confirmedPillars || 0} confirmed`} />
               <KpiCard icon={<Link2 />} label="Internal Links" value={snapshot.kpis.internalLinks} note={`${snapshot.kpis.linkGaps} link gaps queued`} />
-              <KpiCard icon={<AlertTriangle />} label="Orphan Risks" value={snapshot.kpis.orphanPosts} note="weak link signals" tone="warning" />
+              <KpiCard icon={<Target />} label="Keyword Targets" value={snapshot.kpis.keywordTargets || 0} note={`${snapshot.kpis.quickWins || 0} quick wins imported`} tone="warning" />
             </section>
+
+            {snapshot.gameplan && <GameplanPanel gameplan={snapshot.gameplan} />}
 
             <section className="dashboard-grid">
               <div className="panel large-panel" id="pillars">
@@ -670,6 +705,7 @@ function PillarTable({ pillars }: { pillars: Pillar[] }) {
                   {pillar.title}
                   <ExternalLink size={13} />
                 </a>
+                {pillar.confirmedPillar && <span className="row-badge">Confirmed pillar</span>}
                 <small>Updated {pillar.modified || pillar.date}</small>
               </td>
               <td>{pillar.cluster}</td>
@@ -684,6 +720,101 @@ function PillarTable({ pillars }: { pillars: Pillar[] }) {
       </table>
     </div>
   );
+}
+
+function GameplanPanel({ gameplan }: { gameplan: SeoGameplan }) {
+  return (
+    <section className="panel gameplan-panel" id="gameplan">
+      <PanelHeader icon={<ClipboardList />} title="SEO Gameplan" action="imported workbook" />
+      <div className="gameplan-summary">
+        <MetricPill label="Confirmed pillars" value={gameplan.summary.confirmedPillars} />
+        <MetricPill label="Quick wins" value={gameplan.summary.quickWins} />
+        <MetricPill label="Keyword targets" value={gameplan.summary.keywordTargets} />
+        <MetricPill label="Planned content" value={gameplan.summary.plannedContent} />
+        <MetricPill label="Meta tasks" value={gameplan.summary.metaTasks} />
+        <MetricPill label="Schema tasks" value={gameplan.summary.schemaTasks} />
+      </div>
+      <div className="gameplan-grid">
+        <div className="gameplan-card confirmed-card">
+          <h3>Confirmed Pillar</h3>
+          {gameplan.confirmedPillars.map((pillar) => (
+            <article key={pillar.url}>
+              <a href={pillar.url} target="_blank" rel="noreferrer">
+                {pillar.title}
+                <ExternalLink size={13} />
+              </a>
+              <span>{pillar.cluster}</span>
+              <p>{pillar.notes}</p>
+            </article>
+          ))}
+        </div>
+        <GameplanList
+          title="Urgent Quick Wins"
+          rows={gameplan.quickWins.slice(0, 5)}
+          primaryKey="Action"
+          secondaryKey="Page / Target"
+          metaKey="Expected Impact"
+        />
+        <GameplanList
+          title="Priority Keywords"
+          rows={gameplan.keywordTargets.slice(0, 6)}
+          primaryKey="Keyword"
+          secondaryKey="Target URL"
+          metaKey="Action"
+        />
+        <GameplanList
+          title="Content Calendar"
+          rows={gameplan.contentCalendar.slice(0, 5)}
+          primaryKey="Title (SEO-Optimized)"
+          secondaryKey="Target Keyword"
+          metaKey="Priority"
+        />
+      </div>
+    </section>
+  );
+}
+
+function MetricPill({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="metric-pill">
+      <strong>{formatter.format(value)}</strong>
+      <span>{label}</span>
+    </div>
+  );
+}
+
+function GameplanList({
+  title,
+  rows,
+  primaryKey,
+  secondaryKey,
+  metaKey,
+}: {
+  title: string;
+  rows: GameplanRow[];
+  primaryKey: string;
+  secondaryKey: string;
+  metaKey: string;
+}) {
+  return (
+    <div className="gameplan-card">
+      <h3>{title}</h3>
+      <div className="gameplan-list">
+        {rows.map((row, index) => (
+          <article key={`${title}-${index}`}>
+            <strong>{formatCell(row[primaryKey])}</strong>
+            <span>{formatCell(row[secondaryKey])}</span>
+            <small>{formatCell(row[metaKey])}</small>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function formatCell(value: string | number | null | undefined) {
+  if (value === null || value === undefined || value === '') return 'Not set';
+  return String(value);
 }
 
 function HealthMeter({ value, status }: { value: number; status: string }) {
