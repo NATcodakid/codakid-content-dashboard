@@ -102,8 +102,55 @@ export async function ensureAuthSchema() {
     )
   `;
 
+  await sql`
+    create table if not exists google_oauth_states (
+      state_hash text primary key,
+      user_id text not null references dashboard_users(id) on delete cascade,
+      expires_at timestamptz not null,
+      created_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists google_search_console_connections (
+      id text primary key,
+      user_id text not null references dashboard_users(id) on delete cascade,
+      google_email text not null default '',
+      access_token_encrypted text,
+      refresh_token_encrypted text,
+      token_type text,
+      scope text,
+      expires_at timestamptz,
+      connected_at timestamptz not null default now(),
+      updated_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists google_search_console_properties (
+      site_url text primary key,
+      permission_level text,
+      selected boolean not null default false,
+      last_seen_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists google_search_console_snapshots (
+      id text primary key,
+      site_url text not null,
+      start_date date not null,
+      end_date date not null,
+      dimensions text not null,
+      data jsonb not null,
+      created_at timestamptz not null default now()
+    )
+  `;
+
   await sql`create index if not exists dashboard_sessions_user_id_idx on dashboard_sessions(user_id)`;
   await sql`create index if not exists dashboard_sessions_expires_at_idx on dashboard_sessions(expires_at)`;
+  await sql`create index if not exists google_oauth_states_expires_at_idx on google_oauth_states(expires_at)`;
+  await sql`create index if not exists gsc_snapshots_site_dates_idx on google_search_console_snapshots(site_url, start_date, end_date)`;
   await syncEnvAdmin(sql);
   schemaReady = true;
 }

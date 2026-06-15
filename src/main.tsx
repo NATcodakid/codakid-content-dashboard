@@ -128,6 +128,32 @@ type AiResponse = {
   insights: string[];
 };
 
+type GoogleStatus = {
+  configured: boolean;
+  connected: boolean;
+  redirectUri: string;
+  connection: {
+    google_email?: string;
+    expires_at?: string;
+    updated_at?: string;
+  } | null;
+  properties: Array<{
+    site_url: string;
+    permission_level: string;
+    selected: boolean;
+    last_seen_at: string;
+  }>;
+  latestSnapshots: Array<{
+    siteUrl: string;
+    startDate: string;
+    endDate: string;
+    dimensions: string;
+    rowCount: number;
+    totals: { clicks: number; impressions: number };
+    createdAt: string;
+  }>;
+};
+
 type AuthUser = {
   id: string;
   email: string;
@@ -144,11 +170,19 @@ function App() {
   const [snapshot, setSnapshot] = React.useState<Snapshot | null>(null);
   const [competitors, setCompetitors] = React.useState<CompetitorSnapshot | null>(null);
   const [ai, setAi] = React.useState<AiResponse | null>(null);
+  const [googleStatus, setGoogleStatus] = React.useState<GoogleStatus | null>(null);
   const [activeCluster, setActiveCluster] = React.useState('All');
   const [isLoading, setIsLoading] = React.useState(true);
   const [isRefreshingAi, setIsRefreshingAi] = React.useState(false);
+  const [isSyncingGsc, setIsSyncingGsc] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const inviteToken = React.useMemo(() => new URLSearchParams(window.location.search).get('token'), []);
+  const googleMessage = React.useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('google') === 'connected') return 'Google Search Console connected. Run a sync to import the latest rows.';
+    if (params.get('google') === 'error') return params.get('message') || 'Google connection failed.';
+    return '';
+  }, []);
 
   const checkAuth = React.useCallback(async () => {
     try {
@@ -177,9 +211,10 @@ function App() {
     setError(null);
 
     try {
-      const [contentResponse, competitorResponse] = await Promise.all([
+      const [contentResponse, competitorResponse, googleResponse] = await Promise.all([
         fetch('/api/content-snapshot', { credentials: 'include' }),
         fetch('/api/competitors', { credentials: 'include' }),
+        fetch('/api/google/search-console/status', { credentials: 'include' }).catch(() => null),
       ]);
 
       if (contentResponse.status === 401) {
@@ -190,9 +225,11 @@ function App() {
       if (!contentResponse.ok) throw new Error('Content snapshot failed to load.');
       const content = (await contentResponse.json()) as Snapshot;
       const competitorData = competitorResponse.ok ? ((await competitorResponse.json()) as CompetitorSnapshot) : null;
+      const googleData = googleResponse?.ok ? ((await googleResponse.json()) as GoogleStatus) : null;
 
       setSnapshot(content);
       setCompetitors(competitorData);
+      setGoogleStatus(googleData);
       await loadAi(content);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Dashboard failed to load.');
@@ -232,6 +269,30 @@ function App() {
     setUser(nextUser);
     setAuthStatus('authenticated');
     window.history.replaceState({}, '', '/');
+  }
+
+  async function refreshGoogleStatus() {
+    const response = await fetch('/api/google/search-console/status', { credentials: 'include' });
+    if (response.ok) setGoogleStatus((await response.json()) as GoogleStatus);
+  }
+
+  async function syncSearchConsole() {
+    setIsSyncingGsc(true);
+    try {
+      const response = await fetch('/api/google/search-console/sync', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Search Console sync failed.');
+      }
+      await refreshGoogleStatus();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Search Console sync failed.');
+    } finally {
+      setIsSyncingGsc(false);
+    }
   }
 
   async function handleLogout() {
@@ -305,6 +366,7 @@ function App() {
           </div>
         </header>
 
+        {googleMessage && <div className="success-banner">{googleMessage}</div>}
         {error && <div className="error-banner">{error}</div>}
 
         {isLoading && !snapshot ? (
@@ -388,7 +450,9 @@ function App() {
               <div className="panel" id="settings">
                 {user?.role === 'admin' ? (
                   <>
-                    <PanelHeader icon={<UserPlus />} title="Invite Access" action="admin only" />
+                    <PanelHeader icon={<Settings />} title="Integrations & Access" action="admin only" />
+                    <GoogleSearchConsolePanel status={googleStatus} isSyncing={isSyncingGsc} onSync={syncSearchConsole} />
+                    <PanelHeader icon={<UserPlus />} title="Invite Access" action="team" />
                     <InvitePanel />
                   </>
                 ) : (
@@ -402,6 +466,67 @@ function App() {
           </>
         ) : null}
       </main>
+    </div>
+  );
+}
+
+function GoogleSearchConsolePanel({
+  status,
+  isSyncing,
+  onSync,
+}: {
+  status: GoogleStatus | null;
+  isSyncing: boolean;
+  onSync: () => void;
+}) {
+  const latestPageSnapshot = status?.latestSnapshots?.find((snapshot) => snapshot.dimensions === 'page');
+  return (
+    <div className="google-panel">
+      <div className="google-panel-header">
+        <div>
+          <strong>Google Search Console</strong>
+          <span>{status?.connected ? `Connected${status.connection?.google_email ? ` as ${status.connection.google_email}` : ''}` : 'OAuth connection'}</span>
+        </div>
+        <span className={status?.connected ? 'connection-badge connected' : 'connection-badge'}>
+          {status?.connected ? 'Connected' : status?.configured ? 'Ready' : 'Needs env'}
+        </span>
+      </div>
+
+      {!status?.configured && (
+        <div className="setup-box">
+          <strong>Netlify needs Google OAuth credentials first</strong>
+          <p>Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in Netlify. Use this redirect URI in Google Cloud:</p>
+          <code>{status?.redirectUri || 'https://codakidblogdashboard.netlify.app/api/google/oauth/callback'}</code>
+        </div>
+      )}
+
+      {status?.configured && !status.connected && (
+        <a className="secondary-button full-width" href="/api/google/oauth/start">
+          <Search size={16} />
+          Connect Google Search Console
+        </a>
+      )}
+
+      {status?.connected && (
+        <>
+          <div className="gsc-stats">
+            <MetricPill label="GSC properties" value={status.properties.length} />
+            <MetricPill label="Latest page rows" value={latestPageSnapshot?.rowCount || 0} />
+          </div>
+          <button className="secondary-button full-width" onClick={onSync} disabled={isSyncing}>
+            <RefreshCw size={16} className={isSyncing ? 'spin' : ''} />
+            {isSyncing ? 'Syncing Search Console' : 'Sync Search Console now'}
+          </button>
+          <div className="property-list">
+            {status.properties.slice(0, 4).map((property) => (
+              <article key={property.site_url}>
+                <strong>{property.site_url}</strong>
+                <span>{property.permission_level || 'permission unknown'}{property.selected ? ' · selected' : ''}</span>
+              </article>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

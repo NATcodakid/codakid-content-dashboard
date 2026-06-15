@@ -61,6 +61,26 @@
   status = 200
 
 [[redirects]]
+  from = "/api/google/oauth/start"
+  to = "/.netlify/functions/google-oauth-start"
+  status = 200
+
+[[redirects]]
+  from = "/api/google/oauth/callback"
+  to = "/.netlify/functions/google-oauth-callback"
+  status = 200
+
+[[redirects]]
+  from = "/api/google/search-console/status"
+  to = "/.netlify/functions/google-search-console-status"
+  status = 200
+
+[[redirects]]
+  from = "/api/google/search-console/sync"
+  to = "/.netlify/functions/google-search-console-sync"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

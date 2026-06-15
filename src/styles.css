@@ -1217,6 +1217,132 @@ select:focus {
   font-weight: 650;
 }
 
+.success-banner {
+  min-height: auto;
+  margin-bottom: 16px;
+  padding: 13px 15px;
+  border: 1px solid #bfe8d5;
+  border-radius: var(--radius);
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.google-panel {
+  display: grid;
+  gap: 13px;
+  margin-bottom: 20px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-soft);
+}
+
+.google-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.google-panel-header strong,
+.google-panel-header span {
+  display: block;
+}
+
+.google-panel-header strong {
+  color: var(--heading);
+  font-size: 13px;
+}
+
+.google-panel-header span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+.connection-badge {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.25px;
+  text-transform: uppercase;
+}
+
+.connection-badge.connected {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.setup-box {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #f1d9a8;
+  border-radius: var(--radius-sm);
+  background: var(--amber-soft);
+}
+
+.setup-box strong {
+  color: #795205;
+  font-size: 12px;
+}
+
+.setup-box p,
+.setup-box code {
+  color: #795205;
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.setup-box code {
+  overflow-wrap: anywhere;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.gsc-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.property-list {
+  display: grid;
+  gap: 8px;
+}
+
+.property-list article {
+  padding: 10px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+}
+
+.property-list strong,
+.property-list span {
+  display: block;
+}
+
+.property-list strong {
+  overflow-wrap: anywhere;
+  color: var(--heading);
+  font-size: 12px;
+}
+
+.property-list span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
 .spin {
   animation: spin 0.9s linear infinite;
 }
