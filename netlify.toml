@@ -5,6 +5,7 @@
 
 [functions]
   node_bundler = "esbuild"
+  included_files = ["netlify/functions/content-snapshot-fallback.json"]
 
 [[redirects]]
   from = "/api/content-snapshot"

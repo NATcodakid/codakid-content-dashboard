@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { requireUser } from './_auth.mjs';
 
 const WP_BASE = process.env.VITE_WORDPRESS_BASE || 'https://codakid.com';
@@ -6,6 +7,7 @@ const WP_HEADERS = {
   accept: 'application/json',
   'user-agent': 'CodaKidContentDashboard/1.0 (+https://codakidblogdashboard.netlify.app)',
 };
+const fallbackSnapshot = readFallbackSnapshot();
 
 const evergreenSignals = [
   'ultimate guide',
@@ -59,7 +61,7 @@ const starterPillarSlugs = new Set([
 export async function handler(event) {
   try {
     await requireUser(event);
-    const snapshot = await buildSnapshot();
+    const snapshot = await getSnapshot();
     return json(200, snapshot, {
       'cache-control': 'private, no-store',
     });
@@ -71,7 +73,20 @@ export async function handler(event) {
   }
 }
 
-async function buildSnapshot() {
+async function getSnapshot() {
+  try {
+    return await buildSnapshot();
+  } catch (error) {
+    if (!fallbackSnapshot?.kpis) throw error;
+    return {
+      ...fallbackSnapshot,
+      source: 'cached-wordpress-snapshot',
+      sourceDetail: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+export async function buildSnapshot() {
   const [categories, totalPages] = await Promise.all([fetchCategories(), fetchTotalPages()]);
   const posts = await fetchPosts(totalPages);
   const categoryMap = new Map(categories.map((category) => [category.id, category]));
@@ -424,4 +439,13 @@ function json(statusCode, body, headers = {}) {
     },
     body: JSON.stringify(body),
   };
+}
+
+function readFallbackSnapshot() {
+  try {
+    const snapshotPath = new URL('./content-snapshot-fallback.json', import.meta.url);
+    return JSON.parse(readFileSync(snapshotPath, 'utf8'));
+  } catch {
+    return null;
+  }
 }
