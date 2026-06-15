@@ -248,7 +248,7 @@ function App() {
       </aside>
 
       <main className="main">
-        <header className="topbar">
+        <header className="topbar" id="overview">
           <div>
             <h1>Content Intelligence Dashboard</h1>
             <p>
@@ -292,7 +292,7 @@ function App() {
             </section>
 
             <section className="dashboard-grid">
-              <div className="panel large-panel">
+              <div className="panel large-panel" id="pillars">
                 <PanelHeader
                   icon={<Activity />}
                   title="Pillar Health"
@@ -312,7 +312,7 @@ function App() {
                 <PillarTable pillars={filteredPillars} />
               </div>
 
-              <div className="panel ai-panel">
+              <div className="panel ai-panel" id="ai-insights">
                 <PanelHeader
                   icon={<Sparkles />}
                   title="AI Recommendations"
@@ -335,7 +335,7 @@ function App() {
             </section>
 
             <section className="dashboard-grid lower-grid">
-              <div className="panel">
+              <div className="panel" id="links">
                 <PanelHeader icon={<GitBranch />} title="Internal Link Gaps" action={`${snapshot.linkGaps.length} suggestions`} />
                 <LinkGapList gaps={snapshot.linkGaps.slice(0, 9)} />
               </div>
@@ -345,17 +345,24 @@ function App() {
                 <ClusterBars clusters={snapshot.clusters.slice(0, 8)} />
               </div>
 
-              <div className="panel">
+              <div className="panel" id="competitors">
                 <PanelHeader icon={<Globe2 />} title="Competitor Watchlist" action={competitors?.mode || 'loading'} />
                 <CompetitorList competitors={competitors} />
               </div>
 
-              {user?.role === 'admin' && (
-                <div className="panel">
-                  <PanelHeader icon={<UserPlus />} title="Invite Access" action="admin only" />
-                  <InvitePanel />
-                </div>
-              )}
+              <div className="panel" id="settings">
+                {user?.role === 'admin' ? (
+                  <>
+                    <PanelHeader icon={<UserPlus />} title="Invite Access" action="admin only" />
+                    <InvitePanel />
+                  </>
+                ) : (
+                  <>
+                    <PanelHeader icon={<Settings />} title="Settings" action="account" />
+                    <p className="panel-note">You are signed in as {user?.email}. Ask an admin for invite management access.</p>
+                  </>
+                )}
+              </div>
             </section>
           </>
         ) : null}
@@ -516,6 +523,7 @@ function InvitePanel() {
   const [name, setName] = React.useState('');
   const [role, setRole] = React.useState<'viewer' | 'admin'>('viewer');
   const [inviteUrl, setInviteUrl] = React.useState('');
+  const [copyText, setCopyText] = React.useState('Copy link');
   const [error, setError] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -524,6 +532,7 @@ function InvitePanel() {
     setIsSubmitting(true);
     setError('');
     setInviteUrl('');
+    setCopyText('Copy link');
 
     try {
       const response = await fetch('/api/auth/invite', {
@@ -533,10 +542,10 @@ function InvitePanel() {
         body: JSON.stringify({ email, name, role }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Invite failed.');
+      if (!response.ok) throw new Error(data.error || 'Invite failed. Make sure you are signed in as an admin.');
       setInviteUrl(data.inviteUrl);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Invite failed.');
+      setError(caught instanceof Error ? caught.message : 'Invite failed. Make sure you are signed in as an admin.');
     } finally {
       setIsSubmitting(false);
     }
@@ -545,10 +554,12 @@ function InvitePanel() {
   async function copyInvite() {
     if (!inviteUrl) return;
     await navigator.clipboard.writeText(inviteUrl);
+    setCopyText('Copied');
   }
 
   return (
     <form className="invite-form" onSubmit={submit}>
+      <p className="panel-note">Create an invite link for anyone who needs dashboard access. Use admin only for people who should invite others.</p>
       <label>
         Email
         <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
@@ -574,7 +585,7 @@ function InvitePanel() {
           <strong>Invite link</strong>
           <p>{inviteUrl}</p>
           <button type="button" className="secondary-button full-width" onClick={copyInvite}>
-            Copy link
+            {copyText}
           </button>
         </div>
       )}
