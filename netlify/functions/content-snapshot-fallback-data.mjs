@@ -1,0 +1,4820 @@
+export default {
+  "generatedAt": "2026-06-15T22:57:28.704Z",
+  "mode": "wordpress-only",
+  "source": "bundled-wordpress-snapshot",
+  "kpis": {
+    "postsCrawled": 339,
+    "categories": 34,
+    "inferredPillars": 18,
+    "internalLinks": 3392,
+    "orphanPosts": 13,
+    "linkGaps": 40,
+    "postsUpdatedRecently": 10,
+    "confirmedPillars": 1,
+    "quickWins": 15,
+    "keywordTargets": 45,
+    "plannedContent": 30
+  },
+  "categories": [
+    {
+      "id": 614,
+      "name": "Coding for Kids",
+      "slug": "coding-for-kids",
+      "count": 110,
+      "link": "https://codakid.com/category/coding-for-kids/"
+    },
+    {
+      "id": 587,
+      "name": "Minecraft",
+      "slug": "minecraft",
+      "count": 62,
+      "link": "https://codakid.com/category/minecraft/"
+    },
+    {
+      "id": 615,
+      "name": "STEM",
+      "slug": "stem",
+      "count": 39,
+      "link": "https://codakid.com/category/stem/"
+    },
+    {
+      "id": 850,
+      "name": "AI for Kids",
+      "slug": "ai-for-kids",
+      "count": 33,
+      "link": "https://codakid.com/category/ai-for-kids/"
+    },
+    {
+      "id": 580,
+      "name": "Uncategorized",
+      "slug": "uncategorized",
+      "count": 31,
+      "link": "https://codakid.com/category/uncategorized/"
+    },
+    {
+      "id": 637,
+      "name": "Roblox",
+      "slug": "roblox",
+      "count": 22,
+      "link": "https://codakid.com/category/roblox/"
+    },
+    {
+      "id": 600,
+      "name": "Preparing Kids for the Future",
+      "slug": "preparing-kids-for-the-future",
+      "count": 18,
+      "link": "https://codakid.com/category/preparing-kids-for-the-future/"
+    },
+    {
+      "id": 604,
+      "name": "Coding Games",
+      "slug": "coding-games",
+      "count": 16,
+      "link": "https://codakid.com/category/coding-games/"
+    },
+    {
+      "id": 586,
+      "name": "Kids Coding Camps",
+      "slug": "kids-coding-camps",
+      "count": 9,
+      "link": "https://codakid.com/category/kids-coding-camps/"
+    },
+    {
+      "id": 635,
+      "name": "Python",
+      "slug": "python",
+      "count": 8,
+      "link": "https://codakid.com/category/python/"
+    },
+    {
+      "id": 591,
+      "name": "Coding for Homeschoolers",
+      "slug": "coding-for-homeschoolers",
+      "count": 5,
+      "link": "https://codakid.com/category/coding-for-homeschoolers/"
+    },
+    {
+      "id": 864,
+      "name": "Unity",
+      "slug": "unity",
+      "count": 4,
+      "link": "https://codakid.com/category/unity/"
+    },
+    {
+      "id": 634,
+      "name": "Block coding",
+      "slug": "block-coding",
+      "count": 3,
+      "link": "https://codakid.com/category/block-coding/"
+    },
+    {
+      "id": 867,
+      "name": "Game Development",
+      "slug": "game-development",
+      "count": 3,
+      "link": "https://codakid.com/category/game-development/"
+    },
+    {
+      "id": 866,
+      "name": "Web Development",
+      "slug": "web-development",
+      "count": 3,
+      "link": "https://codakid.com/category/web-development/"
+    },
+    {
+      "id": 858,
+      "name": "Coding Competitions",
+      "slug": "coding-competitions",
+      "count": 2,
+      "link": "https://codakid.com/category/coding-competitions/"
+    },
+    {
+      "id": 868,
+      "name": "Coding for Teens",
+      "slug": "coding-for-teens",
+      "count": 2,
+      "link": "https://codakid.com/category/coding-for-teens/"
+    },
+    {
+      "id": 865,
+      "name": "App Development",
+      "slug": "app-development",
+      "count": 1,
+      "link": "https://codakid.com/category/app-development/"
+    },
+    {
+      "id": 859,
+      "name": "ESA",
+      "slug": "esa",
+      "count": 1,
+      "link": "https://codakid.com/category/esa/"
+    },
+    {
+      "id": 872,
+      "name": "Game Design",
+      "slug": "game-design",
+      "count": 1,
+      "link": "https://codakid.com/category/game-design/"
+    },
+    {
+      "id": 787,
+      "name": "Homeschool",
+      "slug": "homeschool",
+      "count": 1,
+      "link": "https://codakid.com/category/homeschool/"
+    },
+    {
+      "id": 857,
+      "name": "JavaScript",
+      "slug": "javascript",
+      "count": 1,
+      "link": "https://codakid.com/category/javascript/"
+    },
+    {
+      "id": 640,
+      "name": "Juni Learning",
+      "slug": "juni-learning",
+      "count": 1,
+      "link": "https://codakid.com/category/juni-learning/"
+    },
+    {
+      "id": 869,
+      "name": "Online Safety",
+      "slug": "online-safety",
+      "count": 1,
+      "link": "https://codakid.com/category/online-safety/"
+    },
+    {
+      "id": 849,
+      "name": "Robotics for Kids",
+      "slug": "robotics-for-kids",
+      "count": 1,
+      "link": "https://codakid.com/category/robotics-for-kids/"
+    },
+    {
+      "id": 871,
+      "name": "Scratch",
+      "slug": "scratch",
+      "count": 1,
+      "link": "https://codakid.com/category/scratch/"
+    },
+    {
+      "id": 870,
+      "name": "Small Group Classes",
+      "slug": "small-group-classes",
+      "count": 1,
+      "link": "https://codakid.com/category/small-group-classes/"
+    },
+    {
+      "id": 863,
+      "name": "Swift",
+      "slug": "swift",
+      "count": 1,
+      "link": "https://codakid.com/category/swift/"
+    },
+    {
+      "id": 862,
+      "name": "Unreal Engine",
+      "slug": "unreal-engine",
+      "count": 1,
+      "link": "https://codakid.com/category/unreal-engine/"
+    }
+  ],
+  "clusters": [
+    {
+      "cluster": "Coding for Kids",
+      "posts": 112,
+      "pillars": 7,
+      "internalLinks": 1317,
+      "averageInbound": 7.6
+    },
+    {
+      "cluster": "Minecraft",
+      "posts": 70,
+      "pillars": 5,
+      "internalLinks": 598,
+      "averageInbound": 5.5
+    },
+    {
+      "cluster": "AI",
+      "posts": 37,
+      "pillars": 3,
+      "internalLinks": 416,
+      "averageInbound": 6.5
+    },
+    {
+      "cluster": "Roblox",
+      "posts": 21,
+      "pillars": 1,
+      "internalLinks": 171,
+      "averageInbound": 6.4
+    },
+    {
+      "cluster": "General",
+      "posts": 19,
+      "pillars": 1,
+      "internalLinks": 119,
+      "averageInbound": 5.9
+    },
+    {
+      "cluster": "STEM",
+      "posts": 13,
+      "pillars": 0,
+      "internalLinks": 76,
+      "averageInbound": 4.9
+    },
+    {
+      "cluster": "Game Development",
+      "posts": 11,
+      "pillars": 0,
+      "internalLinks": 149,
+      "averageInbound": 2
+    },
+    {
+      "cluster": "Preparing Kids for the Future",
+      "posts": 9,
+      "pillars": 0,
+      "internalLinks": 51,
+      "averageInbound": 6
+    },
+    {
+      "cluster": "Python",
+      "posts": 8,
+      "pillars": 1,
+      "internalLinks": 96,
+      "averageInbound": 4.5
+    },
+    {
+      "cluster": "Scratch",
+      "posts": 8,
+      "pillars": 0,
+      "internalLinks": 57,
+      "averageInbound": 6.5
+    },
+    {
+      "cluster": "Coding Games",
+      "posts": 8,
+      "pillars": 0,
+      "internalLinks": 43,
+      "averageInbound": 5.4
+    },
+    {
+      "cluster": "Camps",
+      "posts": 7,
+      "pillars": 0,
+      "internalLinks": 111,
+      "averageInbound": 5.3
+    },
+    {
+      "cluster": "Web Development",
+      "posts": 3,
+      "pillars": 0,
+      "internalLinks": 38,
+      "averageInbound": 1.3
+    },
+    {
+      "cluster": "Homeschool",
+      "posts": 3,
+      "pillars": 0,
+      "internalLinks": 41,
+      "averageInbound": 6.3
+    },
+    {
+      "cluster": "Coding for Homeschoolers",
+      "posts": 2,
+      "pillars": 0,
+      "internalLinks": 24,
+      "averageInbound": 4.5
+    },
+    {
+      "cluster": "Coding Competitions",
+      "posts": 2,
+      "pillars": 0,
+      "internalLinks": 28,
+      "averageInbound": 3
+    },
+    {
+      "cluster": "Online Safety",
+      "posts": 1,
+      "pillars": 0,
+      "internalLinks": 18,
+      "averageInbound": 0
+    },
+    {
+      "cluster": "Coding for Teens",
+      "posts": 1,
+      "pillars": 0,
+      "internalLinks": 8,
+      "averageInbound": 1
+    },
+    {
+      "cluster": "App Development",
+      "posts": 1,
+      "pillars": 0,
+      "internalLinks": 11,
+      "averageInbound": 1
+    },
+    {
+      "cluster": "Swift",
+      "posts": 1,
+      "pillars": 0,
+      "internalLinks": 12,
+      "averageInbound": 1
+    },
+    {
+      "cluster": "ESA",
+      "posts": 1,
+      "pillars": 0,
+      "internalLinks": 2,
+      "averageInbound": 0
+    },
+    {
+      "cluster": "Juni Learning",
+      "posts": 1,
+      "pillars": 0,
+      "internalLinks": 6,
+      "averageInbound": 0
+    }
+  ],
+  "pillars": [
+    {
+      "id": 28883,
+      "title": "Coding for Kids: The Ultimate Guide for Parents (2026)",
+      "slug": "coding-for-kids-the-ultimate-guide-for-parents-2",
+      "url": "https://codakid.com/coding-for-kids-the-ultimate-guide-for-parents-2/",
+      "normalizedUrl": "https://codakid.com/coding-for-kids-the-ultimate-guide-for-parents-2",
+      "date": "2021-07-23",
+      "modified": "2026-05-26",
+      "categories": [
+        "Coding for Kids"
+      ],
+      "cluster": "Coding for Kids",
+      "excerpt": "Coding for Kids: The Ultimate Guide for Parents (2026) In 2026, coding is no longer a niche skill—it's quickly becoming a new form of literacy. As artificial intelligence reshapes industries and technology becomes embedded in nearly every career path, parents ",
+      "wordCount": 4701,
+      "outboundCount": 19,
+      "inboundCount": 90,
+      "inboundSources": [
+        "https://codakid.com/blog/scratch/ultimate-guide-to-scratchjr-for-kids",
+        "https://codakid.com/blog/preparing-kids-for-the-future/why-parents-matter-coding-communities",
+        "https://codakid.com/blog/coding-for-kids/homeschool-tech-curriculum-ultimate-guide",
+        "https://codakid.com/blog/coding-for-kids/youth-coders-creating-better-online-spaces",
+        "https://codakid.com/blog/coding-for-kids/top-resources-parents-coding-communities",
+        "https://codakid.com/blog/coding-for-kids/10-best-computer-coding-courses-kids-2026",
+        "https://codakid.com/blog/coding-for-kids/top-programming-classes-kids-teens-2026",
+        "https://codakid.com/blog/kids-coding-camps/top-5-free-coding-camps-kids-2026",
+        "https://codakid.com/blog/coding-for-kids/top-6-coding-courses-kids-2026",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-for-kids-2025",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-platforms-2025",
+        "https://codakid.com/blog/kids-coding-camps/top-free-coding-camps-kids-2025",
+        "https://codakid.com/blog/minecraft/best-minecraft-coding-games-2025",
+        "https://codakid.com/blog/coding-games/coding-games-for-kids",
+        "https://codakid.com/coding-for-12-year-olds",
+        "https://codakid.com/coding-for-8-year-olds-the-ultimate-guide",
+        "https://codakid.com/what-is-coding-used-for",
+        "https://codakid.com/minecraft-for-kids",
+        "https://codakid.com/scratch-sprites",
+        "https://codakid.com/typing-apps-for-kids",
+        "https://codakid.com/game-design-for-kids",
+        "https://codakid.com/coding-program-for-middle-school",
+        "https://codakid.com/video-game-genres",
+        "https://codakid.com/minecraft-hacks",
+        "https://codakid.com/best-pc-build-for-minecraft",
+        "https://codakid.com/minecraft-fps",
+        "https://codakid.com/minecraft-netherite",
+        "https://codakid.com/how-to-find-diamonds-in-minecraft",
+        "https://codakid.com/minecraft-server-properties",
+        "https://codakid.com/problem-solving-activities-for-kids",
+        "https://codakid.com/helping-your-child-focus-in-school",
+        "https://codakid.com/parts-of-a-computer",
+        "https://codakid.com/coding-terms-for-beginners",
+        "https://codakid.com/blog/preparing-kids-for-the-future/computer-science-for-kids",
+        "https://codakid.com/top-21-kids-coding-websites-of-all-time",
+        "https://codakid.com/internet-safety-for-kids",
+        "https://codakid.com/roblox-promo-codes",
+        "https://codakid.com/minecraft-servers",
+        "https://codakid.com/making-your-own-website-for-kids",
+        "https://codakid.com/computer-basics-for-kids",
+        "https://codakid.com/minecraft-builds",
+        "https://codakid.com/computational-thinking",
+        "https://codakid.com/7-ways-to-teach-your-kids-to-become-entrepreneurs",
+        "https://codakid.com/blog/roblox/roblox-download",
+        "https://codakid.com/blog/roblox/roblox-horror-games",
+        "https://codakid.com/blog/roblox/roblox-music-codes",
+        "https://codakid.com/blog/minecraft/minecraft-seeds",
+        "https://codakid.com/minecraft-farms-ideas",
+        "https://codakid.com/minecraft-addons",
+        "https://codakid.com/minecraft-server-hosting",
+        "https://codakid.com/how-to-allocate-more-ram-to-minecraft",
+        "https://codakid.com/minecraft-houses",
+        "https://codakid.com/hour-of-code-activities",
+        "https://codakid.com/minecraft-enchantments",
+        "https://codakid.com/minecraft-color-codes",
+        "https://codakid.com/pygame-tutorial",
+        "https://codakid.com/scratchjr-review",
+        "https://codakid.com/minecraft-texture-packs",
+        "https://codakid.com/block-coding",
+        "https://codakid.com/minecraft-adventure-mode",
+        "https://codakid.com/guide-to-minecraft-modding-with-java",
+        "https://codakid.com/coding-gifts-for-kids",
+        "https://codakid.com/codemoji-review",
+        "https://codakid.com/code-monster-review",
+        "https://codakid.com/khan-academy-review",
+        "https://codakid.com/codecademy-review",
+        "https://codakid.com/roblox-games-for-kids",
+        "https://codakid.com/homeschool-curriculum-for-stem",
+        "https://codakid.com/11-best-online-education-programs-for-kids",
+        "https://codakid.com/educational-games-for-kids",
+        "https://codakid.com/ultimate-guide-making-your-first-game-on-roblox-studio",
+        "https://codakid.com/coding-kits-kids-guide",
+        "https://codakid.com/5-reasons-python-programming-is-perfect-for-kids",
+        "https://codakid.com/codemonkey-review",
+        "https://codakid.com/bitsbox-review-everything-you-need-to-know",
+        "https://codakid.com/osmo-review",
+        "https://codakid.com/a-beginners-guide-to-teaching-kids-coding-even-when-you-dont-know-how-to-code",
+        "https://codakid.com/middle-school-science-experiments",
+        "https://codakid.com/hey-parents-minecraft-can-teach-kids-java-coding",
+        "https://codakid.com/math-apps",
+        "https://codakid.com/engineering-for-kids-guide",
+        "https://codakid.com/math-games",
+        "https://codakid.com/free-math-websites",
+        "https://codakid.com/stem-toys",
+        "https://codakid.com/coding-for-beginners",
+        "https://codakid.com/tynker-vs-codakid",
+        "https://codakid.com/roblox-scripting-how-to-make-a-game-like-the-pros-on-roblox-studio",
+        "https://codakid.com/12-questions-to-ask-when-choosing-a-kids-online-coding-course",
+        "https://codakid.com/12-surprising-things-your-child-can-learn-from-minecraft",
+        "https://codakid.com/6-great-ways-minecraft-can-help-you-bond-with-your-child"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Coding for Kids with Autism - The Ultimate Guide for Parents and Educators",
+          "url": "https://codakid.com/coding-for-kids-with-autism-the-ultimate-guide-for-parents-and-educators/",
+          "cluster": "Coding for Kids",
+          "date": "2017-12-15"
+        },
+        {
+          "title": "Coding for Kids and Parents: The Complete Guide",
+          "url": "https://codakid.com/blog/coding-for-kids/complete-guide-coding-kids-parents/",
+          "cluster": "Coding for Kids",
+          "date": "2025-11-28"
+        },
+        {
+          "title": "Homeschool Coding with Professional Tools: The Ultimate Guide",
+          "url": "https://codakid.com/blog/coding-for-kids/homeschool-coding-professional-tools-guide/",
+          "cluster": "Coding for Kids",
+          "date": "2025-11-03"
+        },
+        {
+          "title": "Best Coding Platforms for Kids in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-platforms-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-30"
+        },
+        {
+          "title": "How Coding Builds Confidence in Kids: 7 Key Benefits",
+          "url": "https://codakid.com/blog/coding-for-kids/how-coding-builds-confidence-in-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-18"
+        },
+        {
+          "title": "Best Small-Group Coding Classes for Kids",
+          "url": "https://codakid.com/blog/small-group-classes/best-small-group-coding-classes-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-16"
+        },
+        {
+          "title": "Best Coding Apps for Kids Ages 6–8",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-apps-for-kids-ages-6-8/",
+          "cluster": "Coding for Kids",
+          "date": "2026-02-25"
+        },
+        {
+          "title": "Best Online Coding Classes for Kids (Ages 6–18) in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-02-16"
+        }
+      ],
+      "pillarScore": 273,
+      "health": 81,
+      "freshnessDays": 1789,
+      "status": "strong",
+      "confirmedPillar": true
+    },
+    {
+      "id": 28900,
+      "title": "The Ultimate Guide to Minecraft Modding with Java",
+      "slug": "guide-to-minecraft-modding-with-java",
+      "url": "https://codakid.com/guide-to-minecraft-modding-with-java/",
+      "normalizedUrl": "https://codakid.com/guide-to-minecraft-modding-with-java",
+      "date": "2020-06-23",
+      "modified": "2024-11-20",
+      "categories": [
+        "Minecraft"
+      ],
+      "cluster": "Minecraft",
+      "excerpt": "The article is also available in audio Your browser does not support the audio element. In this Minecraft Modding tutorial, we will be providing you with step-by-step instructions on how to get started with Minecraft modding while creating an awesome custom Sw",
+      "wordCount": 5359,
+      "outboundCount": 4,
+      "inboundCount": 26,
+      "inboundSources": [
+        "https://codakid.com/blog/coding-for-kids/best-kids-coding-subscriptions",
+        "https://codakid.com/converting-a-minecraft-bedrock-world-to-java-edition",
+        "https://codakid.com/java-vs-javascript",
+        "https://codakid.com/minecraft-hacks",
+        "https://codakid.com/best-pc-build-for-minecraft",
+        "https://codakid.com/minecraft-fps",
+        "https://codakid.com/how-to-find-diamonds-in-minecraft",
+        "https://codakid.com/minecraft-server-properties",
+        "https://codakid.com/coding-terms-for-beginners",
+        "https://codakid.com/blog/coding-games/coding-games-for-kids-the-best-way-to-teach-computer-programming",
+        "https://codakid.com/blog/minecraft/how-to-make-a-minecraft-server",
+        "https://codakid.com/minecraft-builds",
+        "https://codakid.com/blog/minecraft/minecraft-skins",
+        "https://codakid.com/best-minecraft-mods",
+        "https://codakid.com/minecraft-server-hosting",
+        "https://codakid.com/how-to-allocate-more-ram-to-minecraft",
+        "https://codakid.com/minecraft-houses",
+        "https://codakid.com/minecraft-enchantments",
+        "https://codakid.com/minecraft-color-codes",
+        "https://codakid.com/minecraft-commands",
+        "https://codakid.com/minecraft-forge",
+        "https://codakid.com/block-coding",
+        "https://codakid.com/minecraft-adventure-mode",
+        "https://codakid.com/coding-gifts-for-kids",
+        "https://codakid.com/hey-parents-minecraft-can-teach-kids-java-coding",
+        "https://codakid.com/12-surprising-things-your-child-can-learn-from-minecraft"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Minecraft Modding for Kids: A Parent's Guide",
+          "url": "https://codakid.com/blog/minecraft/minecraft-modding-for-kids-parents-guide/",
+          "cluster": "Minecraft",
+          "date": "2026-04-01"
+        },
+        {
+          "title": "Best Minecraft Coding & Modding Classes for Kids in 2026",
+          "url": "https://codakid.com/blog/minecraft/best-minecraft-coding-modding-classes-for-kids/",
+          "cluster": "Minecraft",
+          "date": "2026-03-02"
+        },
+        {
+          "title": "Minecraft vs. Roblox for Homeschool Game Projects",
+          "url": "https://codakid.com/blog/coding-for-kids/minecraft-vs-roblox-homeschool-game-projects/",
+          "cluster": "Minecraft",
+          "date": "2026-03-17"
+        },
+        {
+          "title": "The Ultimate Guide to Minecraft Weapons and Armor (2025)",
+          "url": "https://codakid.com/minecraft-weapons-and-armor/",
+          "cluster": "Minecraft",
+          "date": "2023-11-02"
+        },
+        {
+          "title": "Minecraft Crafting | The Ultimate Guide",
+          "url": "https://codakid.com/minecraft-crafting/",
+          "cluster": "Minecraft",
+          "date": "2022-07-22"
+        },
+        {
+          "title": "Minecraft Redstone | The Ultimate Guide, Tutorials, and Ideas",
+          "url": "https://codakid.com/minecraft-redstone/",
+          "cluster": "Minecraft",
+          "date": "2022-01-03"
+        },
+        {
+          "title": "Minecraft Villager Trading - The Ultimate Guide",
+          "url": "https://codakid.com/minecraft-villager-trades/",
+          "cluster": "Minecraft",
+          "date": "2021-12-28"
+        },
+        {
+          "title": "Minecraft Screenshots: The Ultimate Guide",
+          "url": "https://codakid.com/blog/minecraft/minecraft-screenshots/",
+          "cluster": "Minecraft",
+          "date": "2021-08-25"
+        }
+      ],
+      "pillarScore": 134,
+      "health": 81,
+      "freshnessDays": 2184,
+      "status": "strong",
+      "confirmedPillar": false
+    },
+    {
+      "id": 40237,
+      "title": "Basic Programming Languages That Are Kid-Friendly",
+      "slug": "basic-programming-languages-that-are-kid-friendly",
+      "url": "https://codakid.com/blog/basic-programming-languages-that-are-kid-friendly/",
+      "normalizedUrl": "https://codakid.com/blog/basic-programming-languages-that-are-kid-friendly",
+      "date": "2024-07-10",
+      "modified": "2024-11-07",
+      "categories": [
+        "Coding for Kids"
+      ],
+      "cluster": "Coding for Kids",
+      "excerpt": "The article is also available in audio Your browser does not support the audio element. In today's digital age, understanding the basics of programming has become an essential skill for children. As technology continues to evolve, so does the need for younger ",
+      "wordCount": 1568,
+      "outboundCount": 6,
+      "inboundCount": 39,
+      "inboundSources": [
+        "https://codakid.com/blog/game-design/top-free-game-design-platforms",
+        "https://codakid.com/blog/small-group-classes/best-small-group-coding-classes-for-kids",
+        "https://codakid.com/blog/coding-for-kids/coding-projects-kids-by-age",
+        "https://codakid.com/blog/game-development/game-development-tools-beginners",
+        "https://codakid.com/blog/coding-for-kids/best-one-on-one-coding-tutors-for-kids",
+        "https://codakid.com/blog/coding-for-kids/top-7-real-time-coding-platforms-for-kids",
+        "https://codakid.com/blog/coding-for-kids/top-programming-classes-kids-teens-2026",
+        "https://codakid.com/blog/coding-for-kids/top-6-coding-courses-kids-2026",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-for-kids-2025",
+        "https://codakid.com/blog/minecraft/teaching-java-to-kids-5-tips",
+        "https://codakid.com/blog/python/python-tutorial-middle-schoolers",
+        "https://codakid.com/blog/unreal-engine/unreal-engine-blueprints-for-kids",
+        "https://codakid.com/blog/coding-competitions/10-beginner-coding-competitions-for-kids",
+        "https://codakid.com/blog/top-10-affordable-ai-robots-to-teach-kids-coding-and-ai",
+        "https://codakid.com/blog/coding-for-elementary-students",
+        "https://codakid.com/what-is-coding-used-for",
+        "https://codakid.com/programming-courses-for-high-school-students",
+        "https://codakid.com/stem-programs-for-kids",
+        "https://codakid.com/scratch-game-ideas",
+        "https://codakid.com/scratch-programming",
+        "https://codakid.com/javascript-games",
+        "https://codakid.com/java-vs-javascript",
+        "https://codakid.com/coding-program-for-middle-school",
+        "https://codakid.com/coding-terms-for-beginners",
+        "https://codakid.com/blog/preparing-kids-for-the-future/computer-science-for-kids",
+        "https://codakid.com/coding-for-homeschoolers-guide-for-parents",
+        "https://codakid.com/computational-thinking",
+        "https://codakid.com/roblox-scripts",
+        "https://codakid.com/hour-of-code-activities",
+        "https://codakid.com/pygame-tutorial",
+        "https://codakid.com/scratchjr-review",
+        "https://codakid.com/block-coding",
+        "https://codakid.com/codemoji-review",
+        "https://codakid.com/code-monster-review",
+        "https://codakid.com/e-learning-websites-for-kids",
+        "https://codakid.com/homeschool-curriculum-for-stem",
+        "https://codakid.com/coding-kits-kids-guide",
+        "https://codakid.com/coding-for-beginners",
+        "https://codakid.com/computer-programming-for-gifted-students-a-complete-guide"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "So Your Kid Wants to Design Games? Here are 5 Practical Tips to Help Her Design Like The Pros",
+          "url": "https://codakid.com/so-your-kid-wants-to-design-games-here-are-5-practical-tips-to-help-her-design-like-the-pros/",
+          "cluster": "Coding for Kids",
+          "date": "2018-05-04"
+        },
+        {
+          "title": "Programming Terms Quiz Maker for Kids",
+          "url": "https://codakid.com/blog/coding-for-kids/programming-terms-quiz-maker-for-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-01-22"
+        },
+        {
+          "title": "Programming Terms Glossary for Kids",
+          "url": "https://codakid.com/blog/coding-for-kids/programming-terms-glossary-for-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2025-12-17"
+        },
+        {
+          "title": "Programming Practice Quiz Maker for Kids",
+          "url": "https://codakid.com/blog/coding-for-kids/programming-practice-quiz-maker-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2025-12-09"
+        },
+        {
+          "title": "Programming Quiz Maker for Learning",
+          "url": "https://codakid.com/blog/coding-for-kids/programming-quiz-maker-for-learning/",
+          "cluster": "Coding for Kids",
+          "date": "2025-10-29"
+        },
+        {
+          "title": "Best Coding Platforms for Kids in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-platforms-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-30"
+        },
+        {
+          "title": "How Coding Builds Confidence in Kids: 7 Key Benefits",
+          "url": "https://codakid.com/blog/coding-for-kids/how-coding-builds-confidence-in-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-18"
+        },
+        {
+          "title": "Best Coding Apps for Kids Ages 6–8",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-apps-for-kids-ages-6-8/",
+          "cluster": "Coding for Kids",
+          "date": "2026-02-25"
+        }
+      ],
+      "pillarScore": 121,
+      "health": 80,
+      "freshnessDays": 706,
+      "status": "strong",
+      "confirmedPillar": false
+    },
+    {
+      "id": 42495,
+      "title": "Best Kids Coding Subscriptions in 2026",
+      "slug": "best-kids-coding-subscriptions",
+      "url": "https://codakid.com/blog/coding-for-kids/best-kids-coding-subscriptions/",
+      "normalizedUrl": "https://codakid.com/blog/coding-for-kids/best-kids-coding-subscriptions",
+      "date": "2026-01-21",
+      "modified": "2026-01-21",
+      "categories": [
+        "Coding for Kids"
+      ],
+      "cluster": "Coding for Kids",
+      "excerpt": "Best Kids Coding Subscriptions in 2026 By 2026, coding for kids has shifted from being a fun extra activity to a critical skill for the future. Platforms like CodaKid are helping kids learn programming languages such as Python, JavaScript, and Java - tools use",
+      "wordCount": 2135,
+      "outboundCount": 15,
+      "inboundCount": 18,
+      "inboundSources": [
+        "https://codakid.com/blog/coding-for-kids/minecraft-vs-roblox-homeschool-game-projects",
+        "https://codakid.com/blog/minecraft/best-minecraft-coding-modding-classes-for-kids",
+        "https://codakid.com/blog/coding-for-kids/best-coding-apps-for-kids-ages-6-8",
+        "https://codakid.com/blog/web-development/fun-css-projects-for-kids",
+        "https://codakid.com/blog/stem/stem-careers-for-homeschoolers",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids",
+        "https://codakid.com/blog/ai-for-kids/afe-ai-learning-at-home-ultimate-guide-for-parents",
+        "https://codakid.com/blog/python/best-python-courses-for-kids-ranked-by-age-goal",
+        "https://codakid.com/blog/game-development/mobile-game-design-5-steps",
+        "https://codakid.com/blog/coding-for-teens/game-design-concept-calculator-for-teens",
+        "https://codakid.com/blog/coding-for-kids/homeschool-game-design-ultimate-guide",
+        "https://codakid.com/blog/coding-for-teens/coding-project-ideas-generator-teens",
+        "https://codakid.com/blog/coding-for-kids/coding-projects-kids-by-age",
+        "https://codakid.com/blog/coding-for-kids/teaching-accessibility-in-coding-a-parents-guide",
+        "https://codakid.com/blog/coding-for-kids/programming-terms-quiz-maker-for-kids",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-for-kids-2025",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-platforms-2025",
+        "https://codakid.com/blog/roblox/roblox-lua-scripting-guide-kids-2025"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Best Coding Platforms for Kids in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-platforms-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-30"
+        },
+        {
+          "title": "How Coding Builds Confidence in Kids: 7 Key Benefits",
+          "url": "https://codakid.com/blog/coding-for-kids/how-coding-builds-confidence-in-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-18"
+        },
+        {
+          "title": "Best Small-Group Coding Classes for Kids",
+          "url": "https://codakid.com/blog/small-group-classes/best-small-group-coding-classes-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-16"
+        },
+        {
+          "title": "Best Homeschool Coding Curriculum in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-homeschool-coding-curriculum",
+          "cluster": "Coding for Kids",
+          "date": "2026-01-27"
+        },
+        {
+          "title": "Coding Skill Level Analyzer for Kids",
+          "url": "https://codakid.com/blog/coding-for-kids/coding-skill-level-analyzer-for-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-01-06"
+        },
+        {
+          "title": "Top Resources for Parents in Coding Communities",
+          "url": "https://codakid.com/blog/coding-for-kids/top-resources-parents-coding-communities/",
+          "cluster": "Coding for Kids",
+          "date": "2026-01-05"
+        },
+        {
+          "title": "Best One-on-One Coding Tutors for Kids in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-one-on-one-coding-tutors-for-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-01-02"
+        },
+        {
+          "title": "Unity Coding for Kids: Complete Step-by-Step Guide",
+          "url": "https://codakid.com/blog/unity/unity-coding-for-kids-complete-guide/",
+          "cluster": "Coding for Kids",
+          "date": "2025-12-30"
+        }
+      ],
+      "pillarScore": 116,
+      "health": 97,
+      "freshnessDays": 146,
+      "status": "strong",
+      "confirmedPillar": false
+    },
+    {
+      "id": 29499,
+      "title": "Best Ways to Teach Kids Computer Coding in 2026",
+      "slug": "best-ways-to-teach-kids-computer-coding",
+      "url": "https://codakid.com/best-ways-to-teach-kids-computer-coding/",
+      "normalizedUrl": "https://codakid.com/best-ways-to-teach-kids-computer-coding",
+      "date": "2023-12-02",
+      "modified": "2026-04-02",
+      "categories": [
+        "Uncategorized"
+      ],
+      "cluster": "General",
+      "excerpt": "Best Ways to Teach Kids Computer Coding in 2026 As per data from the Bureau of Labor Statistics, STEM job sectors are anticipated to expand at double the rate of the average 5% growth rate between 2021 and 2031. With the expansion of agentic AI, many experts b",
+      "wordCount": 2699,
+      "outboundCount": 7,
+      "inboundCount": 22,
+      "inboundSources": [
+        "https://codakid.com/blog/coding-for-kids/coding-projects-kids-by-age",
+        "https://codakid.com/blog/coding-for-kids/homeschool-tech-curriculum-ultimate-guide",
+        "https://codakid.com/blog/coding-for-kids/youth-coders-creating-better-online-spaces",
+        "https://codakid.com/blog/coding-for-kids/10-best-computer-coding-courses-kids-2026",
+        "https://codakid.com/blog/coding-for-kids/top-programming-classes-kids-teens-2026",
+        "https://codakid.com/blog/kids-coding-camps/top-5-free-coding-camps-kids-2026",
+        "https://codakid.com/blog/coding-for-kids/top-6-coding-courses-kids-2026",
+        "https://codakid.com/blog/python/python-syntax-converter-beginners",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-for-kids-2025",
+        "https://codakid.com/blog/coding-competitions/best-high-school-hackathons-2026",
+        "https://codakid.com/blog/minecraft/teaching-java-to-kids-5-tips",
+        "https://codakid.com/blog/coding-for-kids/homeschool-coding-professional-tools-guide",
+        "https://codakid.com/blog/minecraft/best-minecraft-coding-games-2025",
+        "https://codakid.com/blog/coding-for-kids/10-best-visual-coding-platforms-for-kids",
+        "https://codakid.com/blog/ai-for-kids/ai-activities-for-kids-learn-coding",
+        "https://codakid.com/unlocking-creativity-and-learning-with-codakid-the-35-best-scratch-games-for-kids",
+        "https://codakid.com/supplemental-learning-for-kids",
+        "https://codakid.com/helping-your-child-focus-in-school",
+        "https://codakid.com/online-jobs-for-teens",
+        "https://codakid.com/parts-of-a-computer",
+        "https://codakid.com/computational-thinking",
+        "https://codakid.com/11-best-online-education-programs-for-kids"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Coding for 14-Year-Olds - The Ultimate 2026 Guide",
+          "url": "https://codakid.com/coding-for-14-year-olds/",
+          "cluster": "General",
+          "date": "2024-03-05"
+        },
+        {
+          "title": "Coding for 12 Year Olds - The Ultimate Guide",
+          "url": "https://codakid.com/coding-for-12-year-olds/",
+          "cluster": "General",
+          "date": "2023-06-01"
+        },
+        {
+          "title": "Coding for 8 Year Olds - The Ultimate Guide in 2025",
+          "url": "https://codakid.com/coding-for-8-year-olds-the-ultimate-guide/",
+          "cluster": "General",
+          "date": "2023-05-01"
+        },
+        {
+          "title": "12 Best Coding Gifts for Kids",
+          "url": "https://codakid.com/coding-gifts-for-kids/",
+          "cluster": "General",
+          "date": "2020-06-22"
+        },
+        {
+          "title": "8 Best Coding for Girls Platforms",
+          "url": "https://codakid.com/8-best-coding-for-girls-platforms/",
+          "cluster": "General",
+          "date": "2020-05-18"
+        },
+        {
+          "title": "Top 7 Coding Tools for Teens",
+          "url": "https://codakid.com/coding-tools-for-teens/",
+          "cluster": "General",
+          "date": "2020-02-25"
+        },
+        {
+          "title": "Udemy vs CodaKid Review - Which Kids Coding Platform is Better for your Student?",
+          "url": "https://codakid.com/udemy-vs-codakid/",
+          "cluster": "General",
+          "date": "2020-02-08"
+        },
+        {
+          "title": "Coding for Schools: The Ultimate Guide for Teachers and Administrators",
+          "url": "https://codakid.com/coding-for-schools-ultimate-guide-teachers-administrators/",
+          "cluster": "General",
+          "date": "2016-09-19"
+        }
+      ],
+      "pillarScore": 113,
+      "health": 80,
+      "freshnessDays": 927,
+      "status": "strong",
+      "confirmedPillar": false
+    },
+    {
+      "id": 28769,
+      "title": "Minecraft - A Parent's Survival Guide",
+      "slug": "parents-guide-to-minecraft",
+      "url": "https://codakid.com/parents-guide-to-minecraft/",
+      "normalizedUrl": "https://codakid.com/parents-guide-to-minecraft",
+      "date": "2016-02-19",
+      "modified": "2024-10-28",
+      "categories": [
+        "Coding for Kids",
+        "Minecraft"
+      ],
+      "cluster": "Minecraft",
+      "excerpt": "\"Mom, I don't want to eat dinner right now; a Creeper killed my character and I have to restart everything!\" Sound familiar? Don't worry - you're not alone! Nearly every parent with a young Minecraft player at home has likely heard variations of this around su",
+      "wordCount": 993,
+      "outboundCount": 1,
+      "inboundCount": 35,
+      "inboundSources": [
+        "https://codakid.com/blog/juni-learning/juni-learning-vs-codakid",
+        "https://codakid.com/is-minecraft-educational",
+        "https://codakid.com/minecraft-for-kids",
+        "https://codakid.com/minecraft-crafting",
+        "https://codakid.com/minecraft-roofs",
+        "https://codakid.com/minecraft-netherite",
+        "https://codakid.com/minecraft-shortcuts",
+        "https://codakid.com/minecraft-redstone",
+        "https://codakid.com/minecraft-villager-trades",
+        "https://codakid.com/minecraft-tips",
+        "https://codakid.com/best-laptops-for-kids",
+        "https://codakid.com/blog/minecraft/best-minecraft-toys",
+        "https://codakid.com/coding-for-kids-the-ultimate-guide-for-parents-2",
+        "https://codakid.com/benefits-of-video-games",
+        "https://codakid.com/internet-safety-for-kids",
+        "https://codakid.com/how-to-play-minecraft-with-friends",
+        "https://codakid.com/minecraft-servers",
+        "https://codakid.com/computer-basics-for-kids",
+        "https://codakid.com/minecraft-builds",
+        "https://codakid.com/minecraft-castles",
+        "https://codakid.com/minecraft-pixelmon",
+        "https://codakid.com/blog/minecraft/minecraft-skins",
+        "https://codakid.com/blog/minecraft/minecraft-mobs",
+        "https://codakid.com/best-minecraft-mods",
+        "https://codakid.com/how-to-allocate-more-ram-to-minecraft",
+        "https://codakid.com/minecraft-recipes",
+        "https://codakid.com/hour-of-code-activities",
+        "https://codakid.com/minecraft-caves-and-cliffs",
+        "https://codakid.com/minecraft-enchantments",
+        "https://codakid.com/minecraft-potions",
+        "https://codakid.com/roblox-games-for-kids",
+        "https://codakid.com/homeschool-curriculum-for-stem",
+        "https://codakid.com/what-are-minecraft-mods-a-quick-guide-for-parents",
+        "https://codakid.com/udemy-vs-codakid",
+        "https://codakid.com/12-questions-to-ask-when-choosing-a-kids-online-coding-course"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Minecraft Modding for Kids: A Parent's Guide",
+          "url": "https://codakid.com/blog/minecraft/minecraft-modding-for-kids-parents-guide/",
+          "cluster": "Minecraft",
+          "date": "2026-04-01"
+        },
+        {
+          "title": "Minecraft vs. Roblox for Homeschool Game Projects",
+          "url": "https://codakid.com/blog/coding-for-kids/minecraft-vs-roblox-homeschool-game-projects/",
+          "cluster": "Minecraft",
+          "date": "2026-03-17"
+        },
+        {
+          "title": "Best Minecraft Coding & Modding Classes for Kids in 2026",
+          "url": "https://codakid.com/blog/minecraft/best-minecraft-coding-modding-classes-for-kids/",
+          "cluster": "Minecraft",
+          "date": "2026-03-02"
+        },
+        {
+          "title": "Cool Things to Build in Survival Minecraft When You're Bored",
+          "url": "https://codakid.com/blog/minecraft/things-to-build-in-survival-minecraft/",
+          "cluster": "Minecraft",
+          "date": "2024-06-26"
+        },
+        {
+          "title": "Best ​​Minecraft Survival Servers | Complete List",
+          "url": "https://codakid.com/blog/minecraft/minecraft-survival-servers/",
+          "cluster": "Minecraft",
+          "date": "2021-09-16"
+        },
+        {
+          "title": "Best Minecraft Coding Games in 2026",
+          "url": "https://codakid.com/blog/minecraft/best-minecraft-coding-games-2025/",
+          "cluster": "Minecraft",
+          "date": "2025-10-27"
+        },
+        {
+          "title": "Roblox vs Minecraft: Which is Better for Learning Code?",
+          "url": "https://codakid.com/blog/roblox-vs-minecraft-which-is-better-for-learning-code/",
+          "cluster": "Minecraft",
+          "date": "2025-08-23"
+        },
+        {
+          "title": "Customize Your Minecraft World: Block Editing with CodaKid for Kids",
+          "url": "https://codakid.com/blog/minecraft/customize-your-minecraft-world-block-editing-with-codakid-for-kids/",
+          "cluster": "Minecraft",
+          "date": "2024-12-13"
+        }
+      ],
+      "pillarScore": 111,
+      "health": 73,
+      "freshnessDays": 3770,
+      "status": "watch",
+      "confirmedPillar": false
+    },
+    {
+      "id": 42638,
+      "title": "Best Online Coding Classes for Kids (Ages 6–18) in 2026",
+      "slug": "best-online-coding-classes-kids",
+      "url": "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids/",
+      "normalizedUrl": "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids",
+      "date": "2026-02-16",
+      "modified": "2026-02-16",
+      "categories": [
+        "Coding for Kids"
+      ],
+      "cluster": "Coding for Kids",
+      "excerpt": "Best Online Coding Classes for Kids (Ages 6–18) in 2026 Learning to code is becoming a must-have skill for kids, offering benefits like problem-solving, logical thinking, and creativity. Many schools fall short in teaching computer science, so the best online ",
+      "wordCount": 3948,
+      "outboundCount": 31,
+      "inboundCount": 8,
+      "inboundSources": [
+        "https://codakid.com/blog/coding-for-kids/how-coding-builds-confidence-in-kids",
+        "https://codakid.com/blog/coding-for-kids/minecraft-vs-roblox-homeschool-game-projects",
+        "https://codakid.com/blog/kids-coding-camps/online-science-camps-for-homeschoolers",
+        "https://codakid.com/blog/roblox/roblox-lua-scripting-basics-for-beginners",
+        "https://codakid.com/blog/minecraft/best-minecraft-coding-modding-classes-for-kids",
+        "https://codakid.com/blog/web-development/fun-css-projects-for-kids",
+        "https://codakid.com/blog/minecraft/best-roblox-coding-classes-for-kids",
+        "https://codakid.com/blog/stem/stem-careers-for-homeschoolers"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Top 10 Best Online Coding Classes for Kids in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-for-kids-2025/",
+          "cluster": "Coding for Kids",
+          "date": "2025-11-19"
+        },
+        {
+          "title": "Best Small-Group Coding Classes for Kids",
+          "url": "https://codakid.com/blog/small-group-classes/best-small-group-coding-classes-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-16"
+        },
+        {
+          "title": "Best Coding Apps for Kids Ages 6–8",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-apps-for-kids-ages-6-8/",
+          "cluster": "Coding for Kids",
+          "date": "2026-02-25"
+        },
+        {
+          "title": "Best Online Coding Platforms in 2026: A Parent’s Guide",
+          "url": "https://codakid.com/blog/coding-for-kids/best-online-coding-platforms-2025/",
+          "cluster": "Coding for Kids",
+          "date": "2025-11-07"
+        },
+        {
+          "title": "Best Coding Platforms for Kids to Code Together Online",
+          "url": "https://codakid.com/blog/coding-for-kids/best-platforms-kids-code-together-online/",
+          "cluster": "Coding for Kids",
+          "date": "2025-10-24"
+        },
+        {
+          "title": "Best Coding Platforms for Kids in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-platforms-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-30"
+        },
+        {
+          "title": "12 Questions To Ask When Choosing a Kids Online Coding Course",
+          "url": "https://codakid.com/12-questions-to-ask-when-choosing-a-kids-online-coding-course/",
+          "cluster": "Coding for Kids",
+          "date": "2017-10-17"
+        },
+        {
+          "title": "CodaKid is launching Kids Coding Classes in Chandler!",
+          "url": "https://codakid.com/blog/uncategoricodakid-is-launching-kids-coding-classes-in-chandler/zed/codakid-is-launching-kids-coding-classes-in-chandler/",
+          "cluster": "Coding for Kids",
+          "date": "2015-08-28"
+        }
+      ],
+      "pillarScore": 104,
+      "health": 78,
+      "freshnessDays": 120,
+      "status": "strong",
+      "confirmedPillar": false
+    },
+    {
+      "id": 42687,
+      "title": "Best Roblox Coding Classes for Kids in 2026",
+      "slug": "best-roblox-coding-classes-for-kids",
+      "url": "https://codakid.com/blog/minecraft/best-roblox-coding-classes-for-kids/",
+      "normalizedUrl": "https://codakid.com/blog/minecraft/best-roblox-coding-classes-for-kids",
+      "date": "2026-02-23",
+      "modified": "2026-02-23",
+      "categories": [
+        "Roblox"
+      ],
+      "cluster": "Minecraft",
+      "excerpt": "Best Roblox Coding Classes for Kids in 2026 Looking for the best Roblox coding classes for your kids in 2026? Here's a quick guide to help you decide. The best Roblox coding courses teach kids to create games using Lua, a beginner-friendly programming language",
+      "wordCount": 3281,
+      "outboundCount": 26,
+      "inboundCount": 5,
+      "inboundSources": [
+        "https://codakid.com/blog/coding-for-kids/how-coding-builds-confidence-in-kids",
+        "https://codakid.com/blog/coding-for-kids/minecraft-vs-roblox-homeschool-game-projects",
+        "https://codakid.com/blog/kids-coding-camps/online-science-camps-for-homeschoolers",
+        "https://codakid.com/blog/roblox/roblox-lua-scripting-basics-for-beginners",
+        "https://codakid.com/blog/coding-for-kids/best-coding-apps-for-kids-ages-6-8"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Best Minecraft Coding & Modding Classes for Kids in 2026",
+          "url": "https://codakid.com/blog/minecraft/best-minecraft-coding-modding-classes-for-kids/",
+          "cluster": "Minecraft",
+          "date": "2026-03-02"
+        },
+        {
+          "title": "How Online Minecraft Modding Classes Can Jumpstart your Child's Future in Coding",
+          "url": "https://codakid.com/online-minecraft-modding-classes-can-jumpstart-your-childs-future-in-coding/",
+          "cluster": "Minecraft",
+          "date": "2016-02-19"
+        },
+        {
+          "title": "Best Minecraft Coding Games in 2026",
+          "url": "https://codakid.com/blog/minecraft/best-minecraft-coding-games-2025/",
+          "cluster": "Minecraft",
+          "date": "2025-10-27"
+        },
+        {
+          "title": "Roblox vs Minecraft: Which is Better for Learning Code?",
+          "url": "https://codakid.com/blog/roblox-vs-minecraft-which-is-better-for-learning-code/",
+          "cluster": "Minecraft",
+          "date": "2025-08-23"
+        },
+        {
+          "title": "Minecraft Modding for Kids: A Parent's Guide",
+          "url": "https://codakid.com/blog/minecraft/minecraft-modding-for-kids-parents-guide/",
+          "cluster": "Minecraft",
+          "date": "2026-04-01"
+        },
+        {
+          "title": "Introduction to Java Coding for Kids: A Beginner's Guide",
+          "url": "https://codakid.com/blog/introduction-to-java-coding-for-kids/",
+          "cluster": "Minecraft",
+          "date": "2024-09-07"
+        },
+        {
+          "title": "Hey, Parents! Did you know that Minecraft can teach your kids Java coding?",
+          "url": "https://codakid.com/hey-parents-minecraft-can-teach-kids-java-coding/",
+          "cluster": "Minecraft",
+          "date": "2019-03-30"
+        },
+        {
+          "title": "Teaching Java to Kids: 5 Important Tips",
+          "url": "https://codakid.com/blog/minecraft/teaching-java-to-kids-5-tips/",
+          "cluster": "Minecraft",
+          "date": "2025-11-10"
+        }
+      ],
+      "pillarScore": 103,
+      "health": 71,
+      "freshnessDays": 113,
+      "status": "watch",
+      "confirmedPillar": false
+    },
+    {
+      "id": 28855,
+      "title": "The Ultimate Guide to Making Your First Game on Roblox Studio",
+      "slug": "ultimate-guide-making-your-first-game-on-roblox-studio",
+      "url": "https://codakid.com/ultimate-guide-making-your-first-game-on-roblox-studio/",
+      "normalizedUrl": "https://codakid.com/ultimate-guide-making-your-first-game-on-roblox-studio",
+      "date": "2020-03-09",
+      "modified": "2024-11-07",
+      "categories": [
+        "Roblox"
+      ],
+      "cluster": "Roblox",
+      "excerpt": "The article is also available in audio Your browser does not support the audio element. You’ve probably heard of Roblox by now with how rapidly the platform has grown. As one of the largest online gaming servers, Roblox’s community is widespread. Current playe",
+      "wordCount": 3044,
+      "outboundCount": 9,
+      "inboundCount": 23,
+      "inboundSources": [
+        "https://codakid.com/blog/roblox/roblox-lua-scripting-guide-kids-2025",
+        "https://codakid.com/blog/roblox/kids-learn-game-development-roblox-studio",
+        "https://codakid.com/video-game-classes",
+        "https://codakid.com/game-design-for-kids",
+        "https://codakid.com/coding-program-for-middle-school",
+        "https://codakid.com/roblox-games-to-play",
+        "https://codakid.com/roblox-commands",
+        "https://codakid.com/roblox-parental-controls",
+        "https://codakid.com/best-laptops-for-kids",
+        "https://codakid.com/roblox-on-chromebook",
+        "https://codakid.com/making-your-own-website-for-kids",
+        "https://codakid.com/roblox-scripts",
+        "https://codakid.com/blog/roblox/roblox-download",
+        "https://codakid.com/blog/roblox/roblox-horror-games",
+        "https://codakid.com/blog/roblox/roblox-music-codes",
+        "https://codakid.com/blog/roblox/roblox-shirt-template",
+        "https://codakid.com/pygame-tutorial",
+        "https://codakid.com/coding-gifts-for-kids",
+        "https://codakid.com/roblox-games-for-kids",
+        "https://codakid.com/roblox-safety-review",
+        "https://codakid.com/engineering-for-kids-guide",
+        "https://codakid.com/coding-for-beginners",
+        "https://codakid.com/5-awesome-roblox-games-you-can-make-at-home"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Roblox Scripting: How to Make a Game Like the Pros on Roblox Studio",
+          "url": "https://codakid.com/roblox-scripting-how-to-make-a-game-like-the-pros-on-roblox-studio/",
+          "cluster": "Roblox",
+          "date": "2018-05-24"
+        },
+        {
+          "title": "Roblox Lua Scripting Basics for Beginners",
+          "url": "https://codakid.com/blog/roblox/roblox-lua-scripting-basics-for-beginners/",
+          "cluster": "Roblox",
+          "date": "2026-03-03"
+        },
+        {
+          "title": "How Roblox Keeps Your Children's Safety a Priority",
+          "url": "https://codakid.com/blog/roblox/how-roblox-keeps-your-childrens-safety-a-priority/",
+          "cluster": "Roblox",
+          "date": "2025-10-07"
+        },
+        {
+          "title": "Roblox Promo Codes for Free Clothes and Items",
+          "url": "https://codakid.com/roblox-promo-codes/",
+          "cluster": "Roblox",
+          "date": "2021-06-01"
+        },
+        {
+          "title": "Hour of Code 2025 | Roblox Coding with Lua",
+          "url": "https://codakid.com/hour-of-code/",
+          "cluster": "Roblox",
+          "date": "2018-10-20"
+        }
+      ],
+      "pillarScore": 99,
+      "health": 81,
+      "freshnessDays": 2290,
+      "status": "strong",
+      "confirmedPillar": false
+    },
+    {
+      "id": 28832,
+      "title": "What are Minecraft Mods? A Quick Guide for Parents",
+      "slug": "what-are-minecraft-mods-a-quick-guide-for-parents",
+      "url": "https://codakid.com/what-are-minecraft-mods-a-quick-guide-for-parents/",
+      "normalizedUrl": "https://codakid.com/what-are-minecraft-mods-a-quick-guide-for-parents",
+      "date": "2020-02-27",
+      "modified": "2024-10-28",
+      "categories": [
+        "Minecraft"
+      ],
+      "cluster": "Minecraft",
+      "excerpt": "In May of 2009, game developers Mojang released a sandbox video game titled “Minecraft.” It was a predominantly survival-themed game with a pseudo-open world feel to it with 3D pixelated characters. No one could have predicted how huge and influential it would",
+      "wordCount": 1890,
+      "outboundCount": 9,
+      "inboundCount": 25,
+      "inboundSources": [
+        "https://codakid.com/is-minecraft-educational",
+        "https://codakid.com/game-design-for-kids",
+        "https://codakid.com/minecraft-tips",
+        "https://codakid.com/blog/minecraft/minecraft-survival-servers",
+        "https://codakid.com/blog/coding-for-kids/coding-books-for-kids",
+        "https://codakid.com/blog/minecraft/best-minecraft-toys",
+        "https://codakid.com/blog/minecraft/minecraft-skins",
+        "https://codakid.com/blog/minecraft/minecraft-seeds",
+        "https://codakid.com/blog/minecraft/minecraft-shaders",
+        "https://codakid.com/blog/minecraft/minecraft-mobs",
+        "https://codakid.com/blog/minecraft/how-to-install-minecraft-mods-the-ultimate-2021-guide",
+        "https://codakid.com/minecraft-farms-ideas",
+        "https://codakid.com/minecraft-addons",
+        "https://codakid.com/minecraft-server-hosting",
+        "https://codakid.com/how-to-allocate-more-ram-to-minecraft",
+        "https://codakid.com/minecraft-caves-and-cliffs",
+        "https://codakid.com/minecraft-enchantments",
+        "https://codakid.com/minecraft-color-codes",
+        "https://codakid.com/minecraft-commands",
+        "https://codakid.com/minecraft-potions",
+        "https://codakid.com/minecraft-forge",
+        "https://codakid.com/minecraft-adventure-mode",
+        "https://codakid.com/e-learning-websites-for-kids",
+        "https://codakid.com/homeschool-curriculum-for-stem",
+        "https://codakid.com/educational-games-for-kids"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Minecraft Modding for Kids: A Parent's Guide",
+          "url": "https://codakid.com/blog/minecraft/minecraft-modding-for-kids-parents-guide/",
+          "cluster": "Minecraft",
+          "date": "2026-04-01"
+        },
+        {
+          "title": "Minecraft vs. Roblox for Homeschool Game Projects",
+          "url": "https://codakid.com/blog/coding-for-kids/minecraft-vs-roblox-homeschool-game-projects/",
+          "cluster": "Minecraft",
+          "date": "2026-03-17"
+        },
+        {
+          "title": "Best Minecraft Coding & Modding Classes for Kids in 2026",
+          "url": "https://codakid.com/blog/minecraft/best-minecraft-coding-modding-classes-for-kids/",
+          "cluster": "Minecraft",
+          "date": "2026-03-02"
+        },
+        {
+          "title": "Your Quick Cheat Sheet On How To Build Minecraft Roofs",
+          "url": "https://codakid.com/minecraft-roofs/",
+          "cluster": "Minecraft",
+          "date": "2022-03-07"
+        },
+        {
+          "title": "13 Minecraft Builds You Didn't Know You Could Make (No Mods)",
+          "url": "https://codakid.com/minecraft-builds/",
+          "cluster": "Minecraft",
+          "date": "2021-04-19"
+        },
+        {
+          "title": "8 Best Minecraft Mods",
+          "url": "https://codakid.com/best-minecraft-mods/",
+          "cluster": "Minecraft",
+          "date": "2020-12-22"
+        },
+        {
+          "title": "Hey, Parents! Did you know that Minecraft can teach your kids Java coding?",
+          "url": "https://codakid.com/hey-parents-minecraft-can-teach-kids-java-coding/",
+          "cluster": "Minecraft",
+          "date": "2019-03-30"
+        },
+        {
+          "title": "Best Minecraft Coding Games in 2026",
+          "url": "https://codakid.com/blog/minecraft/best-minecraft-coding-games-2025/",
+          "cluster": "Minecraft",
+          "date": "2025-10-27"
+        }
+      ],
+      "pillarScore": 99,
+      "health": 77,
+      "freshnessDays": 2301,
+      "status": "watch",
+      "confirmedPillar": false
+    },
+    {
+      "id": 42464,
+      "title": "Best AI Classes for Kids & Teens in 2026",
+      "slug": "best-ai-classes-kids-teens",
+      "url": "https://codakid.com/blog/ai-for-kids/best-ai-classes-for-kids-teens/",
+      "normalizedUrl": "https://codakid.com/blog/ai-for-kids/best-ai-classes-for-kids-teens",
+      "date": "2026-01-14",
+      "modified": "2026-01-14",
+      "categories": [
+        "AI for Kids"
+      ],
+      "cluster": "AI",
+      "excerpt": "Best AI Classes for Kids & Teens in 2026 AI education for kids and teens is shifting from using AI tools like ChatGPT to teaching them how to create AI-powered applications. The best AI classes like CodaKid focus on hands-on projects, helping students build ga",
+      "wordCount": 2038,
+      "outboundCount": 24,
+      "inboundCount": 18,
+      "inboundSources": [
+        "https://codakid.com/blog/kids-coding-camps/best-ai-summer-camps-for-teens",
+        "https://codakid.com/blog/kids-coding-camps/ai-camps-for-kids-complete-checklist",
+        "https://codakid.com/blog/minecraft/best-roblox-coding-classes-for-kids",
+        "https://codakid.com/blog/stem/stem-careers-for-homeschoolers",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids",
+        "https://codakid.com/blog/ai-for-kids/afe-ai-learning-at-home-ultimate-guide-for-parents",
+        "https://codakid.com/blog/python/best-python-courses-for-kids-ranked-by-age-goal",
+        "https://codakid.com/blog/game-development/mobile-game-design-5-steps",
+        "https://codakid.com/blog/coding-for-teens/game-design-concept-calculator-for-teens",
+        "https://codakid.com/blog/coding-for-teens/coding-project-ideas-generator-teens",
+        "https://codakid.com/blog/coding-for-kids/coding-projects-kids-by-age",
+        "https://codakid.com/blog/coding-for-kids/teaching-accessibility-in-coding-a-parents-guide",
+        "https://codakid.com/blog/coding-for-kids/programming-terms-quiz-maker-for-kids",
+        "https://codakid.com/blog/coding-for-kids/best-kids-coding-subscriptions",
+        "https://codakid.com/blog/preparing-kids-for-the-future/why-parents-matter-coding-communities",
+        "https://codakid.com/blog/coding-for-kids/digital-footprints-teaching-kids-online-presence",
+        "https://codakid.com/blog/coding-for-kids/homeschool-tech-curriculum-ultimate-guide",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-for-kids-2025"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "AI Club for Teens: Step-by-Step Guide",
+          "url": "https://codakid.com/blog/ai-for-kids/how-to-start-an-ai-club-for-teens/",
+          "cluster": "AI",
+          "date": "2025-10-08"
+        },
+        {
+          "title": "Top 10 AI Courses for Kids and Teens in 2026",
+          "url": "https://codakid.com/blog/ai-for-kids/top-10-ai-courses-for-kids-and-teens/",
+          "cluster": "AI",
+          "date": "2025-08-11"
+        },
+        {
+          "title": "Best AI Tools for Students in 2026 (Safe + School-Friendly Picks)",
+          "url": "https://codakid.com/blog/ai-for-kids/best-ai-tools-for-students-safe-school-friendly-picks/",
+          "cluster": "AI",
+          "date": "2026-03-09"
+        },
+        {
+          "title": "AI Regulations: Building a Safer Future for Kids Online",
+          "url": "https://codakid.com/blog/ai-for-kids/ai-regulations-building-safer-future-kids-online/",
+          "cluster": "AI",
+          "date": "2026-01-12"
+        },
+        {
+          "title": "Real-Time Feedback in AI and Coding Education",
+          "url": "https://codakid.com/blog/ai-for-kids/real-time-feedback-ai-coding-education/",
+          "cluster": "AI",
+          "date": "2025-12-23"
+        },
+        {
+          "title": "Algorithmic Bias: What Parents Need to Know About AI for Kids",
+          "url": "https://codakid.com/blog/ai-for-kids/algorithmic-bias-ai-for-kids/",
+          "cluster": "AI",
+          "date": "2025-12-16"
+        },
+        {
+          "title": "AI Ethics: Educating Young Minds",
+          "url": "https://codakid.com/blog/ai-for-kids/ai-ethics-educating-young-minds/",
+          "cluster": "AI",
+          "date": "2025-12-11"
+        },
+        {
+          "title": "AI Bias and Diversity: What Parents Should Know",
+          "url": "https://codakid.com/blog/ai-for-kids/ai-bias-diversity-parents-guide/",
+          "cluster": "AI",
+          "date": "2025-12-01"
+        }
+      ],
+      "pillarScore": 98,
+      "health": 96,
+      "freshnessDays": 153,
+      "status": "strong",
+      "confirmedPillar": false
+    },
+    {
+      "id": 28778,
+      "title": "Hey, Parents! Did you know that Minecraft can teach your kids Java coding?",
+      "slug": "hey-parents-minecraft-can-teach-kids-java-coding",
+      "url": "https://codakid.com/hey-parents-minecraft-can-teach-kids-java-coding/",
+      "normalizedUrl": "https://codakid.com/hey-parents-minecraft-can-teach-kids-java-coding",
+      "date": "2019-03-30",
+      "modified": "2024-10-28",
+      "categories": [
+        "Minecraft"
+      ],
+      "cluster": "Minecraft",
+      "excerpt": "Does your kid spend hours playing Minecraft or watching Minecraft Modding videos on YouTube? Ever ask yourself how you can turn this into something positive? I suggest trying a little experiment. Use the M word. Ask your son or daughter if he/she would be inte",
+      "wordCount": 828,
+      "outboundCount": 6,
+      "inboundCount": 26,
+      "inboundSources": [
+        "https://codakid.com/blog/game-design/top-free-game-design-platforms",
+        "https://codakid.com/blog/coding-for-kids/best-coding-apps-for-kids-ages-6-8",
+        "https://codakid.com/blog/stem/stem-careers-for-homeschoolers",
+        "https://codakid.com/blog/coding-for-kids/homeschool-game-design-ultimate-guide",
+        "https://codakid.com/blog/coding-for-kids/top-6-coding-courses-kids-2026",
+        "https://codakid.com/blog/minecraft/teaching-java-to-kids-5-tips",
+        "https://codakid.com/blog/minecraft/best-minecraft-coding-games-2025",
+        "https://codakid.com/change-your-name-in-minecraft",
+        "https://codakid.com/is-minecraft-educational",
+        "https://codakid.com/java-vs-javascript",
+        "https://codakid.com/minecraft-for-kids",
+        "https://codakid.com/coding-program-for-middle-school",
+        "https://codakid.com/minecraft-redstone",
+        "https://codakid.com/coding-terms-for-beginners",
+        "https://codakid.com/minecraft-tips",
+        "https://codakid.com/blog/coding-for-kids/top-7-kids-coding-languages-of-2018",
+        "https://codakid.com/minecraft-servers",
+        "https://codakid.com/computer-basics-for-kids",
+        "https://codakid.com/minecraft-builds",
+        "https://codakid.com/blog/minecraft/minecraft-skins",
+        "https://codakid.com/how-to-allocate-more-ram-to-minecraft",
+        "https://codakid.com/minecraft-enchantments",
+        "https://codakid.com/minecraft-potions",
+        "https://codakid.com/codemoji-review",
+        "https://codakid.com/what-are-minecraft-mods-a-quick-guide-for-parents",
+        "https://codakid.com/code-org"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Best Minecraft Coding & Modding Classes for Kids in 2026",
+          "url": "https://codakid.com/blog/minecraft/best-minecraft-coding-modding-classes-for-kids/",
+          "cluster": "Minecraft",
+          "date": "2026-03-02"
+        },
+        {
+          "title": "Minecraft Caves & Cliffs: Everything You Need to Know",
+          "url": "https://codakid.com/minecraft-caves-and-cliffs/",
+          "cluster": "Minecraft",
+          "date": "2020-10-13"
+        },
+        {
+          "title": "Minecraft Adventure Mode | Everything You Need to Know",
+          "url": "https://codakid.com/minecraft-adventure-mode/",
+          "cluster": "Minecraft",
+          "date": "2020-07-16"
+        },
+        {
+          "title": "6 Great Ways Minecraft Can Help You Bond with Your Child",
+          "url": "https://codakid.com/6-great-ways-minecraft-can-help-you-bond-with-your-child/",
+          "cluster": "Minecraft",
+          "date": "2016-10-14"
+        },
+        {
+          "title": "How Online Minecraft Modding Classes Can Jumpstart your Child's Future in Coding",
+          "url": "https://codakid.com/online-minecraft-modding-classes-can-jumpstart-your-childs-future-in-coding/",
+          "cluster": "Minecraft",
+          "date": "2016-02-19"
+        },
+        {
+          "title": "Minecraft Modding for Kids: A Parent's Guide",
+          "url": "https://codakid.com/blog/minecraft/minecraft-modding-for-kids-parents-guide/",
+          "cluster": "Minecraft",
+          "date": "2026-04-01"
+        },
+        {
+          "title": "Minecraft vs. Roblox for Homeschool Game Projects",
+          "url": "https://codakid.com/blog/coding-for-kids/minecraft-vs-roblox-homeschool-game-projects/",
+          "cluster": "Minecraft",
+          "date": "2026-03-17"
+        },
+        {
+          "title": "Best Roblox Coding Classes for Kids in 2026",
+          "url": "https://codakid.com/blog/minecraft/best-roblox-coding-classes-for-kids/",
+          "cluster": "Minecraft",
+          "date": "2026-02-23"
+        }
+      ],
+      "pillarScore": 97,
+      "health": 72,
+      "freshnessDays": 2635,
+      "status": "watch",
+      "confirmedPillar": false
+    },
+    {
+      "id": 40471,
+      "title": "Interactive AI Learning Tools for Kids: Apps and Platforms to Get Started",
+      "slug": "interactive-ai-learning-tools-for-kids-apps-and-platforms-to-get-started",
+      "url": "https://codakid.com/blog/interactive-ai-learning-tools-for-kids/",
+      "normalizedUrl": "https://codakid.com/blog/interactive-ai-learning-tools-for-kids",
+      "date": "2024-08-22",
+      "modified": "2024-08-22",
+      "categories": [
+        "AI for Kids"
+      ],
+      "cluster": "AI",
+      "excerpt": "Artificial intelligence (AI) is transforming education, especially for kids, by making learning more engaging and personalized. AI-powered apps and platforms adapt to each child's learning style, offering a fun and effective way to learn. These tools help deve",
+      "wordCount": 1642,
+      "outboundCount": 2,
+      "inboundCount": 21,
+      "inboundSources": [
+        "https://codakid.com/blog/coding-for-kids/homeschool-game-design-ultimate-guide",
+        "https://codakid.com/blog/coding-for-kids/coding-projects-kids-by-age",
+        "https://codakid.com/blog/coding-for-kids/homeschool-tech-curriculum-ultimate-guide",
+        "https://codakid.com/blog/ai-for-kids/ai-regulations-building-safer-future-kids-online",
+        "https://codakid.com/blog/game-development/game-development-tools-beginners",
+        "https://codakid.com/blog/coding-for-kids/youth-coders-creating-better-online-spaces",
+        "https://codakid.com/blog/coding-for-kids/top-7-real-time-coding-platforms-for-kids",
+        "https://codakid.com/blog/ai-for-kids/real-time-feedback-ai-coding-education",
+        "https://codakid.com/blog/ai-for-kids/ai-ethics-educating-young-minds",
+        "https://codakid.com/blog/ai-for-kids/how-ai-transforms-digital-art-for-kids",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-for-kids-2025",
+        "https://codakid.com/blog/ai-for-kids/ai-tools-for-kids-art",
+        "https://codakid.com/blog/ai-for-kids/explain-ai-to-kids-by-age",
+        "https://codakid.com/blog/ai-for-kids/best-free-ai-activities-homeschoolers",
+        "https://codakid.com/blog/kids-coding-camps/top-free-coding-camps-kids-2025",
+        "https://codakid.com/blog/coding-for-kids/top-7-search-engines-for-kids-2025",
+        "https://codakid.com/blog/ai-for-kids/ai-activities-for-kids-learn-coding",
+        "https://codakid.com/blog/introduce-ai-concepts-to-kids",
+        "https://codakid.com/blog/why-ai-education-is-crucial-for-kids-in-2025",
+        "https://codakid.com/blog/top-10-affordable-ai-robots-to-teach-kids-coding-and-ai",
+        "https://codakid.com/blog/chatgpt-for-kids"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Best AI Tools for Students in 2026 (Safe + School-Friendly Picks)",
+          "url": "https://codakid.com/blog/ai-for-kids/best-ai-tools-for-students-safe-school-friendly-picks/",
+          "cluster": "AI",
+          "date": "2026-03-09"
+        },
+        {
+          "title": "Safe AI Learning at Home: Ultimate Guide for Parents",
+          "url": "https://codakid.com/blog/ai-for-kids/afe-ai-learning-at-home-ultimate-guide-for-parents/",
+          "cluster": "AI",
+          "date": "2026-02-12"
+        },
+        {
+          "title": "Top 8 AI Tools Kids Can Use to Learn Programming",
+          "url": "https://codakid.com/blog/ai-for-kids/top-8-ai-tools-kids-can-use-to-learn-programming/",
+          "cluster": "AI",
+          "date": "2025-08-20"
+        },
+        {
+          "title": "Best AI Summer Camps for Teens (2026)",
+          "url": "https://codakid.com/blog/kids-coding-camps/best-ai-summer-camps-for-teens/",
+          "cluster": "AI",
+          "date": "2026-04-06"
+        },
+        {
+          "title": "AI Camps for Kids: The Complete Checklist",
+          "url": "https://codakid.com/blog/kids-coding-camps/ai-camps-for-kids-complete-checklist/",
+          "cluster": "AI",
+          "date": "2026-03-10"
+        },
+        {
+          "title": "Machine Learning for Kids - The Ultimate Guide for Parents",
+          "url": "https://codakid.com/machine-learning-for-kids/",
+          "cluster": "AI",
+          "date": "2023-11-17"
+        },
+        {
+          "title": "Best AI Classes for Kids & Teens in 2026",
+          "url": "https://codakid.com/blog/ai-for-kids/best-ai-classes-for-kids-teens/",
+          "cluster": "AI",
+          "date": "2026-01-14"
+        },
+        {
+          "title": "Algorithmic Bias: What Parents Need to Know About AI for Kids",
+          "url": "https://codakid.com/blog/ai-for-kids/algorithmic-bias-ai-for-kids/",
+          "cluster": "AI",
+          "date": "2025-12-16"
+        }
+      ],
+      "pillarScore": 94,
+      "health": 81,
+      "freshnessDays": 663,
+      "status": "strong",
+      "confirmedPillar": false
+    },
+    {
+      "id": 28857,
+      "title": "Python for Kids: 5 Reasons Python Programming is Best for Kids",
+      "slug": "5-reasons-python-programming-is-perfect-for-kids",
+      "url": "https://codakid.com/5-reasons-python-programming-is-perfect-for-kids/",
+      "normalizedUrl": "https://codakid.com/5-reasons-python-programming-is-perfect-for-kids",
+      "date": "2019-12-02",
+      "modified": "2024-10-28",
+      "categories": [
+        "Coding for Kids"
+      ],
+      "cluster": "Python",
+      "excerpt": "Today, there are so many programming languages to choose from and every one of them differs in ease-of-use, complexity, and application. If your kids are just starting to code, our number one piece of advice is that you select your language based on your child",
+      "wordCount": 2186,
+      "outboundCount": 6,
+      "inboundCount": 22,
+      "inboundSources": [
+        "https://codakid.com/blog/coding-for-homeschoolers/soft-skills-tech-careers-homeschooling",
+        "https://codakid.com/blog/game-design/top-free-game-design-platforms",
+        "https://codakid.com/blog/kids-coding-camps/best-online-coding-camps-for-kids-ultimate-guide",
+        "https://codakid.com/blog/coding-for-kids/10-best-computer-coding-courses-kids-2026",
+        "https://codakid.com/blog/python/interactive-coding-simulations-python-kids",
+        "https://codakid.com/what-is-coding-used-for",
+        "https://codakid.com/programming-courses-for-high-school-students",
+        "https://codakid.com/stem-programs-for-kids",
+        "https://codakid.com/how-to-code-a-game-2",
+        "https://codakid.com/coding-program-for-middle-school",
+        "https://codakid.com/coding-terms-for-beginners",
+        "https://codakid.com/blog/coding-for-kids/coding-books-for-kids",
+        "https://codakid.com/blog/coding-for-kids/top-7-kids-coding-languages-of-2018",
+        "https://codakid.com/coding-for-homeschoolers-guide-for-parents",
+        "https://codakid.com/7-ways-to-teach-your-kids-to-become-entrepreneurs",
+        "https://codakid.com/pygame-tutorial",
+        "https://codakid.com/8-best-coding-for-girls-platforms",
+        "https://codakid.com/codecademy-review",
+        "https://codakid.com/codecombat-review-everything-you-need-to-know-in-2020",
+        "https://codakid.com/educational-games-for-kids",
+        "https://codakid.com/coding-tools-for-teens",
+        "https://codakid.com/udemy-vs-codakid"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Sprite Animation with Python: Beginner Tips",
+          "url": "https://codakid.com/blog/python/sprite-animation-python-beginner-tips/",
+          "cluster": "Python",
+          "date": "2026-03-25"
+        },
+        {
+          "title": "Best Python Courses for Kids in 2026 (Ranked by Age & Goal)",
+          "url": "https://codakid.com/blog/python/best-python-courses-for-kids-ranked-by-age-goal/",
+          "cluster": "Python",
+          "date": "2026-02-10"
+        },
+        {
+          "title": "Python Syntax Converter for Beginners",
+          "url": "https://codakid.com/blog/python/python-syntax-converter-beginners/",
+          "cluster": "Python",
+          "date": "2025-11-24"
+        },
+        {
+          "title": "Python Tutorial for Middle Schoolers: Step-by-Step",
+          "url": "https://codakid.com/blog/python/python-tutorial-middle-schoolers/",
+          "cluster": "Python",
+          "date": "2025-10-15"
+        },
+        {
+          "title": "7 Best Python Projects for Kids: Fun Coding Adventures",
+          "url": "https://codakid.com/blog/python/7-best-python-projects-for-kids-fun-coding-adventures/",
+          "cluster": "Python",
+          "date": "2025-09-17"
+        },
+        {
+          "title": "Programming Terms Quiz Maker for Kids",
+          "url": "https://codakid.com/blog/coding-for-kids/programming-terms-quiz-maker-for-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-01-22"
+        },
+        {
+          "title": "Programming Terms Glossary for Kids",
+          "url": "https://codakid.com/blog/coding-for-kids/programming-terms-glossary-for-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2025-12-17"
+        },
+        {
+          "title": "Top Computer Programming Classes for Kids and Teens in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/top-programming-classes-kids-teens-2026/",
+          "cluster": "Coding for Kids",
+          "date": "2025-12-12"
+        }
+      ],
+      "pillarScore": 94,
+      "health": 78,
+      "freshnessDays": 2388,
+      "status": "strong",
+      "confirmedPillar": false
+    },
+    {
+      "id": 42411,
+      "title": "Best One-on-One Coding Tutors for Kids in 2026",
+      "slug": "best-one-on-one-coding-tutors-for-kids",
+      "url": "https://codakid.com/blog/coding-for-kids/best-one-on-one-coding-tutors-for-kids/",
+      "normalizedUrl": "https://codakid.com/blog/coding-for-kids/best-one-on-one-coding-tutors-for-kids",
+      "date": "2026-01-02",
+      "modified": "2026-01-02",
+      "categories": [
+        "Coding for Kids"
+      ],
+      "cluster": "Coding for Kids",
+      "excerpt": "Best One-on-One Coding Tutors for Kids in 2026 Finding the best one-on-one coding tutors for your child in 2026 is crucial as software-related jobs are expected to grow by 34%, making coding a must-have skill. Personalized one-on-one tutoring can boost learnin",
+      "wordCount": 3494,
+      "outboundCount": 19,
+      "inboundCount": 18,
+      "inboundSources": [
+        "https://codakid.com/blog/coding-for-kids/minecraft-vs-roblox-homeschool-game-projects",
+        "https://codakid.com/blog/minecraft/best-roblox-coding-classes-for-kids",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids",
+        "https://codakid.com/blog/coding-for-teens/game-design-concept-calculator-for-teens",
+        "https://codakid.com/blog/coding-for-kids/homeschool-game-design-ultimate-guide",
+        "https://codakid.com/blog/coding-for-kids/coding-projects-kids-by-age",
+        "https://codakid.com/blog/coding-for-kids/programming-terms-quiz-maker-for-kids",
+        "https://codakid.com/blog/coding-for-kids/best-kids-coding-subscriptions",
+        "https://codakid.com/blog/coding-for-kids/digital-footprints-teaching-kids-online-presence",
+        "https://codakid.com/blog/coding-for-kids/homeschool-tech-curriculum-ultimate-guide",
+        "https://codakid.com/blog/ai-for-kids/best-ai-classes-for-kids-teens",
+        "https://codakid.com/blog/game-development/game-design-concept-planner-teens",
+        "https://codakid.com/blog/ai-for-kids/ai-regulations-building-safer-future-kids-online",
+        "https://codakid.com/blog/game-development/game-development-tools-beginners",
+        "https://codakid.com/blog/coding-for-kids/youth-coders-creating-better-online-spaces",
+        "https://codakid.com/blog/coding-for-kids/coding-skill-level-analyzer-for-kids",
+        "https://codakid.com/blog/coding-for-kids/top-resources-parents-coding-communities",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-for-kids-2025"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Best Coding Platforms for Kids in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-platforms-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-30"
+        },
+        {
+          "title": "How Coding Builds Confidence in Kids: 7 Key Benefits",
+          "url": "https://codakid.com/blog/coding-for-kids/how-coding-builds-confidence-in-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-18"
+        },
+        {
+          "title": "Best Small-Group Coding Classes for Kids",
+          "url": "https://codakid.com/blog/small-group-classes/best-small-group-coding-classes-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-16"
+        },
+        {
+          "title": "Best Coding Apps for Kids Ages 6–8",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-apps-for-kids-ages-6-8/",
+          "cluster": "Coding for Kids",
+          "date": "2026-02-25"
+        },
+        {
+          "title": "Best Homeschool Coding Curriculum in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-homeschool-coding-curriculum",
+          "cluster": "Coding for Kids",
+          "date": "2026-01-27"
+        },
+        {
+          "title": "Teaching Accessibility in Coding: A Parent's Guide",
+          "url": "https://codakid.com/blog/coding-for-kids/teaching-accessibility-in-coding-a-parents-guide/",
+          "cluster": "Coding for Kids",
+          "date": "2026-01-26"
+        },
+        {
+          "title": "Unity Coding for Kids: Complete Step-by-Step Guide",
+          "url": "https://codakid.com/blog/unity/unity-coding-for-kids-complete-guide/",
+          "cluster": "Coding for Kids",
+          "date": "2025-12-30"
+        },
+        {
+          "title": "Top 7 Real-Time Coding Platforms for Kids",
+          "url": "https://codakid.com/blog/coding-for-kids/top-7-real-time-coding-platforms-for-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2025-12-26"
+        }
+      ],
+      "pillarScore": 92,
+      "health": 100,
+      "freshnessDays": 165,
+      "status": "strong",
+      "confirmedPillar": false
+    },
+    {
+      "id": 42151,
+      "title": "How to Explain AI to Kids by Age Group",
+      "slug": "explain-ai-to-kids-by-age",
+      "url": "https://codakid.com/blog/ai-for-kids/explain-ai-to-kids-by-age/",
+      "normalizedUrl": "https://codakid.com/blog/ai-for-kids/explain-ai-to-kids-by-age",
+      "date": "2025-11-11",
+      "modified": "2025-11-11",
+      "categories": [
+        "AI for Kids"
+      ],
+      "cluster": "AI",
+      "excerpt": "How to Explain AI to Kids by Age Group Artificial Intelligence (AI) is part of everyday life, from voice assistants like Alexa to YouTube recommendations. Teaching kids about AI helps them understand the technology they interact with daily, builds critical thi",
+      "wordCount": 3026,
+      "outboundCount": 24,
+      "inboundCount": 4,
+      "inboundSources": [
+        "https://codakid.com/blog/ai-for-kids/best-ai-classes-for-kids-teens",
+        "https://codakid.com/blog/ai-for-kids/ai-bias-diversity-parents-guide",
+        "https://codakid.com/blog/ai-for-kids/how-ai-transforms-digital-art-for-kids",
+        "https://codakid.com/blog/ai-for-kids/ai-tools-for-kids-art"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Best AI Summer Camps for Teens (2026)",
+          "url": "https://codakid.com/blog/kids-coding-camps/best-ai-summer-camps-for-teens/",
+          "cluster": "AI",
+          "date": "2026-04-06"
+        },
+        {
+          "title": "AI Camps for Kids: The Complete Checklist",
+          "url": "https://codakid.com/blog/kids-coding-camps/ai-camps-for-kids-complete-checklist/",
+          "cluster": "AI",
+          "date": "2026-03-10"
+        },
+        {
+          "title": "Best AI Tools for Students in 2026 (Safe + School-Friendly Picks)",
+          "url": "https://codakid.com/blog/ai-for-kids/best-ai-tools-for-students-safe-school-friendly-picks/",
+          "cluster": "AI",
+          "date": "2026-03-09"
+        },
+        {
+          "title": "Safe AI Learning at Home: Ultimate Guide for Parents",
+          "url": "https://codakid.com/blog/ai-for-kids/afe-ai-learning-at-home-ultimate-guide-for-parents/",
+          "cluster": "AI",
+          "date": "2026-02-12"
+        },
+        {
+          "title": "AI Regulations: Building a Safer Future for Kids Online",
+          "url": "https://codakid.com/blog/ai-for-kids/ai-regulations-building-safer-future-kids-online/",
+          "cluster": "AI",
+          "date": "2026-01-12"
+        },
+        {
+          "title": "Real-Time Feedback in AI and Coding Education",
+          "url": "https://codakid.com/blog/ai-for-kids/real-time-feedback-ai-coding-education/",
+          "cluster": "AI",
+          "date": "2025-12-23"
+        },
+        {
+          "title": "Algorithmic Bias: What Parents Need to Know About AI for Kids",
+          "url": "https://codakid.com/blog/ai-for-kids/algorithmic-bias-ai-for-kids/",
+          "cluster": "AI",
+          "date": "2025-12-16"
+        },
+        {
+          "title": "AI Ethics: Educating Young Minds",
+          "url": "https://codakid.com/blog/ai-for-kids/ai-ethics-educating-young-minds/",
+          "cluster": "AI",
+          "date": "2025-12-11"
+        }
+      ],
+      "pillarScore": 90,
+      "health": 60,
+      "freshnessDays": 217,
+      "status": "watch",
+      "confirmedPillar": false
+    },
+    {
+      "id": 28859,
+      "title": "Best Coding Apps for Teaching Kids Tech Skills (2026)",
+      "slug": "top-5-coding-apps-that-teach-kids-real-computer-programming",
+      "url": "https://codakid.com/top-5-coding-apps-that-teach-kids-real-computer-programming/",
+      "normalizedUrl": "https://codakid.com/top-5-coding-apps-that-teach-kids-real-computer-programming",
+      "date": "2024-03-30",
+      "modified": "2026-03-04",
+      "categories": [
+        "Coding Games"
+      ],
+      "cluster": "Coding for Kids",
+      "excerpt": "Best Coding Apps for Teaching Kids Tech Skills (2026) At some point, children who want to learn coding transition from using visual blocks and drag-and-drop coding - to embracing the exciting realm of coding using actual programming languages. Some parents cho",
+      "wordCount": 4151,
+      "outboundCount": 7,
+      "inboundCount": 19,
+      "inboundSources": [
+        "https://codakid.com/blog/coding-for-kids/top-7-real-time-coding-platforms-for-kids",
+        "https://codakid.com/blog/coding-for-kids/10-best-computer-coding-courses-kids-2026",
+        "https://codakid.com/blog/coding-for-kids/top-programming-classes-kids-teens-2026",
+        "https://codakid.com/blog/kids-coding-camps/top-5-free-coding-camps-kids-2026",
+        "https://codakid.com/blog/coding-for-kids/top-6-coding-courses-kids-2026",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-for-kids-2025",
+        "https://codakid.com/blog/kids-coding-camps/top-free-coding-camps-kids-2025",
+        "https://codakid.com/blog/minecraft/best-minecraft-coding-games-2025",
+        "https://codakid.com/blog/introduction-to-java-coding-for-kids",
+        "https://codakid.com/coding-for-12-year-olds",
+        "https://codakid.com/java-vs-javascript",
+        "https://codakid.com/online-game-school",
+        "https://codakid.com/how-to-make-a-video-game",
+        "https://codakid.com/coding-gifts-for-kids",
+        "https://codakid.com/code-monster-review",
+        "https://codakid.com/codecademy-review",
+        "https://codakid.com/math-games",
+        "https://codakid.com/stem-toys",
+        "https://codakid.com/scratch-vs-codakid"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Best Coding Apps for Kids Ages 6–8",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-apps-for-kids-ages-6-8/",
+          "cluster": "Coding for Kids",
+          "date": "2026-02-25"
+        },
+        {
+          "title": "Best Free Coding Websites and Apps for Kids to Learn Programming Skills",
+          "url": "https://codakid.com/blog/coding-websites-and-apps-for-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2024-07-03"
+        },
+        {
+          "title": "Teaching Accessibility in Coding: A Parent's Guide",
+          "url": "https://codakid.com/blog/coding-for-kids/teaching-accessibility-in-coding-a-parents-guide/",
+          "cluster": "Coding for Kids",
+          "date": "2026-01-26"
+        },
+        {
+          "title": "Best Coding Platforms for Kids in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-platforms-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-30"
+        },
+        {
+          "title": "How Coding Builds Confidence in Kids: 7 Key Benefits",
+          "url": "https://codakid.com/blog/coding-for-kids/how-coding-builds-confidence-in-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-18"
+        },
+        {
+          "title": "Best Small-Group Coding Classes for Kids",
+          "url": "https://codakid.com/blog/small-group-classes/best-small-group-coding-classes-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-16"
+        },
+        {
+          "title": "Best Online Coding Classes for Kids (Ages 6–18) in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-02-16"
+        },
+        {
+          "title": "A Beginner's Guide to Teaching Kids Coding (Even When You Don't Know How to Code)",
+          "url": "https://codakid.com/a-beginners-guide-to-teaching-kids-coding-even-when-you-dont-know-how-to-code/",
+          "cluster": "Coding for Kids",
+          "date": "2019-05-01"
+        }
+      ],
+      "pillarScore": 90,
+      "health": 86,
+      "freshnessDays": 808,
+      "status": "strong",
+      "confirmedPillar": false
+    },
+    {
+      "id": 28872,
+      "title": "Scratch vs CodaKid: Which Kids Coding Website is Best for Your Child?",
+      "slug": "scratch-vs-codakid",
+      "url": "https://codakid.com/scratch-vs-codakid/",
+      "normalizedUrl": "https://codakid.com/scratch-vs-codakid",
+      "date": "2018-10-15",
+      "modified": "2024-10-28",
+      "categories": [
+        "Coding for Kids"
+      ],
+      "cluster": "Coding for Kids",
+      "excerpt": "Scratch vs CodaKid: Which Kids Coding Website is Best for Your Child? Earlier this fall, we took a deep dive into kids coding websites Tynker and CodaKid, both Parents' Choice Gold Award winners and CODiE Finalists for Best Coding and Computational Thinking So",
+      "wordCount": 2857,
+      "outboundCount": 3,
+      "inboundCount": 21,
+      "inboundSources": [
+        "https://codakid.com/blog/coding-for-kids/top-7-real-time-coding-platforms-for-kids",
+        "https://codakid.com/blog/coding-for-kids/10-best-computer-coding-courses-kids-2026",
+        "https://codakid.com/blog/coding-for-kids/top-programming-classes-kids-teens-2026",
+        "https://codakid.com/blog/kids-coding-camps/top-5-free-coding-camps-kids-2026",
+        "https://codakid.com/blog/coding-for-kids/top-6-coding-courses-kids-2026",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-for-kids-2025",
+        "https://codakid.com/blog/coding-for-kids/best-online-coding-platforms-2025",
+        "https://codakid.com/scratch-sprites",
+        "https://codakid.com/blog/coding-games/coding-games-for-kids-the-best-way-to-teach-computer-programming",
+        "https://codakid.com/blog/coding-for-kids/top-7-kids-coding-languages-of-2018",
+        "https://codakid.com/top-21-kids-coding-websites-of-all-time",
+        "https://codakid.com/computer-basics-for-kids",
+        "https://codakid.com/hour-of-code-activities",
+        "https://codakid.com/pygame-tutorial",
+        "https://codakid.com/scratchjr-review",
+        "https://codakid.com/block-coding",
+        "https://codakid.com/11-best-online-education-programs-for-kids",
+        "https://codakid.com/udemy-vs-codakid",
+        "https://codakid.com/coding-kits-kids-guide",
+        "https://codakid.com/osmo-review",
+        "https://codakid.com/engineering-for-kids-guide"
+      ],
+      "relatedPostCount": 18,
+      "missingRelatedLinks": [
+        {
+          "title": "Tynker vs CodaKid Review: Which Kids Coding Website is Best for Your Child?",
+          "url": "https://codakid.com/tynker-vs-codakid/",
+          "cluster": "Coding for Kids",
+          "date": "2018-09-07"
+        },
+        {
+          "title": "Choosing the Best Coding Class for My Child in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/choosing-the-best-coding-class-for-my-child/",
+          "cluster": "Coding for Kids",
+          "date": "2025-03-01"
+        },
+        {
+          "title": "Best Coding Platforms for Kids in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-platforms-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-30"
+        },
+        {
+          "title": "How Coding Builds Confidence in Kids: 7 Key Benefits",
+          "url": "https://codakid.com/blog/coding-for-kids/how-coding-builds-confidence-in-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-18"
+        },
+        {
+          "title": "Best Small-Group Coding Classes for Kids",
+          "url": "https://codakid.com/blog/small-group-classes/best-small-group-coding-classes-for-kids",
+          "cluster": "Coding for Kids",
+          "date": "2026-03-16"
+        },
+        {
+          "title": "Best Coding Apps for Kids Ages 6–8",
+          "url": "https://codakid.com/blog/coding-for-kids/best-coding-apps-for-kids-ages-6-8/",
+          "cluster": "Coding for Kids",
+          "date": "2026-02-25"
+        },
+        {
+          "title": "Best Online Coding Classes for Kids (Ages 6–18) in 2026",
+          "url": "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids/",
+          "cluster": "Coding for Kids",
+          "date": "2026-02-16"
+        },
+        {
+          "title": "CodaKid is launching Kids Coding Classes in Chandler!",
+          "url": "https://codakid.com/blog/uncategoricodakid-is-launching-kids-coding-classes-in-chandler/zed/codakid-is-launching-kids-coding-classes-in-chandler/",
+          "cluster": "Coding for Kids",
+          "date": "2015-08-28"
+        }
+      ],
+      "pillarScore": 90,
+      "health": 80,
+      "freshnessDays": 2801,
+      "status": "strong",
+      "confirmedPillar": false
+    }
+  ],
+  "underlinkedPillars": [
+    {
+      "title": "Coding for Kids: The Ultimate Guide for Parents (2026)",
+      "url": "https://codakid.com/coding-for-kids-the-ultimate-guide-for-parents-2/",
+      "cluster": "Coding for Kids",
+      "inboundCount": 90,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "The Ultimate Guide to Minecraft Modding with Java",
+      "url": "https://codakid.com/guide-to-minecraft-modding-with-java/",
+      "cluster": "Minecraft",
+      "inboundCount": 26,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Basic Programming Languages That Are Kid-Friendly",
+      "url": "https://codakid.com/blog/basic-programming-languages-that-are-kid-friendly/",
+      "cluster": "Coding for Kids",
+      "inboundCount": 39,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Best Kids Coding Subscriptions in 2026",
+      "url": "https://codakid.com/blog/coding-for-kids/best-kids-coding-subscriptions/",
+      "cluster": "Coding for Kids",
+      "inboundCount": 18,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Best Ways to Teach Kids Computer Coding in 2026",
+      "url": "https://codakid.com/best-ways-to-teach-kids-computer-coding/",
+      "cluster": "General",
+      "inboundCount": 22,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Minecraft - A Parent's Survival Guide",
+      "url": "https://codakid.com/parents-guide-to-minecraft/",
+      "cluster": "Minecraft",
+      "inboundCount": 35,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Best Online Coding Classes for Kids (Ages 6–18) in 2026",
+      "url": "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids/",
+      "cluster": "Coding for Kids",
+      "inboundCount": 8,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Best Roblox Coding Classes for Kids in 2026",
+      "url": "https://codakid.com/blog/minecraft/best-roblox-coding-classes-for-kids/",
+      "cluster": "Minecraft",
+      "inboundCount": 5,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "The Ultimate Guide to Making Your First Game on Roblox Studio",
+      "url": "https://codakid.com/ultimate-guide-making-your-first-game-on-roblox-studio/",
+      "cluster": "Roblox",
+      "inboundCount": 23,
+      "opportunity": "5 likely supporting posts can add links"
+    },
+    {
+      "title": "What are Minecraft Mods? A Quick Guide for Parents",
+      "url": "https://codakid.com/what-are-minecraft-mods-a-quick-guide-for-parents/",
+      "cluster": "Minecraft",
+      "inboundCount": 25,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Best AI Classes for Kids & Teens in 2026",
+      "url": "https://codakid.com/blog/ai-for-kids/best-ai-classes-for-kids-teens/",
+      "cluster": "AI",
+      "inboundCount": 18,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Hey, Parents! Did you know that Minecraft can teach your kids Java coding?",
+      "url": "https://codakid.com/hey-parents-minecraft-can-teach-kids-java-coding/",
+      "cluster": "Minecraft",
+      "inboundCount": 26,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Interactive AI Learning Tools for Kids: Apps and Platforms to Get Started",
+      "url": "https://codakid.com/blog/interactive-ai-learning-tools-for-kids/",
+      "cluster": "AI",
+      "inboundCount": 21,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Python for Kids: 5 Reasons Python Programming is Best for Kids",
+      "url": "https://codakid.com/5-reasons-python-programming-is-perfect-for-kids/",
+      "cluster": "Python",
+      "inboundCount": 22,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Best One-on-One Coding Tutors for Kids in 2026",
+      "url": "https://codakid.com/blog/coding-for-kids/best-one-on-one-coding-tutors-for-kids/",
+      "cluster": "Coding for Kids",
+      "inboundCount": 18,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "How to Explain AI to Kids by Age Group",
+      "url": "https://codakid.com/blog/ai-for-kids/explain-ai-to-kids-by-age/",
+      "cluster": "AI",
+      "inboundCount": 4,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Best Coding Apps for Teaching Kids Tech Skills (2026)",
+      "url": "https://codakid.com/top-5-coding-apps-that-teach-kids-real-computer-programming/",
+      "cluster": "Coding for Kids",
+      "inboundCount": 19,
+      "opportunity": "8 likely supporting posts can add links"
+    },
+    {
+      "title": "Scratch vs CodaKid: Which Kids Coding Website is Best for Your Child?",
+      "url": "https://codakid.com/scratch-vs-codakid/",
+      "cluster": "Coding for Kids",
+      "inboundCount": 21,
+      "opportunity": "8 likely supporting posts can add links"
+    }
+  ],
+  "linkGaps": [
+    {
+      "pillarTitle": "Coding for Kids: The Ultimate Guide for Parents (2026)",
+      "pillarUrl": "https://codakid.com/coding-for-kids-the-ultimate-guide-for-parents-2/",
+      "sourceTitle": "Coding for Kids with Autism - The Ultimate Guide for Parents and Educators",
+      "sourceUrl": "https://codakid.com/coding-for-kids-with-autism-the-ultimate-guide-for-parents-and-educators/",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Coding for Kids: The Ultimate Guide for Parents"
+    },
+    {
+      "pillarTitle": "Coding for Kids: The Ultimate Guide for Parents (2026)",
+      "pillarUrl": "https://codakid.com/coding-for-kids-the-ultimate-guide-for-parents-2/",
+      "sourceTitle": "Coding for Kids and Parents: The Complete Guide",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/complete-guide-coding-kids-parents/",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Coding for Kids: The Ultimate Guide for Parents"
+    },
+    {
+      "pillarTitle": "Coding for Kids: The Ultimate Guide for Parents (2026)",
+      "pillarUrl": "https://codakid.com/coding-for-kids-the-ultimate-guide-for-parents-2/",
+      "sourceTitle": "Homeschool Coding with Professional Tools: The Ultimate Guide",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/homeschool-coding-professional-tools-guide/",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Coding for Kids: The Ultimate Guide for Parents"
+    },
+    {
+      "pillarTitle": "Coding for Kids: The Ultimate Guide for Parents (2026)",
+      "pillarUrl": "https://codakid.com/coding-for-kids-the-ultimate-guide-for-parents-2/",
+      "sourceTitle": "Best Coding Platforms for Kids in 2026",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/best-coding-platforms-for-kids",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Coding for Kids: The Ultimate Guide for Parents"
+    },
+    {
+      "pillarTitle": "The Ultimate Guide to Minecraft Modding with Java",
+      "pillarUrl": "https://codakid.com/guide-to-minecraft-modding-with-java/",
+      "sourceTitle": "Minecraft Modding for Kids: A Parent's Guide",
+      "sourceUrl": "https://codakid.com/blog/minecraft/minecraft-modding-for-kids-parents-guide/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "The Ultimate Guide to Minecraft Modding with Java"
+    },
+    {
+      "pillarTitle": "The Ultimate Guide to Minecraft Modding with Java",
+      "pillarUrl": "https://codakid.com/guide-to-minecraft-modding-with-java/",
+      "sourceTitle": "Best Minecraft Coding & Modding Classes for Kids in 2026",
+      "sourceUrl": "https://codakid.com/blog/minecraft/best-minecraft-coding-modding-classes-for-kids/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "The Ultimate Guide to Minecraft Modding with Java"
+    },
+    {
+      "pillarTitle": "The Ultimate Guide to Minecraft Modding with Java",
+      "pillarUrl": "https://codakid.com/guide-to-minecraft-modding-with-java/",
+      "sourceTitle": "Minecraft vs. Roblox for Homeschool Game Projects",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/minecraft-vs-roblox-homeschool-game-projects/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "The Ultimate Guide to Minecraft Modding with Java"
+    },
+    {
+      "pillarTitle": "The Ultimate Guide to Minecraft Modding with Java",
+      "pillarUrl": "https://codakid.com/guide-to-minecraft-modding-with-java/",
+      "sourceTitle": "The Ultimate Guide to Minecraft Weapons and Armor (2025)",
+      "sourceUrl": "https://codakid.com/minecraft-weapons-and-armor/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "The Ultimate Guide to Minecraft Modding with Java"
+    },
+    {
+      "pillarTitle": "Basic Programming Languages That Are Kid-Friendly",
+      "pillarUrl": "https://codakid.com/blog/basic-programming-languages-that-are-kid-friendly/",
+      "sourceTitle": "So Your Kid Wants to Design Games? Here are 5 Practical Tips to Help Her Design Like The Pros",
+      "sourceUrl": "https://codakid.com/so-your-kid-wants-to-design-games-here-are-5-practical-tips-to-help-her-design-like-the-pros/",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Basic Programming Languages That Are Kid-Friendly"
+    },
+    {
+      "pillarTitle": "Basic Programming Languages That Are Kid-Friendly",
+      "pillarUrl": "https://codakid.com/blog/basic-programming-languages-that-are-kid-friendly/",
+      "sourceTitle": "Programming Terms Quiz Maker for Kids",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/programming-terms-quiz-maker-for-kids/",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Basic Programming Languages That Are Kid-Friendly"
+    },
+    {
+      "pillarTitle": "Basic Programming Languages That Are Kid-Friendly",
+      "pillarUrl": "https://codakid.com/blog/basic-programming-languages-that-are-kid-friendly/",
+      "sourceTitle": "Programming Terms Glossary for Kids",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/programming-terms-glossary-for-kids/",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Basic Programming Languages That Are Kid-Friendly"
+    },
+    {
+      "pillarTitle": "Basic Programming Languages That Are Kid-Friendly",
+      "pillarUrl": "https://codakid.com/blog/basic-programming-languages-that-are-kid-friendly/",
+      "sourceTitle": "Programming Practice Quiz Maker for Kids",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/programming-practice-quiz-maker-kids/",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Basic Programming Languages That Are Kid-Friendly"
+    },
+    {
+      "pillarTitle": "Best Kids Coding Subscriptions in 2026",
+      "pillarUrl": "https://codakid.com/blog/coding-for-kids/best-kids-coding-subscriptions/",
+      "sourceTitle": "Best Coding Platforms for Kids in 2026",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/best-coding-platforms-for-kids",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Best Kids Coding Subscriptions in 2026"
+    },
+    {
+      "pillarTitle": "Best Kids Coding Subscriptions in 2026",
+      "pillarUrl": "https://codakid.com/blog/coding-for-kids/best-kids-coding-subscriptions/",
+      "sourceTitle": "How Coding Builds Confidence in Kids: 7 Key Benefits",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/how-coding-builds-confidence-in-kids/",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Best Kids Coding Subscriptions in 2026"
+    },
+    {
+      "pillarTitle": "Best Kids Coding Subscriptions in 2026",
+      "pillarUrl": "https://codakid.com/blog/coding-for-kids/best-kids-coding-subscriptions/",
+      "sourceTitle": "Best Small-Group Coding Classes for Kids",
+      "sourceUrl": "https://codakid.com/blog/small-group-classes/best-small-group-coding-classes-for-kids",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Best Kids Coding Subscriptions in 2026"
+    },
+    {
+      "pillarTitle": "Best Kids Coding Subscriptions in 2026",
+      "pillarUrl": "https://codakid.com/blog/coding-for-kids/best-kids-coding-subscriptions/",
+      "sourceTitle": "Best Homeschool Coding Curriculum in 2026",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/best-homeschool-coding-curriculum",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Best Kids Coding Subscriptions in 2026"
+    },
+    {
+      "pillarTitle": "Best Ways to Teach Kids Computer Coding in 2026",
+      "pillarUrl": "https://codakid.com/best-ways-to-teach-kids-computer-coding/",
+      "sourceTitle": "Coding for 14-Year-Olds - The Ultimate 2026 Guide",
+      "sourceUrl": "https://codakid.com/coding-for-14-year-olds/",
+      "cluster": "General",
+      "suggestedAnchor": "Best Ways to Teach Kids Computer Coding in 2026"
+    },
+    {
+      "pillarTitle": "Best Ways to Teach Kids Computer Coding in 2026",
+      "pillarUrl": "https://codakid.com/best-ways-to-teach-kids-computer-coding/",
+      "sourceTitle": "Coding for 12 Year Olds - The Ultimate Guide",
+      "sourceUrl": "https://codakid.com/coding-for-12-year-olds/",
+      "cluster": "General",
+      "suggestedAnchor": "Best Ways to Teach Kids Computer Coding in 2026"
+    },
+    {
+      "pillarTitle": "Best Ways to Teach Kids Computer Coding in 2026",
+      "pillarUrl": "https://codakid.com/best-ways-to-teach-kids-computer-coding/",
+      "sourceTitle": "Coding for 8 Year Olds - The Ultimate Guide in 2025",
+      "sourceUrl": "https://codakid.com/coding-for-8-year-olds-the-ultimate-guide/",
+      "cluster": "General",
+      "suggestedAnchor": "Best Ways to Teach Kids Computer Coding in 2026"
+    },
+    {
+      "pillarTitle": "Best Ways to Teach Kids Computer Coding in 2026",
+      "pillarUrl": "https://codakid.com/best-ways-to-teach-kids-computer-coding/",
+      "sourceTitle": "12 Best Coding Gifts for Kids",
+      "sourceUrl": "https://codakid.com/coding-gifts-for-kids/",
+      "cluster": "General",
+      "suggestedAnchor": "Best Ways to Teach Kids Computer Coding in 2026"
+    },
+    {
+      "pillarTitle": "Minecraft - A Parent's Survival Guide",
+      "pillarUrl": "https://codakid.com/parents-guide-to-minecraft/",
+      "sourceTitle": "Minecraft Modding for Kids: A Parent's Guide",
+      "sourceUrl": "https://codakid.com/blog/minecraft/minecraft-modding-for-kids-parents-guide/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "Minecraft - A Parent's Survival Guide"
+    },
+    {
+      "pillarTitle": "Minecraft - A Parent's Survival Guide",
+      "pillarUrl": "https://codakid.com/parents-guide-to-minecraft/",
+      "sourceTitle": "Minecraft vs. Roblox for Homeschool Game Projects",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/minecraft-vs-roblox-homeschool-game-projects/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "Minecraft - A Parent's Survival Guide"
+    },
+    {
+      "pillarTitle": "Minecraft - A Parent's Survival Guide",
+      "pillarUrl": "https://codakid.com/parents-guide-to-minecraft/",
+      "sourceTitle": "Best Minecraft Coding & Modding Classes for Kids in 2026",
+      "sourceUrl": "https://codakid.com/blog/minecraft/best-minecraft-coding-modding-classes-for-kids/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "Minecraft - A Parent's Survival Guide"
+    },
+    {
+      "pillarTitle": "Minecraft - A Parent's Survival Guide",
+      "pillarUrl": "https://codakid.com/parents-guide-to-minecraft/",
+      "sourceTitle": "Cool Things to Build in Survival Minecraft When You're Bored",
+      "sourceUrl": "https://codakid.com/blog/minecraft/things-to-build-in-survival-minecraft/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "Minecraft - A Parent's Survival Guide"
+    },
+    {
+      "pillarTitle": "Best Online Coding Classes for Kids (Ages 6–18) in 2026",
+      "pillarUrl": "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids/",
+      "sourceTitle": "Top 10 Best Online Coding Classes for Kids in 2026",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-for-kids-2025/",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Best Online Coding Classes for Kids in 2026"
+    },
+    {
+      "pillarTitle": "Best Online Coding Classes for Kids (Ages 6–18) in 2026",
+      "pillarUrl": "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids/",
+      "sourceTitle": "Best Small-Group Coding Classes for Kids",
+      "sourceUrl": "https://codakid.com/blog/small-group-classes/best-small-group-coding-classes-for-kids",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Best Online Coding Classes for Kids in 2026"
+    },
+    {
+      "pillarTitle": "Best Online Coding Classes for Kids (Ages 6–18) in 2026",
+      "pillarUrl": "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids/",
+      "sourceTitle": "Best Coding Apps for Kids Ages 6–8",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/best-coding-apps-for-kids-ages-6-8/",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Best Online Coding Classes for Kids in 2026"
+    },
+    {
+      "pillarTitle": "Best Online Coding Classes for Kids (Ages 6–18) in 2026",
+      "pillarUrl": "https://codakid.com/blog/coding-for-kids/best-online-coding-classes-kids/",
+      "sourceTitle": "Best Online Coding Platforms in 2026: A Parent’s Guide",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/best-online-coding-platforms-2025/",
+      "cluster": "Coding for Kids",
+      "suggestedAnchor": "Best Online Coding Classes for Kids in 2026"
+    },
+    {
+      "pillarTitle": "Best Roblox Coding Classes for Kids in 2026",
+      "pillarUrl": "https://codakid.com/blog/minecraft/best-roblox-coding-classes-for-kids/",
+      "sourceTitle": "Best Minecraft Coding & Modding Classes for Kids in 2026",
+      "sourceUrl": "https://codakid.com/blog/minecraft/best-minecraft-coding-modding-classes-for-kids/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "Best Roblox Coding Classes for Kids in 2026"
+    },
+    {
+      "pillarTitle": "Best Roblox Coding Classes for Kids in 2026",
+      "pillarUrl": "https://codakid.com/blog/minecraft/best-roblox-coding-classes-for-kids/",
+      "sourceTitle": "How Online Minecraft Modding Classes Can Jumpstart your Child's Future in Coding",
+      "sourceUrl": "https://codakid.com/online-minecraft-modding-classes-can-jumpstart-your-childs-future-in-coding/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "Best Roblox Coding Classes for Kids in 2026"
+    },
+    {
+      "pillarTitle": "Best Roblox Coding Classes for Kids in 2026",
+      "pillarUrl": "https://codakid.com/blog/minecraft/best-roblox-coding-classes-for-kids/",
+      "sourceTitle": "Best Minecraft Coding Games in 2026",
+      "sourceUrl": "https://codakid.com/blog/minecraft/best-minecraft-coding-games-2025/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "Best Roblox Coding Classes for Kids in 2026"
+    },
+    {
+      "pillarTitle": "Best Roblox Coding Classes for Kids in 2026",
+      "pillarUrl": "https://codakid.com/blog/minecraft/best-roblox-coding-classes-for-kids/",
+      "sourceTitle": "Roblox vs Minecraft: Which is Better for Learning Code?",
+      "sourceUrl": "https://codakid.com/blog/roblox-vs-minecraft-which-is-better-for-learning-code/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "Best Roblox Coding Classes for Kids in 2026"
+    },
+    {
+      "pillarTitle": "The Ultimate Guide to Making Your First Game on Roblox Studio",
+      "pillarUrl": "https://codakid.com/ultimate-guide-making-your-first-game-on-roblox-studio/",
+      "sourceTitle": "Roblox Scripting: How to Make a Game Like the Pros on Roblox Studio",
+      "sourceUrl": "https://codakid.com/roblox-scripting-how-to-make-a-game-like-the-pros-on-roblox-studio/",
+      "cluster": "Roblox",
+      "suggestedAnchor": "The Ultimate Guide to Making Your First Game on Roblox Studio"
+    },
+    {
+      "pillarTitle": "The Ultimate Guide to Making Your First Game on Roblox Studio",
+      "pillarUrl": "https://codakid.com/ultimate-guide-making-your-first-game-on-roblox-studio/",
+      "sourceTitle": "Roblox Lua Scripting Basics for Beginners",
+      "sourceUrl": "https://codakid.com/blog/roblox/roblox-lua-scripting-basics-for-beginners/",
+      "cluster": "Roblox",
+      "suggestedAnchor": "The Ultimate Guide to Making Your First Game on Roblox Studio"
+    },
+    {
+      "pillarTitle": "The Ultimate Guide to Making Your First Game on Roblox Studio",
+      "pillarUrl": "https://codakid.com/ultimate-guide-making-your-first-game-on-roblox-studio/",
+      "sourceTitle": "How Roblox Keeps Your Children's Safety a Priority",
+      "sourceUrl": "https://codakid.com/blog/roblox/how-roblox-keeps-your-childrens-safety-a-priority/",
+      "cluster": "Roblox",
+      "suggestedAnchor": "The Ultimate Guide to Making Your First Game on Roblox Studio"
+    },
+    {
+      "pillarTitle": "The Ultimate Guide to Making Your First Game on Roblox Studio",
+      "pillarUrl": "https://codakid.com/ultimate-guide-making-your-first-game-on-roblox-studio/",
+      "sourceTitle": "Roblox Promo Codes for Free Clothes and Items",
+      "sourceUrl": "https://codakid.com/roblox-promo-codes/",
+      "cluster": "Roblox",
+      "suggestedAnchor": "The Ultimate Guide to Making Your First Game on Roblox Studio"
+    },
+    {
+      "pillarTitle": "What are Minecraft Mods? A Quick Guide for Parents",
+      "pillarUrl": "https://codakid.com/what-are-minecraft-mods-a-quick-guide-for-parents/",
+      "sourceTitle": "Minecraft Modding for Kids: A Parent's Guide",
+      "sourceUrl": "https://codakid.com/blog/minecraft/minecraft-modding-for-kids-parents-guide/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "What are Minecraft Mods? A Quick Guide for Parents"
+    },
+    {
+      "pillarTitle": "What are Minecraft Mods? A Quick Guide for Parents",
+      "pillarUrl": "https://codakid.com/what-are-minecraft-mods-a-quick-guide-for-parents/",
+      "sourceTitle": "Minecraft vs. Roblox for Homeschool Game Projects",
+      "sourceUrl": "https://codakid.com/blog/coding-for-kids/minecraft-vs-roblox-homeschool-game-projects/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "What are Minecraft Mods? A Quick Guide for Parents"
+    },
+    {
+      "pillarTitle": "What are Minecraft Mods? A Quick Guide for Parents",
+      "pillarUrl": "https://codakid.com/what-are-minecraft-mods-a-quick-guide-for-parents/",
+      "sourceTitle": "Best Minecraft Coding & Modding Classes for Kids in 2026",
+      "sourceUrl": "https://codakid.com/blog/minecraft/best-minecraft-coding-modding-classes-for-kids/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "What are Minecraft Mods? A Quick Guide for Parents"
+    },
+    {
+      "pillarTitle": "What are Minecraft Mods? A Quick Guide for Parents",
+      "pillarUrl": "https://codakid.com/what-are-minecraft-mods-a-quick-guide-for-parents/",
+      "sourceTitle": "Your Quick Cheat Sheet On How To Build Minecraft Roofs",
+      "sourceUrl": "https://codakid.com/minecraft-roofs/",
+      "cluster": "Minecraft",
+      "suggestedAnchor": "What are Minecraft Mods? A Quick Guide for Parents"
+    }
+  ],
+  "orphanPosts": [
+    {
+      "title": "Florida Step Up for Students: 5 Key Facts Parents Must Know",
+      "url": "https://codakid.com/blog/esa/florida-step-up-for-students",
+      "cluster": "ESA",
+      "date": "2025-09-13",
+      "inboundCount": 0,
+      "outboundCount": 2
+    },
+    {
+      "title": "Transform Your Gameplay: Customizing Minecraft Items for Kids",
+      "url": "https://codakid.com/blog/minecraft/transform-your-gameplay-customizing-minecraft-items-for-kids/",
+      "cluster": "Minecraft",
+      "date": "2024-12-10",
+      "inboundCount": 0,
+      "outboundCount": 2
+    },
+    {
+      "title": "A Comprehensive Parents Guide to Missouri Close the Gap ESA",
+      "url": "https://codakid.com/blog/missouri-close-the-gap-esa/",
+      "cluster": "Coding for Kids",
+      "date": "2024-09-02",
+      "inboundCount": 0,
+      "outboundCount": 0
+    },
+    {
+      "title": "A Parent’s Guide to the Kansas KEEP ESA Scholarship Program",
+      "url": "https://codakid.com/blog/kansas-keep-esa-scholarship-program/",
+      "cluster": "Coding for Kids",
+      "date": "2024-09-02",
+      "inboundCount": 0,
+      "outboundCount": 1
+    },
+    {
+      "title": "A Comprehensive Guide to the Ohio ACE Program for Parents",
+      "url": "https://codakid.com/blog/ohio-ace-program-for-parents/",
+      "cluster": "Coding for Kids",
+      "date": "2024-08-29",
+      "inboundCount": 0,
+      "outboundCount": 1
+    },
+    {
+      "title": "A Comprehensive Guide to the Idaho Empowering Parents Scholarship Program",
+      "url": "https://codakid.com/blog/idaho-empowering-parents-scholarship-program/",
+      "cluster": "Coding for Kids",
+      "date": "2024-08-29",
+      "inboundCount": 0,
+      "outboundCount": 2
+    },
+    {
+      "title": "A Comprehensive Parent’s Guide to Texas SSES ESA: Enhancing Education for Special Needs Children",
+      "url": "https://codakid.com/blog/texas-sses-esa/",
+      "cluster": "Coding for Kids",
+      "date": "2024-08-22",
+      "inboundCount": 0,
+      "outboundCount": 1
+    },
+    {
+      "title": "7 Cool Minecraft Bridge Ideas, Designs, and How-to Tutorials",
+      "url": "https://codakid.com/blog/minecraft/minecraft-bridge-ideas/",
+      "cluster": "Minecraft",
+      "date": "2024-03-16",
+      "inboundCount": 0,
+      "outboundCount": 2
+    },
+    {
+      "title": "Top Coding Toys for Kids in 2026: The Essential Guide",
+      "url": "https://codakid.com/blog/coding-games/top-coding-toys-for-children-in-2024-essential-guide/",
+      "cluster": "Coding Games",
+      "date": "2024-03-07",
+      "inboundCount": 0,
+      "outboundCount": 2
+    },
+    {
+      "title": "UEFN Tutorial - How to Make a Fortnite Game",
+      "url": "https://codakid.com/uefn-tutorial/",
+      "cluster": "Game Development",
+      "date": "2023-09-06",
+      "inboundCount": 0,
+      "outboundCount": 1
+    },
+    {
+      "title": "A Comprehensive Arizona ESA Guide for Parents in 2026",
+      "url": "https://codakid.com/arizona-esa/",
+      "cluster": "Homeschool",
+      "date": "2023-07-28",
+      "inboundCount": 0,
+      "outboundCount": 1
+    },
+    {
+      "title": "CodaKid is launching Kids Coding Classes in Chandler!",
+      "url": "https://codakid.com/blog/uncategoricodakid-is-launching-kids-coding-classes-in-chandler/zed/codakid-is-launching-kids-coding-classes-in-chandler/",
+      "cluster": "Coding for Kids",
+      "date": "2015-08-28",
+      "inboundCount": 0,
+      "outboundCount": 1
+    },
+    {
+      "title": "CodaKid - Kids Coding and Game Design Academy Launches in Scottsdale",
+      "url": "https://codakid.com/kids-coding-and-game-design-academy-launches-in-scottsdale/",
+      "cluster": "Game Development",
+      "date": "2014-12-30",
+      "inboundCount": 0,
+      "outboundCount": 0
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "High",
+      "title": "Protect the highest-authority pillar",
+      "detail": "Coding for Kids: The Ultimate Guide for Parents (2026) has the strongest internal footprint. Use it as the model for cluster linking and conversion routing."
+    },
+    {
+      "priority": "High",
+      "title": "Build links into underlinked pillars",
+      "detail": "18 inferred pillars need more supporting links. Start with the first 8 contextual opportunities."
+    },
+    {
+      "priority": "Medium",
+      "title": "Turn recent posts into supporting assets",
+      "detail": "New 2026 posts should link back to the correct evergreen guides, especially AI, Minecraft, Roblox, and coding-class pages."
+    },
+    {
+      "priority": "Medium",
+      "title": "Clean up orphaned content",
+      "detail": "13 posts have weak link signals. Decide whether to refresh, merge, redirect, or add them to a cluster."
+    }
+  ],
+  "gameplan": {
+    "source": {
+      "fileName": "CodaKid-SEO-Gameplan.xlsx",
+      "importedAt": null
+    },
+    "confirmedPillars": [
+      {
+        "title": "Coding for Kids: The Ultimate Guide for Parents",
+        "url": "https://codakid.com/coding-for-kids-the-ultimate-guide-for-parents-2/",
+        "cluster": "Coding for Kids",
+        "status": "confirmed",
+        "notes": "Confirmed by CodaKid team as a pillar blog to track."
+      }
+    ],
+    "technicalAudit": [
+      {
+        "Issue": "Redirect loops (Cyrillic URL)",
+        "Severity": "CRITICAL",
+        "Count": 34,
+        "Impact": "34 pages caught in infinite redirect loops. Users and crawlers stuck. Wastes crawl budget.",
+        "Fix Instructions": "Find the URL with Cyrillic 'с' (not Latin 'c') in 'сodakid'. Set up a proper 301 redirect from the Cyrillic URL to the correct Latin version. Update all internal links pointing to this URL. URL contains: /unlocking-creativity-and-learning-with-сodakid-the-35-best-scratch-games-for-kids/",
+        "Status": "TODO"
+      },
+      {
+        "Issue": "Broken 404 pages",
+        "Severity": "HIGH",
+        "Count": 45,
+        "Impact": "Dead links throughout the site. Lost link equity, bad user experience, wasted crawl budget.",
+        "Fix Instructions": "Set up 301 redirects from each deleted URL to the most relevant existing page. Priority redirects: /coding-for-kids-the-ultimate-guide-for-parents-part-1/ → /coding-for-kids/, /private-tutoring-plans/ → /private-online-coding-classes/",
+        "Status": "TODO"
+      },
+      {
+        "Issue": "Homepage missing H1 tag",
+        "Severity": "HIGH",
+        "Count": 1,
+        "Impact": "Homepage has no H1. Google uses H1 to understand what the page is about.",
+        "Fix Instructions": "Add an H1 tag to homepage. Suggested H1: 'Online Coding Classes for Kids — Learn Scratch, Python, Minecraft & More'. Only ONE H1 per page.",
+        "Status": "TODO"
+      },
+      {
+        "Issue": "Pages missing meta descriptions",
+        "Severity": "HIGH",
+        "Count": 297,
+        "Impact": "44% of pages have no meta description. Google may auto-generate one (often poorly).",
+        "Fix Instructions": "Write unique meta descriptions for all pages. Priority: top 30 traffic pages first. Keep 150-160 characters. Include target keyword + call-to-action. See 'Meta Tags' tab for specific recommendations.",
+        "Status": "TODO"
+      },
+      {
+        "Issue": "Pages missing H1 tags",
+        "Severity": "HIGH",
+        "Count": 194,
+        "Impact": "29% of pages have no H1. Search engines can't properly understand page topic.",
+        "Fix Instructions": "Add unique, descriptive H1 tags to all pages. H1 should contain the page's primary target keyword. See 'Meta Tags' tab for specific recommendations.",
+        "Status": "TODO"
+      },
+      {
+        "Issue": "Course catalog pages blocked for crawlers (403 for bots)",
+        "Severity": "MEDIUM",
+        "Count": 94,
+        "Impact": "Course pages work for human visitors but return 403 to Google's crawler. These pages won't appear in search results. Less critical since the main SEO play is pillar pages and blog content, but still worth fixing for long-tail course-specific searches.",
+        "Fix Instructions": "Check bot protection settings (Cloudflare, Sucuri, Wordfence, or hosting firewall). Whitelist Googlebot and other legitimate crawlers for /course-catalog/ pages. These pages should be publicly crawlable since they show course descriptions (not the actual paid content). The 'Start Now' button already redirects to /book-consultation/ so there's no security risk in making them crawlable.",
+        "Status": "TODO"
+      },
+      {
+        "Issue": "Pages buried at crawl depth 7-18",
+        "Severity": "MEDIUM",
+        "Count": 58,
+        "Impact": "58 pages require 7+ clicks from homepage. Google may never crawl them.",
+        "Fix Instructions": "Add internal links from higher-level pages (homepage, category pages, pillar pages) to deeply buried content. See 'Internal Linking' tab.",
+        "Status": "TODO"
+      },
+      {
+        "Issue": "Duplicate H1 tags (theme bug)",
+        "Severity": "MEDIUM",
+        "Count": 119,
+        "Impact": "Same H1 rendered twice on 119 pages. Likely a WordPress theme template issue.",
+        "Fix Instructions": "Edit the WordPress theme template (usually header.php or single.php) to remove the duplicate H1 output. Check if Yoast SEO and the theme are both outputting H1s.",
+        "Status": "TODO"
+      },
+      {
+        "Issue": "ZERO structured data / rich results",
+        "Severity": "HIGH",
+        "Count": 0,
+        "Impact": "No schema markup producing any Google rich results. No star ratings, FAQ dropdowns, course info, or breadcrumbs in search results.",
+        "Fix Instructions": "Add JSON-LD structured data. See 'Schema Checklist' tab and the schema template files for ready-to-use code. Priority: Organization (homepage), Course (all course pages), Article (all blog posts), FAQ (key landing pages).",
+        "Status": "TODO"
+      },
+      {
+        "Issue": "Thin content pages (under 300 words)",
+        "Severity": "LOW",
+        "Count": 21,
+        "Impact": "21 pages with very little content. Google may consider them low-quality.",
+        "Fix Instructions": "Either expand thin pages to 500+ words with useful content, or noindex them if they're not important (e.g., tag/category archives). Review each page individually.",
+        "Status": "TODO"
+      },
+      {
+        "Issue": "Links to defunct external sites",
+        "Severity": "LOW",
+        "Count": 6,
+        "Impact": "Links to junilearning.com (now redirects to acely.ai) and other moved external sites.",
+        "Fix Instructions": "Find and update or remove links to defunct external sites. Check: junilearning.com links should be updated or removed.",
+        "Status": "TODO"
+      },
+      {
+        "Issue": "Temporary redirects that should be permanent",
+        "Severity": "LOW",
+        "Count": 5,
+        "Impact": "5 redirect chains use 302/307 (temporary) instead of 301 (permanent).",
+        "Fix Instructions": "Change 302/307 redirects to 301 if the moves are permanent. Temporary redirects don't pass full link equity.",
+        "Status": "TODO"
+      }
+    ],
+    "keywordTargets": [
+      {
+        "Priority": "P0 - Pillar Page",
+        "Keyword": "coding camp",
+        "Monthly Volume": 2000,
+        "KD": 93,
+        "Current Position": "Not ranking",
+        "Target URL": "/coding-camps/",
+        "Action": "Create page — CodingWithKids losing grip on this",
+        "Intent": "Commercial",
+        "Source": "Strategy"
+      },
+      {
+        "Priority": "P0 - Pillar Page",
+        "Keyword": "online coding classes for kids",
+        "Monthly Volume": 600,
+        "KD": 68,
+        "Current Position": "Not ranking",
+        "Target URL": "/online-coding-classes-for-kids/",
+        "Action": "Dedicated page for this high-intent keyword",
+        "Intent": "Transactional",
+        "Source": "Strategy"
+      },
+      {
+        "Priority": "P0 - Pillar Page",
+        "Keyword": "coding classes for kids",
+        "Monthly Volume": 3000,
+        "KD": 84,
+        "Current Position": "Not ranking",
+        "Target URL": "/coding-classes-for-kids/",
+        "Action": "Create landing page targeting parents ready to buy",
+        "Intent": "Transactional",
+        "Source": "Strategy"
+      },
+      {
+        "Priority": "P0 - Pillar Page",
+        "Keyword": "coding for kids free",
+        "Monthly Volume": 16000,
+        "KD": 70,
+        "Current Position": "Not ranking",
+        "Target URL": "/coding-for-kids-free/",
+        "Action": "Create free resources page + free trial funnel",
+        "Intent": "Commercial",
+        "Source": "Strategy"
+      },
+      {
+        "Priority": "P0 - Pillar Page",
+        "Keyword": "hour of code",
+        "Monthly Volume": 86000,
+        "KD": 60,
+        "Current Position": "Not ranking",
+        "Target URL": "/hour-of-code/",
+        "Action": "Create guide + CodaKid Hour of Code activities",
+        "Intent": "Informational",
+        "Source": "Strategy"
+      },
+      {
+        "Priority": "P0 - Pillar Page",
+        "Keyword": "coding games",
+        "Monthly Volume": 17000,
+        "KD": 80,
+        "Current Position": "Not ranking",
+        "Target URL": "/coding-games/",
+        "Action": "Create interactive guide to coding games for kids",
+        "Intent": "Informational",
+        "Source": "Strategy"
+      },
+      {
+        "Priority": "P0 - Pillar Page",
+        "Keyword": "best scratch games",
+        "Monthly Volume": 4800,
+        "KD": 30,
+        "Current Position": "Not ranking",
+        "Target URL": "/best-scratch-games/",
+        "Action": "Create — proven format (CodeWizardsHQ gets 1,843 traffic from this)",
+        "Intent": "Informational",
+        "Source": "Strategy"
+      },
+      {
+        "Priority": "P0 - Pillar Page",
+        "Keyword": "coding for kids",
+        "Monthly Volume": 15000,
+        "KD": 81,
+        "Current Position": 30,
+        "Target URL": "/coding-for-kids/",
+        "Action": "Create definitive 3000+ word pillar page",
+        "Intent": "Commercial",
+        "Source": "Strategy"
+      },
+      {
+        "Priority": "P1 - Quick Win",
+        "Keyword": "t-shirt roblox boy",
+        "Monthly Volume": 56000,
+        "KD": 0,
+        "Current Position": 10,
+        "Current URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Target URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Action": "Refresh & optimize existing content",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P1 - Quick Win",
+        "Keyword": "minecraft farm ideas",
+        "Monthly Volume": 6600,
+        "KD": 0,
+        "Current Position": 4,
+        "Current URL": "https://codakid.com/minecraft-farms-ideas/",
+        "Target URL": "https://codakid.com/minecraft-farms-ideas/",
+        "Action": "Refresh & optimize existing content",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P1 - Quick Win",
+        "Keyword": "color codes minecraft",
+        "Monthly Volume": 2300,
+        "KD": 16,
+        "Current Position": 4,
+        "Current URL": "https://codakid.com/minecraft-color-codes/",
+        "Target URL": "https://codakid.com/minecraft-color-codes/",
+        "Action": "Refresh & optimize existing content",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P1 - Quick Win",
+        "Keyword": "minecraft screenshot location",
+        "Monthly Volume": 1800,
+        "KD": 0,
+        "Current Position": 9,
+        "Current URL": "https://codakid.com/blog/minecraft/minecraft-screenshots/",
+        "Target URL": "https://codakid.com/blog/minecraft/minecraft-screenshots/",
+        "Action": "Refresh & optimize existing content",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P1 - Quick Win",
+        "Keyword": "minecraft bridge ideas",
+        "Monthly Volume": 1700,
+        "KD": 0,
+        "Current Position": 5,
+        "Current URL": "https://codakid.com/blog/minecraft/minecraft-bridge-ideas/",
+        "Target URL": "https://codakid.com/blog/minecraft/minecraft-bridge-ideas/",
+        "Action": "Refresh & optimize existing content",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P1 - Quick Win",
+        "Keyword": "minecraft bridges",
+        "Monthly Volume": 1500,
+        "KD": 0,
+        "Current Position": 8,
+        "Current URL": "https://codakid.com/blog/minecraft/minecraft-bridge-ideas/",
+        "Target URL": "https://codakid.com/blog/minecraft/minecraft-bridge-ideas/",
+        "Action": "Refresh & optimize existing content",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "roblox shirt template",
+        "Monthly Volume": 20000,
+        "KD": 16,
+        "Current Position": 15,
+        "Current URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Target URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "tshirt roblox",
+        "Monthly Volume": 9300,
+        "KD": 0,
+        "Current Position": 12,
+        "Current URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Target URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "t-shirt roblox black",
+        "Monthly Volume": 8300,
+        "KD": 0,
+        "Current Position": 19,
+        "Current URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Target URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "minecraft roofs",
+        "Monthly Volume": 4100,
+        "KD": 0,
+        "Current Position": 11,
+        "Current URL": "https://codakid.com/minecraft-roofs/",
+        "Target URL": "https://codakid.com/minecraft-roofs/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "coding classes for kids",
+        "Monthly Volume": 3000,
+        "KD": 84,
+        "Current Position": 18,
+        "Current URL": "https://codakid.com/",
+        "Target URL": "https://codakid.com/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "facts about ai",
+        "Monthly Volume": 3000,
+        "KD": 47,
+        "Current Position": 18,
+        "Current URL": "https://codakid.com/blog/13-fun-facts-about-artificial-intelligence-for-kids/",
+        "Target URL": "https://codakid.com/blog/13-fun-facts-about-artificial-intelligence-for-kids/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "template baju roblox",
+        "Monthly Volume": 2800,
+        "KD": 30,
+        "Current Position": 17,
+        "Current URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Target URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "what is the scariest game on roblox",
+        "Monthly Volume": 2700,
+        "KD": 0,
+        "Current Position": 15,
+        "Current URL": "https://codakid.com/blog/roblox/roblox-horror-games/",
+        "Target URL": "https://codakid.com/blog/roblox/roblox-horror-games/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "scratch programming",
+        "Monthly Volume": 2600,
+        "KD": 42,
+        "Current Position": 15,
+        "Current URL": "https://codakid.com/scratch-programming/",
+        "Target URL": "https://codakid.com/scratch-programming/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "minecraft castles",
+        "Monthly Volume": 2500,
+        "KD": 2,
+        "Current Position": 12,
+        "Current URL": "https://codakid.com/minecraft-castles/",
+        "Target URL": "https://codakid.com/minecraft-castles/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "computer ke parts",
+        "Monthly Volume": 2400,
+        "KD": 0,
+        "Current Position": 16,
+        "Current URL": "https://codakid.com/parts-of-a-computer/",
+        "Target URL": "https://codakid.com/parts-of-a-computer/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "villager trades",
+        "Monthly Volume": 2100,
+        "KD": 12,
+        "Current Position": 17,
+        "Current URL": "https://codakid.com/minecraft-villager-trades/",
+        "Target URL": "https://codakid.com/minecraft-villager-trades/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "minecraft colour codes",
+        "Monthly Volume": 2100,
+        "KD": 26,
+        "Current Position": 13,
+        "Current URL": "https://codakid.com/minecraft-color-codes/",
+        "Target URL": "https://codakid.com/minecraft-color-codes/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "horror games on roblox",
+        "Monthly Volume": 1900,
+        "KD": 0,
+        "Current Position": 17,
+        "Current URL": "https://codakid.com/blog/roblox/roblox-horror-games/",
+        "Target URL": "https://codakid.com/blog/roblox/roblox-horror-games/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "what villager trades sticks",
+        "Monthly Volume": 1700,
+        "KD": 1,
+        "Current Position": 12,
+        "Current URL": "https://codakid.com/minecraft-villager-trades/",
+        "Target URL": "https://codakid.com/minecraft-villager-trades/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "scratch coding",
+        "Monthly Volume": 1700,
+        "KD": 67,
+        "Current Position": 14,
+        "Current URL": "https://codakid.com/scratch-programming/",
+        "Target URL": "https://codakid.com/scratch-programming/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "scratch flappy bird",
+        "Monthly Volume": 1700,
+        "KD": 3,
+        "Current Position": 19,
+        "Current URL": "https://codakid.com/blog/how-to-make-a-flappy-bird-in-scratch/",
+        "Target URL": "https://codakid.com/blog/how-to-make-a-flappy-bird-in-scratch/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "minecraft mobs",
+        "Monthly Volume": 1700,
+        "KD": 0,
+        "Current Position": 13,
+        "Current URL": "https://codakid.com/blog/minecraft/minecraft-mobs/",
+        "Target URL": "https://codakid.com/blog/minecraft/minecraft-mobs/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "minecraft roof designs",
+        "Monthly Volume": 1600,
+        "KD": 0,
+        "Current Position": 17,
+        "Current URL": "https://codakid.com/minecraft-roofs/",
+        "Target URL": "https://codakid.com/minecraft-roofs/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "online jobs for 16 year olds",
+        "Monthly Volume": 1400,
+        "KD": 0,
+        "Current Position": 13,
+        "Current URL": "https://codakid.com/online-jobs-for-teens/",
+        "Target URL": "https://codakid.com/online-jobs-for-teens/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "best villager trades for emeralds",
+        "Monthly Volume": 1400,
+        "KD": 0,
+        "Current Position": 15,
+        "Current URL": "https://codakid.com/minecraft-villager-trades/",
+        "Target URL": "https://codakid.com/minecraft-villager-trades/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "scariest game on roblox",
+        "Monthly Volume": 1400,
+        "KD": 0,
+        "Current Position": 16,
+        "Current URL": "https://codakid.com/blog/roblox/roblox-horror-games/",
+        "Target URL": "https://codakid.com/blog/roblox/roblox-horror-games/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "t-shirt roblox cute",
+        "Monthly Volume": 1400,
+        "KD": 0,
+        "Current Position": 17,
+        "Current URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Target URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "facts about ai",
+        "Monthly Volume": 1300,
+        "KD": 70,
+        "Current Position": 20,
+        "Current URL": "https://codakid.com/blog/13-fun-facts-about-artificial-intelligence-for-kids/",
+        "Target URL": "https://codakid.com/blog/13-fun-facts-about-artificial-intelligence-for-kids/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "roblox song id",
+        "Monthly Volume": 1300,
+        "KD": 39,
+        "Current Position": 16,
+        "Current URL": "https://codakid.com/blog/roblox/roblox-music-codes/",
+        "Target URL": "https://codakid.com/blog/roblox/roblox-music-codes/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "minecraft build ideas",
+        "Monthly Volume": 1300,
+        "KD": 23,
+        "Current Position": 18,
+        "Current URL": "https://codakid.com/blog/minecraft/things-to-build-in-survival-minecraft/",
+        "Target URL": "https://codakid.com/blog/minecraft/things-to-build-in-survival-minecraft/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "minecraft yapı fikirleri",
+        "Monthly Volume": 1300,
+        "KD": 0,
+        "Current Position": 17,
+        "Current URL": "https://codakid.com/blog/minecraft/things-to-build-in-survival-minecraft/",
+        "Target URL": "https://codakid.com/blog/minecraft/things-to-build-in-survival-minecraft/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "minecraft build ideas",
+        "Monthly Volume": 1200,
+        "KD": 16,
+        "Current Position": 17,
+        "Current URL": "https://codakid.com/blog/minecraft/things-to-build-in-survival-minecraft/",
+        "Target URL": "https://codakid.com/blog/minecraft/things-to-build-in-survival-minecraft/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "gambar baju roblox",
+        "Monthly Volume": 1200,
+        "KD": 0,
+        "Current Position": 15,
+        "Current URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Target URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "minecraft castle ideas",
+        "Monthly Volume": 1200,
+        "KD": 3,
+        "Current Position": 12,
+        "Current URL": "https://codakid.com/minecraft-castles/",
+        "Target URL": "https://codakid.com/minecraft-castles/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      },
+      {
+        "Priority": "P2 - Push to Page 1",
+        "Keyword": "roof designs minecraft",
+        "Monthly Volume": 1200,
+        "KD": 0,
+        "Current Position": 13,
+        "Current URL": "https://codakid.com/minecraft-roofs/",
+        "Target URL": "https://codakid.com/minecraft-roofs/",
+        "Action": "Update content to push from page 2 to page 1",
+        "Intent": "Informational",
+        "Source": "CodaKid Organic"
+      }
+    ],
+    "contentCalendar": [
+      {
+        "Month": "Month 1",
+        "Week": "W1",
+        "Content Type": "Pillar Page",
+        "Title (SEO-Optimized)": "Coding for Kids: The Complete 2026 Guide for Parents",
+        "Target Keyword": "coding for kids",
+        "Volume": 15000,
+        "KD": 81,
+        "Word Count": 3500,
+        "Target URL": "/coding-for-kids/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P0",
+        "Competitor to Beat": "CodeMonkey (#1), CodingWithKids (#2)",
+        "Status": "TODO",
+        "Title/URL": "Coding for Kids: The Ultimate Guide for Parents (2026)",
+        "Update": "DONE"
+      },
+      {
+        "Month": "Month 1",
+        "Week": "W1",
+        "Content Type": "Pillar Page",
+        "Title (SEO-Optimized)": "Best Coding Classes for Kids — Online & In-Person [2026]",
+        "Target Keyword": "coding classes for kids",
+        "Volume": 3000,
+        "KD": 84,
+        "Word Count": 2500,
+        "Target URL": "/coding-classes-for-kids/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P0",
+        "Competitor to Beat": "CodingWithKids (#3), CodeWizardsHQ (#10)",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 1",
+        "Week": "W2",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "25+ Best Scratch Games for Kids to Play & Learn From",
+        "Target Keyword": "best scratch games",
+        "Volume": 4800,
+        "KD": 30,
+        "Word Count": 3000,
+        "Target URL": "/best-scratch-games/",
+        "Cluster": "Scratch",
+        "Priority": "P0",
+        "Competitor to Beat": "CodeWizardsHQ (#1, 1,843 traffic)",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 1",
+        "Week": "W4",
+        "Content Type": "Pillar Page",
+        "Title (SEO-Optimized)": "Best Coding Games for Kids to Learn Programming [2026]",
+        "Target Keyword": "coding games",
+        "Volume": 17000,
+        "KD": 80,
+        "Word Count": 3000,
+        "Target URL": "/coding-games/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P0",
+        "Competitor to Beat": "CodeMonkey (#1)",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 2",
+        "Week": "W2",
+        "Content Type": "Landing Page",
+        "Title (SEO-Optimized)": "Online Coding Classes for Kids — Live Instruction + Projects",
+        "Target Keyword": "online coding classes for kids",
+        "Volume": 600,
+        "KD": 68,
+        "Word Count": 2000,
+        "Target URL": "/online-coding-classes-for-kids/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P0",
+        "Competitor to Beat": "CodeMonkey (#1), CodeWizardsHQ (#3)",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 2",
+        "Week": "W4",
+        "Content Type": "Pillar Page",
+        "Title (SEO-Optimized)": "Hour of Code Activities — Complete Guide for Parents & Teachers",
+        "Target Keyword": "hour of code",
+        "Volume": 86000,
+        "KD": 60,
+        "Word Count": 3000,
+        "Target URL": "/hour-of-code/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P0",
+        "Competitor to Beat": "Tynker (declining traffic)",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 3",
+        "Week": "W3",
+        "Content Type": "Landing Page",
+        "Title (SEO-Optimized)": "Coding Camps for Kids — Online Summer & Year-Round",
+        "Target Keyword": "coding camp",
+        "Volume": 2000,
+        "KD": 93,
+        "Word Count": 2000,
+        "Target URL": "/coding-camps/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P0",
+        "Competitor to Beat": "CodingWithKids (#3, crashing)",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 1",
+        "Week": "W3",
+        "Content Type": "Content Refresh",
+        "Title (SEO-Optimized)": "Machine Learning for Kids — Updated Guide for 2026",
+        "Target Keyword": "machine learning for kids",
+        "Volume": 2400,
+        "KD": 50,
+        "Word Count": 2500,
+        "Target URL": "/machine-learning-for-kids/",
+        "Cluster": "AI for Kids",
+        "Priority": "P1",
+        "Competitor to Beat": "Traffic dropped from 745→7. Emergency refresh.",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 1",
+        "Week": "W3",
+        "Content Type": "Content Refresh",
+        "Title (SEO-Optimized)": "Minecraft Color Codes — Complete Guide [2026 Updated]",
+        "Target Keyword": "minecraft color codes",
+        "Volume": 14000,
+        "KD": 24,
+        "Word Count": 2000,
+        "Target URL": "/minecraft-color-codes/",
+        "Cluster": "Minecraft",
+        "Priority": "P1",
+        "Competitor to Beat": "Currently pos 24. Push to top 10.",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 1",
+        "Week": "W4",
+        "Content Type": "Content Refresh",
+        "Title (SEO-Optimized)": "Parts of a Computer — Kid-Friendly Guide [2026]",
+        "Target Keyword": "parts of a computer",
+        "Volume": 9700,
+        "KD": 30,
+        "Word Count": 2000,
+        "Target URL": "/parts-of-a-computer/",
+        "Cluster": "General",
+        "Priority": "P1",
+        "Competitor to Beat": "Currently pos 30. Massive volume.",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 2",
+        "Week": "W1",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "How to Make a Game on Scratch — Step-by-Step Tutorial",
+        "Target Keyword": "how to make a game on scratch",
+        "Volume": 2900,
+        "KD": 25,
+        "Word Count": 2500,
+        "Target URL": "/blog/how-to-make-a-game-on-scratch/",
+        "Cluster": "Scratch",
+        "Priority": "P1",
+        "Competitor to Beat": "CodeWizardsHQ (#3, 461 traffic)",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 2",
+        "Week": "W1",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "Scratch Project Ideas: 20 Cool Projects for Beginners",
+        "Target Keyword": "scratch project ideas",
+        "Volume": 1500,
+        "KD": 20,
+        "Word Count": 2500,
+        "Target URL": "/blog/scratch-project-ideas/",
+        "Cluster": "Scratch",
+        "Priority": "P1",
+        "Competitor to Beat": "CodeWizardsHQ (#2, 319 traffic)",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 2",
+        "Week": "W2",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "Scratch vs Python: Which Should Your Kid Learn First?",
+        "Target Keyword": "scratch vs python",
+        "Volume": 500,
+        "KD": 15,
+        "Word Count": 2000,
+        "Target URL": "/blog/scratch-vs-python/",
+        "Cluster": "Scratch",
+        "Priority": "P1",
+        "Competitor to Beat": "Nobody owns this comparison",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 2",
+        "Week": "W4",
+        "Content Type": "Content Refresh",
+        "Title (SEO-Optimized)": "How to Make a Minecraft Server [2026 Updated]",
+        "Target Keyword": "how to make a minecraft server",
+        "Volume": 5000,
+        "KD": 40,
+        "Word Count": 2500,
+        "Target URL": "/blog/minecraft/how-to-make-a-minecraft-server/",
+        "Cluster": "Minecraft",
+        "Priority": "P1",
+        "Competitor to Beat": "Currently pos ~5. Protect & grow.",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 3",
+        "Week": "W1",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "How to Make a Roblox Game — Beginner's Guide for Kids",
+        "Target Keyword": "how to make a roblox game",
+        "Volume": 3600,
+        "KD": 35,
+        "Word Count": 2500,
+        "Target URL": "/blog/how-to-make-a-roblox-game/",
+        "Cluster": "Roblox",
+        "Priority": "P1",
+        "Competitor to Beat": "CodeWizardsHQ (368 traffic)",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 3",
+        "Week": "W2",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "Python for Kids: Complete Beginner's Guide [2026]",
+        "Target Keyword": "python for kids",
+        "Volume": 2000,
+        "KD": 45,
+        "Word Count": 3000,
+        "Target URL": "/blog/python-for-kids/",
+        "Cluster": "Python",
+        "Priority": "P1",
+        "Competitor to Beat": "Rewrite existing dead content",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 3",
+        "Week": "W4",
+        "Content Type": "Content Refresh",
+        "Title (SEO-Optimized)": "Things to Build in Minecraft — 50+ Survival Ideas [2026]",
+        "Target Keyword": "things to build in minecraft",
+        "Volume": 5100,
+        "KD": 23,
+        "Word Count": 2500,
+        "Target URL": "/blog/minecraft/things-to-build-in-survival-minecraft/",
+        "Cluster": "Minecraft",
+        "Priority": "P1",
+        "Competitor to Beat": "Currently losing traffic (-477). Refresh urgently.",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 4",
+        "Week": "W1",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "AI for Kids: What It Is & How Kids Can Learn It",
+        "Target Keyword": "ai for kids",
+        "Volume": 800,
+        "KD": 30,
+        "Word Count": 2500,
+        "Target URL": "/blog/ai-for-kids/",
+        "Cluster": "AI for Kids",
+        "Priority": "P1",
+        "Competitor to Beat": "Emerging topic, CodaKid has AI courses",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 4",
+        "Week": "W3",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "How to Teach Kids to Code — Parent's Complete Guide",
+        "Target Keyword": "how to teach kids to code",
+        "Volume": 500,
+        "KD": 25,
+        "Word Count": 3000,
+        "Target URL": "/blog/how-to-teach-kids-to-code/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P1",
+        "Competitor to Beat": "High-intent parent content",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 1",
+        "Week": "W2",
+        "Content Type": "Pillar Page",
+        "Title (SEO-Optimized)": "Best AI Classes for Kids Ages 6 - 12— Online Courses & Activities",
+        "Target Keyword": "ai classes for kids",
+        "KD": 20,
+        "Word Count": 2000,
+        "Target URL": "/blog/best-ai-classes-for-kids/",
+        "Cluster": "AI for Kids",
+        "Priority": "P2",
+        "Competitor to Beat": "CodaKid has courses, needs content",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 2",
+        "Week": "W1",
+        "Content Type": "Pillar Page",
+        "Title (SEO-Optimized)": "Best AI Classes for Teens Ages 13 - 18— Online Courses & Activities",
+        "Target Keyword": "ai classes for teens",
+        "KD": 20,
+        "Word Count": 2000,
+        "Target URL": "/blog/best-ai-classes-for-teens/",
+        "Cluster": "AI for Kids",
+        "Priority": "P2",
+        "Competitor to Beat": "CodaKid has courses, needs content",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 2",
+        "Week": "W3",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "Coding for 5 Year Olds: Best Apps, Games & Activities",
+        "Target Keyword": "coding for 5 year olds",
+        "Volume": 300,
+        "KD": 10,
+        "Word Count": 2000,
+        "Target URL": "/blog/coding-for-5-year-olds/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P2",
+        "Competitor to Beat": "Nobody owns age-specific content",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 2",
+        "Week": "W3",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "Coding for 8 Year Olds: Languages, Games & Courses",
+        "Target Keyword": "coding for 8 year olds",
+        "Volume": 250,
+        "KD": 8,
+        "Word Count": 2000,
+        "Target URL": "/blog/coding-for-8-year-olds/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P2",
+        "Competitor to Beat": "Nobody owns age-specific content",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 3",
+        "Week": "W1",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "Roblox Lua Tutorial for Kids — Learn to Code in Roblox",
+        "Target Keyword": "roblox lua tutorial",
+        "Volume": 800,
+        "KD": 15,
+        "Word Count": 2500,
+        "Target URL": "/blog/roblox-lua-tutorial/",
+        "Cluster": "Roblox",
+        "Priority": "P2",
+        "Competitor to Beat": "Low competition, CodaKid has courses",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 3",
+        "Week": "W2",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "Best Python Projects for Kids — 15 Fun Ideas",
+        "Target Keyword": "python projects for kids",
+        "Volume": 500,
+        "KD": 10,
+        "Word Count": 2500,
+        "Target URL": "/blog/python-projects-for-kids/",
+        "Cluster": "Python",
+        "Priority": "P2",
+        "Competitor to Beat": "Nobody owns this well",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 3",
+        "Week": "W3",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "Best Coding Languages for Kids — Which One to Start With?",
+        "Target Keyword": "best coding language for kids",
+        "Volume": 400,
+        "KD": 20,
+        "Word Count": 2500,
+        "Target URL": "/blog/best-coding-languages-for-kids/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P2",
+        "Competitor to Beat": "Decision-making content for parents",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 3",
+        "Week": "W4",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "Is Coding Good for Kids? 10 Research-Backed Benefits",
+        "Target Keyword": "is coding good for kids",
+        "Volume": 300,
+        "KD": 15,
+        "Word Count": 2000,
+        "Target URL": "/blog/is-coding-good-for-kids/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P2",
+        "Competitor to Beat": "Parent education content — builds trust",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 4",
+        "Week": "W1",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "Best AI Classes for Kids — Online Courses & Activities",
+        "Target Keyword": "ai classes for kids",
+        "Volume": 300,
+        "KD": 20,
+        "Word Count": 2000,
+        "Target URL": "/blog/ai-classes-for-kids/",
+        "Cluster": "AI for Kids",
+        "Priority": "P2",
+        "Competitor to Beat": "CodaKid has courses, needs content",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 4",
+        "Week": "W2",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "CodaKid vs Tynker — Which Coding Platform is Better?",
+        "Target Keyword": "codakid vs tynker",
+        "Volume": 100,
+        "KD": 5,
+        "Word Count": 2000,
+        "Target URL": "/blog/codakid-vs-tynker/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P2",
+        "Competitor to Beat": "Comparison content captures buying-intent",
+        "Status": "TODO"
+      },
+      {
+        "Month": "Month 4",
+        "Week": "W2",
+        "Content Type": "Blog Post",
+        "Title (SEO-Optimized)": "CodaKid vs CodeMonkey — Honest Comparison for Parents",
+        "Target Keyword": "codakid vs codemonkey",
+        "Volume": 50,
+        "KD": 3,
+        "Word Count": 2000,
+        "Target URL": "/blog/codakid-vs-codemonkey/",
+        "Cluster": "Coding for Kids",
+        "Priority": "P2",
+        "Competitor to Beat": "Comparison content captures buying-intent",
+        "Status": "TODO"
+      }
+    ],
+    "metaTags": [
+      {
+        "URL": "https://codakid.com/",
+        "Current Title": "Online Coding for Kids | Game-Based Programming | CodaKid",
+        "Recommended Title": "CodaKid — Online Coding Classes for Kids | Scratch, Python, Minecraft & More",
+        "Current Meta Description": "👩‍💻Empower your child's future with engaging online coding courses for kids! Unlock creativity, critical thinking, and problem-solving skills. Enroll now to give your child a head start in the digital world.",
+        "Recommended Meta Description": "Award-winning online coding classes for kids ages 5-15. Learn Scratch, Python, Minecraft modding, Roblox & AI with live instructors. Free trial available.",
+        "Current H1": "MISSING",
+        "Recommended H1": "Online Coding Classes for Kids",
+        "Priority": "P0"
+      },
+      {
+        "URL": "https://codakid.com/camps/",
+        "Current Title": "Coding Camps for Teens | Online Coding Summer Camp | CodaKid",
+        "Recommended Title": "Online Coding Camps for Kids — Summer & Year-Round | CodaKid",
+        "Current Meta Description": "🌟 Ignite your child's passion for tech 🚀 with CodaKid's thrilling coding camps! 💻 Dive into a world of creativity, coding, and collaboration 🌐 Our camps offer an unforgettable mix of fun and learning 🎉 Secure their spot today and start the adventure!",
+        "Recommended Meta Description": "Join CodaKid online coding camps for kids ages 5-15. Minecraft, Roblox, Python & Scratch camps with live instructors. Sign up today!",
+        "Current H1": "Online Kids Coding Workshops",
+        "Recommended H1": "Online Coding Camps for Kids",
+        "Priority": "P0"
+      },
+      {
+        "URL": "https://codakid.com/private-online-coding-classes/",
+        "Current Title": "Coding Private Tutor | 1 on 1 Coding Classes | CodaKid",
+        "Recommended Title": "Private Online Coding Classes for Kids — 1-on-1 Lessons | CodaKid",
+        "Current Meta Description": "💻🎓Empower your learning journey with personalized private online coding classes! Accelerate your skills with one-on-one guidance from expert instructors. Embark on a coding adventure tailored just for you!",
+        "Recommended Meta Description": "Private 1-on-1 online coding classes for kids. Personalized instruction in Scratch, Python, Minecraft & more. Try a free lesson today.",
+        "Current H1": "Private Online Coding Classes",
+        "Recommended H1": "Private Online Coding Classes for Kids",
+        "Priority": "P0"
+      },
+      {
+        "URL": "https://codakid.com/scratch-coding/",
+        "Current Title": "Scratch Coding for Kids | Scratch coding classes for kids | Codakid",
+        "Recommended Title": "Scratch Coding for Kids — Online Classes & Projects | CodaKid",
+        "Current Meta Description": "👩‍💻Spark your child's imagination with Scratch coding for kids! 🚀🎮 Our courses make learning to code a creative adventure, empowering young minds to build interactive stories, games, and animations. Unleash their potential with Scratch!",
+        "Recommended Meta Description": "Learn Scratch coding with CodaKid. Fun online classes teaching kids to create games, animations & stories. Live instructors. Free trial.",
+        "Current H1": "Scratch Coding for Kids",
+        "Recommended H1": "Scratch Coding for Kids",
+        "Priority": "P0"
+      },
+      {
+        "URL": "https://codakid.com/roblox-coding/",
+        "Current Title": "Roblox Coding Online Classes for Kids | Roblox Coding | Codakid",
+        "Recommended Title": "Roblox Coding for Kids — Learn Lua & Game Development | CodaKid",
+        "Current Meta Description": "👩‍💻Unleash your child's creativity with Roblox coding for kids! 🎮 Our courses empower young learners to design, code, and share their own games on the popular Roblox platform. Level up their potential with Roblox coding!",
+        "Recommended Meta Description": "Learn Roblox coding with CodaKid. Kids create real Roblox games using Lua programming. Live online classes. Free trial available.",
+        "Current H1": "Roblox Coding Online Classes for Kids",
+        "Recommended H1": "Roblox Coding for Kids",
+        "Priority": "P0"
+      },
+      {
+        "URL": "https://codakid.com/minecraft-coding/",
+        "Current Title": "Coding with Minecraft | Programming classes | CodaKid",
+        "Recommended Title": "Minecraft Coding for Kids — Modding & Java Classes | CodaKid",
+        "Current Meta Description": "🎮 Dive into the world of Minecraft coding! 🧩 Learn to create custom mods, games, and adventures using Java and Eclipse IDE. 🚀 Fun, interactive, and perfect for young coders!",
+        "Recommended Meta Description": "Learn Minecraft coding and modding with CodaKid. Kids create real Minecraft mods using Java. Live online classes. Free trial.",
+        "Current H1": "Minecraft Coding Courses for Kids and Teens",
+        "Recommended H1": "Minecraft Coding for Kids",
+        "Priority": "P0"
+      },
+      {
+        "URL": "https://codakid.com/blog/roblox/roblox-shirt-template/",
+        "Current Title": "Roblox Shirt Template | The Easy Way to Make Shirts, T-Shirts, and Pants - CodaKid",
+        "Recommended Title": "Roblox Shirt Template — Free Download & Design Guide [2026]",
+        "Current Meta Description": "Codakid covers the complete guide to getting started with a Roblox shirt template. We cover the creation, setup and more!",
+        "Recommended Meta Description": "Download free Roblox shirt templates and learn how to design custom shirts for your avatar. Step-by-step guide with free PNG templates.",
+        "Current H1": "Roblox Shirt Template | The Easy Way to Make Shirts, T-Shirts, and Pants",
+        "Recommended H1": "Roblox Shirt Template — Free Download & Design Guide",
+        "Priority": "P1"
+      },
+      {
+        "URL": "https://codakid.com/blog/minecraft/how-to-make-a-minecraft-server/",
+        "Current Title": "How To Make a Minecraft Server - The Ultimate Guide - CodaKid",
+        "Recommended Title": "How to Make a Minecraft Server — Complete Setup Guide [2026]",
+        "Current Meta Description": "In this tutorial, we give helpful instructions on how to set up and host your own Minecraft server so you can play with family and friends.",
+        "Recommended Meta Description": "Learn how to create your own Minecraft server step-by-step. Free & paid options, Java & Bedrock editions. Updated for 2026.",
+        "Current H1": "How To Make a Minecraft Server – The Ultimate Guide",
+        "Recommended H1": "How to Make a Minecraft Server",
+        "Priority": "P1"
+      },
+      {
+        "URL": "https://codakid.com/minecraft-villager-trades/",
+        "Current Title": "Minecraft Villager Trading - The Ultimate Guide - CodaKid",
+        "Recommended Title": "Minecraft Villager Trades — Complete Trading Guide [2026]",
+        "Current Meta Description": "What are some of the best Minecraft villager trading tactics? Learn with our comprehensive guide on how to manage trades and your villagers!",
+        "Recommended Meta Description": "Complete guide to Minecraft villager trades and trading. Every profession, trade table, and tips to get the best deals. Updated for 2026.",
+        "Current H1": "Minecraft Villager Trading – The Ultimate Guide",
+        "Recommended H1": "Minecraft Villager Trades — Complete Guide",
+        "Priority": "P1"
+      },
+      {
+        "URL": "https://codakid.com/minecraft-color-codes/",
+        "Current Title": "Minecraft Color Codes | The Ultimate Guide",
+        "Recommended Title": "Minecraft Color Codes — Complete List & How to Use Them [2026]",
+        "Current Meta Description": "CodaKid provides you the complete list of Minecraft Color Codes and Format Codes that are available. You can use it in chat & game commands.",
+        "Recommended Meta Description": "Every Minecraft color code and formatting code in one place. Copy-paste ready codes for chat, signs, and commands. Updated 2026.",
+        "Current H1": "Minecraft Color Codes | The Ultimate Guide",
+        "Recommended H1": "Minecraft Color Codes — Complete List",
+        "Priority": "P1"
+      },
+      {
+        "URL": "https://codakid.com/minecraft-farms-ideas/",
+        "Current Title": "9 Creative Minecraft Farms for Ideas and Inspiration - CodaKid",
+        "Recommended Title": "Minecraft Farm Ideas — 30+ Best Farms to Build [2026]",
+        "Current Meta Description": "What are the best Minecraft farm ideas? Codakid has you covered by doing the research for the coolest most unique Minecraft farms on the net!",
+        "Recommended Meta Description": "Best Minecraft farm ideas for survival mode. Automatic farms, crop farms, animal farms & XP farms with step-by-step guides.",
+        "Current H1": "9 Creative Minecraft Farms for Ideas and Inspiration",
+        "Recommended H1": "Best Minecraft Farm Ideas",
+        "Priority": "P1"
+      },
+      {
+        "URL": "https://codakid.com/minecraft-roofs/",
+        "Current Title": "Your Quick Cheat Sheet On How To Build Minecraft Roofs - CodaKid",
+        "Recommended Title": "Minecraft Roof Designs — 20+ Ideas & Building Tips [2026]",
+        "Current Meta Description": "Do you want to know everything about Minecraft roofs? Then this article is the most important thing you will read today!",
+        "Recommended Meta Description": "Best Minecraft roof designs and building techniques. Modern, medieval, Japanese & more styles with step-by-step tutorials.",
+        "Current H1": "Your Quick Cheat Sheet On How To Build Minecraft Roofs",
+        "Recommended H1": "Minecraft Roof Designs & Building Tips",
+        "Priority": "P1"
+      },
+      {
+        "URL": "https://codakid.com/blog/roblox/roblox-horror-games/",
+        "Current Title": "10 Best Roblox Horror Games to Play with Friends - CodaKid",
+        "Recommended Title": "Best Roblox Horror Games — 20+ Scariest Games to Play [2026]",
+        "Current Meta Description": "Codakid covers the best Roblox horror games that are spooky and fun! In our research we discovered some hidden gems that you will enjoy!",
+        "Recommended Meta Description": "The best Roblox horror games ranked. From Doors to The Mimic — discover the scariest Roblox games with ratings and descriptions.",
+        "Current H1": "10 Best Roblox Horror Games to Play with Friends",
+        "Recommended H1": "Best Roblox Horror Games",
+        "Priority": "P1"
+      },
+      {
+        "URL": "https://codakid.com/machine-learning-for-kids/",
+        "Current Title": "Machine Learning for Kids - The Ultimate Guide for Parents - CodaKid",
+        "Recommended Title": "Machine Learning for Kids — Fun Projects & Activities [2026]",
+        "Current Meta Description": "We provide parents an overview of how to educate their kids on machine learning and AI and the educational pathways to prepare them.",
+        "Recommended Meta Description": "Introduce kids to machine learning with hands-on projects and activities. Age-appropriate AI concepts made fun and easy to understand.",
+        "Current H1": "Machine Learning for Kids – The Ultimate Guide for Parents",
+        "Recommended H1": "Machine Learning for Kids",
+        "Priority": "P1 - EMERGENCY"
+      }
+    ],
+    "internalLinks": [
+      {
+        "Source Page (Link FROM here)": "/coding-for-kids/ (new)",
+        "Target Page (Link TO here)": "/scratch-coding/",
+        "Suggested Anchor Text": "Scratch coding classes for kids",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-for-kids/ (new)",
+        "Target Page (Link TO here)": "/roblox-coding/",
+        "Suggested Anchor Text": "Roblox coding classes",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-for-kids/ (new)",
+        "Target Page (Link TO here)": "/minecraft-coding/",
+        "Suggested Anchor Text": "Minecraft coding classes",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-for-kids/ (new)",
+        "Target Page (Link TO here)": "/private-online-coding-classes/",
+        "Suggested Anchor Text": "private coding lessons",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-for-kids/ (new)",
+        "Target Page (Link TO here)": "/camps/",
+        "Suggested Anchor Text": "coding camps for kids",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-for-kids/ (new)",
+        "Target Page (Link TO here)": "/coding-for-kids-free/",
+        "Suggested Anchor Text": "free coding resources",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-for-kids/ (new)",
+        "Target Page (Link TO here)": "/coding-games/",
+        "Suggested Anchor Text": "coding games for kids",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-for-kids/ (new)",
+        "Target Page (Link TO here)": "/best-scratch-games/",
+        "Suggested Anchor Text": "best Scratch games",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-classes-for-kids/ (new)",
+        "Target Page (Link TO here)": "/coding-for-kids/",
+        "Suggested Anchor Text": "coding for kids",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-classes-for-kids/ (new)",
+        "Target Page (Link TO here)": "/private-online-coding-classes/",
+        "Suggested Anchor Text": "private 1-on-1 classes",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-classes-for-kids/ (new)",
+        "Target Page (Link TO here)": "/camps/",
+        "Suggested Anchor Text": "coding camps",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-for-kids-free/ (new)",
+        "Target Page (Link TO here)": "/coding-for-kids/",
+        "Suggested Anchor Text": "coding for kids",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-for-kids-free/ (new)",
+        "Target Page (Link TO here)": "/coding-classes-for-kids/",
+        "Suggested Anchor Text": "coding classes for kids",
+        "Link Type": "CTA",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/hour-of-code/ (new)",
+        "Target Page (Link TO here)": "/coding-for-kids/",
+        "Suggested Anchor Text": "coding for kids",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-games/ (new)",
+        "Target Page (Link TO here)": "/coding-for-kids/",
+        "Suggested Anchor Text": "coding for kids",
+        "Link Type": "Contextual",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/ (homepage)",
+        "Target Page (Link TO here)": "/coding-for-kids/ (new)",
+        "Suggested Anchor Text": "coding for kids",
+        "Link Type": "Navigation / CTA",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/ (homepage)",
+        "Target Page (Link TO here)": "/coding-classes-for-kids/ (new)",
+        "Suggested Anchor Text": "coding classes for kids",
+        "Link Type": "Navigation",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/ (homepage)",
+        "Target Page (Link TO here)": "/coding-for-kids-free/ (new)",
+        "Suggested Anchor Text": "try free coding",
+        "Link Type": "CTA",
+        "Priority": "P0",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/minecraft/how-to-make-a-minecraft-server/",
+        "Target Page (Link TO here)": "/coding-for-kids/",
+        "Suggested Anchor Text": "coding for kids",
+        "Link Type": "Contextual",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/minecraft/how-to-make-a-minecraft-server/",
+        "Target Page (Link TO here)": "/minecraft-coding/",
+        "Suggested Anchor Text": "Minecraft coding classes",
+        "Link Type": "CTA / Related",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/minecraft/things-to-build-in-survival-minecraft/",
+        "Target Page (Link TO here)": "/coding-for-kids/",
+        "Suggested Anchor Text": "learn to code",
+        "Link Type": "Contextual",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/minecraft/things-to-build-in-survival-minecraft/",
+        "Target Page (Link TO here)": "/minecraft-coding/",
+        "Suggested Anchor Text": "Minecraft modding courses",
+        "Link Type": "CTA / Related",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/minecraft-color-codes/",
+        "Target Page (Link TO here)": "/coding-for-kids/",
+        "Suggested Anchor Text": "coding for kids",
+        "Link Type": "Contextual",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/minecraft-color-codes/",
+        "Target Page (Link TO here)": "/minecraft-coding/",
+        "Suggested Anchor Text": "learn Minecraft coding",
+        "Link Type": "CTA / Related",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/minecraft-farms-ideas/",
+        "Target Page (Link TO here)": "/minecraft-coding/",
+        "Suggested Anchor Text": "Minecraft coding classes",
+        "Link Type": "CTA / Related",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/minecraft-farms-ideas/",
+        "Target Page (Link TO here)": "/coding-for-kids/",
+        "Suggested Anchor Text": "coding for kids",
+        "Link Type": "Contextual",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/minecraft-roofs/",
+        "Target Page (Link TO here)": "/minecraft-coding/",
+        "Suggested Anchor Text": "learn to mod Minecraft",
+        "Link Type": "CTA / Related",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/minecraft-villager-trades/",
+        "Target Page (Link TO here)": "/minecraft-coding/",
+        "Suggested Anchor Text": "Minecraft modding classes",
+        "Link Type": "CTA / Related",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/minecraft-villager-trades/",
+        "Target Page (Link TO here)": "/coding-for-kids/",
+        "Suggested Anchor Text": "kids coding courses",
+        "Link Type": "Contextual",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/roblox/roblox-shirt-template/",
+        "Target Page (Link TO here)": "/roblox-coding/",
+        "Suggested Anchor Text": "learn Roblox coding",
+        "Link Type": "CTA / Related",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/roblox/roblox-shirt-template/",
+        "Target Page (Link TO here)": "/coding-for-kids/",
+        "Suggested Anchor Text": "coding for kids",
+        "Link Type": "Contextual",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/roblox/roblox-horror-games/",
+        "Target Page (Link TO here)": "/roblox-coding/",
+        "Suggested Anchor Text": "Roblox game development",
+        "Link Type": "CTA / Related",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/roblox/roblox-horror-games/",
+        "Target Page (Link TO here)": "/coding-for-kids/",
+        "Suggested Anchor Text": "learn to code",
+        "Link Type": "Contextual",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/scratch-coding/",
+        "Target Page (Link TO here)": "/best-scratch-games/ (new)",
+        "Suggested Anchor Text": "best Scratch games",
+        "Link Type": "Related Content",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/scratch-coding/",
+        "Target Page (Link TO here)": "/blog/how-to-make-a-game-on-scratch/ (new)",
+        "Suggested Anchor Text": "how to make a game on Scratch",
+        "Link Type": "Related Content",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/roblox-coding/",
+        "Target Page (Link TO here)": "/blog/how-to-make-a-roblox-game/ (new)",
+        "Suggested Anchor Text": "how to make a Roblox game",
+        "Link Type": "Related Content",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/minecraft-coding/",
+        "Target Page (Link TO here)": "/blog/minecraft/how-to-make-a-minecraft-server/",
+        "Suggested Anchor Text": "how to make a Minecraft server",
+        "Link Type": "Related Content",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/hour-of-code/ (new)",
+        "Target Page (Link TO here)": "/scratch-coding/",
+        "Suggested Anchor Text": "Scratch coding",
+        "Link Type": "Contextual",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/coding-games/ (new)",
+        "Target Page (Link TO here)": "/scratch-coding/",
+        "Suggested Anchor Text": "Scratch coding classes",
+        "Link Type": "CTA",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/python-for-kids/ (new)",
+        "Target Page (Link TO here)": "/blog/python-projects-for-kids/ (new)",
+        "Suggested Anchor Text": "Python projects for kids",
+        "Link Type": "Related",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/scratch-project-ideas/ (new)",
+        "Target Page (Link TO here)": "/best-scratch-games/ (new)",
+        "Suggested Anchor Text": "best Scratch games",
+        "Link Type": "Related",
+        "Priority": "P1",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/minecraft-shortcuts/",
+        "Target Page (Link TO here)": "/minecraft-coding/",
+        "Suggested Anchor Text": "Minecraft coding for kids",
+        "Link Type": "CTA",
+        "Priority": "P2",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/coding-for-5-year-olds/ (new)",
+        "Target Page (Link TO here)": "/blog/coding-for-8-year-olds/ (new)",
+        "Suggested Anchor Text": "coding for 8 year olds",
+        "Link Type": "Related",
+        "Priority": "P2",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/coding-for-8-year-olds/ (new)",
+        "Target Page (Link TO here)": "/blog/coding-for-teens/ (new)",
+        "Suggested Anchor Text": "coding for teens",
+        "Link Type": "Related",
+        "Priority": "P2",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/best-coding-languages-for-kids/ (new)",
+        "Target Page (Link TO here)": "/blog/python-for-kids/ (new)",
+        "Suggested Anchor Text": "Python for kids",
+        "Link Type": "Related",
+        "Priority": "P2",
+        "Status": "TODO"
+      },
+      {
+        "Source Page (Link FROM here)": "/blog/best-coding-languages-for-kids/ (new)",
+        "Target Page (Link TO here)": "/blog/scratch-vs-python/ (new)",
+        "Suggested Anchor Text": "Scratch vs Python",
+        "Link Type": "Related",
+        "Priority": "P2",
+        "Status": "TODO"
+      }
+    ],
+    "schemaChecklist": [
+      {
+        "Schema Type": "Organization",
+        "Apply To": "Homepage only",
+        "Page Count": 1,
+        "Priority": "P0",
+        "Required Fields": "name, url, logo, description, sameAs (social links), contactPoint",
+        "Implementation Notes": "Add to homepage <head>. Include social media URLs, phone, email. See schema-organization.json template.",
+        "Status": "TODO"
+      },
+      {
+        "Schema Type": "Course",
+        "Apply To": "All course pages (/course-catalog/)",
+        "Page Count": 120,
+        "Priority": "P0",
+        "Required Fields": "name, description, provider (Organization), courseMode (online), offers (price), educationalLevel",
+        "Implementation Notes": "Add to each course page. Once the 403 issue is fixed, implement course schema on all 120 pages. Use Yoast or custom JSON-LD. See schema-course.json template.",
+        "Status": "TODO"
+      },
+      {
+        "Schema Type": "Article",
+        "Apply To": "All blog posts (/blog/)",
+        "Page Count": 70,
+        "Priority": "P1",
+        "Required Fields": "headline, author (Person), datePublished, dateModified, image, publisher (Organization)",
+        "Implementation Notes": "Add to every blog post via Yoast SEO or theme template. See schema-article.json template.",
+        "Status": "TODO"
+      },
+      {
+        "Schema Type": "FAQ",
+        "Apply To": "Key landing pages + blog posts with FAQ sections",
+        "Page Count": 15,
+        "Priority": "P1",
+        "Required Fields": "mainEntity: array of Question + acceptedAnswer pairs",
+        "Implementation Notes": "Add to: homepage, /coding-for-kids/, /coding-classes-for-kids/, top blog posts. Enables FAQ rich results (dropdown answers in Google). See schema-faq.json template.",
+        "Status": "TODO"
+      },
+      {
+        "Schema Type": "BreadcrumbList",
+        "Apply To": "All pages sitewide",
+        "Page Count": 400,
+        "Priority": "P1",
+        "Required Fields": "itemListElement: array of ListItem with position, name, item (URL)",
+        "Implementation Notes": "Implement via Yoast SEO breadcrumb feature or theme. Shows breadcrumb trail in search results (Home > Blog > Minecraft > Post Title).",
+        "Status": "TODO"
+      },
+      {
+        "Schema Type": "HowTo",
+        "Apply To": "Tutorial blog posts (Minecraft guides, coding tutorials)",
+        "Page Count": 20,
+        "Priority": "P2",
+        "Required Fields": "name, step (array of HowToStep with name, text, image)",
+        "Implementation Notes": "Add to how-to style posts: Minecraft server setup, Roblox game creation, Scratch tutorials. Shows step-by-step cards in Google.",
+        "Status": "TODO"
+      },
+      {
+        "Schema Type": "Review / AggregateRating",
+        "Apply To": "Homepage + course pages (if testimonials exist)",
+        "Page Count": 5,
+        "Priority": "P2",
+        "Required Fields": "reviewRating, author, reviewBody OR ratingValue, ratingCount, bestRating",
+        "Implementation Notes": "Only add if CodaKid has genuine reviews/testimonials. Shows star ratings in search results. Do NOT fabricate reviews.",
+        "Status": "TODO"
+      },
+      {
+        "Schema Type": "VideoObject",
+        "Apply To": "Pages with embedded videos",
+        "Page Count": 10,
+        "Priority": "P2",
+        "Required Fields": "name, description, thumbnailUrl, uploadDate, contentUrl or embedUrl",
+        "Implementation Notes": "Add to pages with YouTube/Vimeo embeds. Shows video thumbnails in search results.",
+        "Status": "TODO"
+      }
+    ],
+    "quickWins": [
+      {
+        "Rank": 1,
+        "Action": "Fix bot-blocking on course catalog pages",
+        "Page / Target": "/course-catalog/ (94 pages)",
+        "Expected Impact": "MEDIUM — course pages work for visitors but Google can't see them",
+        "Effort": "Medium",
+        "Keyword / Volume": "N/A",
+        "Current Pos": "Blocked",
+        "Details": "Bot protection (likely Cloudflare/Wordfence) is blocking crawlers from /course-catalog/ pages. Visitors can see them fine. Whitelist Googlebot. Lower priority since pillar pages and blog content are the main SEO play."
+      },
+      {
+        "Rank": 2,
+        "Action": "Fix Cyrillic redirect loops",
+        "Page / Target": "34 affected pages",
+        "Expected Impact": "HIGH — stop wasting crawl budget",
+        "Effort": "Easy",
+        "Keyword / Volume": "N/A",
+        "Current Pos": "Loop",
+        "Details": "One URL with a Cyrillic character causes 34 redirect loops. Fix the URL and update internal links."
+      },
+      {
+        "Rank": 3,
+        "Action": "Add Organization schema to homepage",
+        "Page / Target": "codakid.com/",
+        "Expected Impact": "MEDIUM — appear as brand entity in Google",
+        "Effort": "Easy",
+        "Keyword / Volume": "N/A",
+        "Current Pos": "N/A",
+        "Details": "Paste JSON-LD into <head>. 15-minute task with the template provided."
+      },
+      {
+        "Rank": 4,
+        "Action": "Add H1 to homepage",
+        "Page / Target": "codakid.com/",
+        "Expected Impact": "MEDIUM — tell Google what the page is about",
+        "Effort": "Easy",
+        "Keyword / Volume": "coding for kids / 15K",
+        "Current Pos": "30",
+        "Details": "Add: <h1>Online Coding Classes for Kids</h1>"
+      },
+      {
+        "Rank": 5,
+        "Action": "Refresh /machine-learning-for-kids/",
+        "Page / Target": "/machine-learning-for-kids/",
+        "Expected Impact": "HIGH — recover 745→7 traffic crash",
+        "Effort": "Medium",
+        "Keyword / Volume": "machine learning for kids / 2.4K",
+        "Current Pos": "Dropped",
+        "Details": "Traffic collapsed. Update with 2026 content, new examples, better keyword targeting."
+      },
+      {
+        "Rank": 6,
+        "Action": "Create 'Best Scratch Games' post",
+        "Page / Target": "/best-scratch-games/ (new)",
+        "Expected Impact": "HIGH — proven format, 4,800 volume",
+        "Effort": "Medium",
+        "Keyword / Volume": "best scratch games / 4,800",
+        "Current Pos": "Not ranking",
+        "Details": "CodeWizardsHQ gets 1,843 traffic from this. Create a better version with more games and CodaKid course CTAs."
+      },
+      {
+        "Rank": 7,
+        "Action": "Write meta descriptions for top 30 pages",
+        "Page / Target": "Top 30 traffic pages",
+        "Expected Impact": "MEDIUM — improve click-through rates",
+        "Effort": "Easy",
+        "Keyword / Volume": "Multiple",
+        "Current Pos": "Multiple",
+        "Details": "44% of pages missing meta descriptions. Start with the highest-traffic pages."
+      },
+      {
+        "Rank": 8,
+        "Action": "Fix duplicate H1 theme bug",
+        "Page / Target": "119 affected pages",
+        "Expected Impact": "LOW-MEDIUM — clean up header structure",
+        "Effort": "Easy",
+        "Keyword / Volume": "N/A",
+        "Current Pos": "N/A",
+        "Details": "Edit WordPress theme template to remove duplicate H1 output."
+      },
+      {
+        "Rank": 9,
+        "Action": "Optimize Minecraft color codes page",
+        "Page / Target": "/minecraft-color-codes/",
+        "Expected Impact": "HIGH — 14K volume keyword at position 24",
+        "Effort": "Medium",
+        "Keyword / Volume": "minecraft color codes / 14K",
+        "Current Pos": "24",
+        "Details": "Rewrite title, meta, H1. Add more content, formatting codes, FAQ section."
+      },
+      {
+        "Rank": 10,
+        "Action": "Add internal links from Minecraft posts to courses",
+        "Page / Target": "6+ Minecraft blog posts",
+        "Expected Impact": "MEDIUM — funnel gaming traffic to course pages",
+        "Effort": "Easy",
+        "Keyword / Volume": "Multiple",
+        "Current Pos": "Multiple",
+        "Details": "Add 'Learn Minecraft Coding' CTAs and contextual links to /minecraft-coding/ from every Minecraft blog post."
+      },
+      {
+        "Rank": 11,
+        "Action": "Create /coding-for-kids/ pillar page",
+        "Page / Target": "/coding-for-kids/ (new)",
+        "Expected Impact": "VERY HIGH — 15K volume, currently pos 30",
+        "Effort": "High",
+        "Keyword / Volume": "coding for kids / 15K",
+        "Current Pos": "30",
+        "Details": "3000+ word definitive guide. This is the #1 money keyword. 6-12 month play to reach top 5."
+      },
+      {
+        "Rank": 12,
+        "Action": "Create /coding-for-kids-free/ page",
+        "Page / Target": "/coding-for-kids-free/ (new)",
+        "Expected Impact": "HIGH — 16K volume, not ranking",
+        "Effort": "Medium",
+        "Keyword / Volume": "coding for kids free / 16K",
+        "Current Pos": "Not ranking",
+        "Details": "Free resources page + free trial funnel. CodeWizardsHQ proving this works (+390 growth)."
+      },
+      {
+        "Rank": 13,
+        "Action": "Set up 301 redirects for 404 pages",
+        "Page / Target": "45 broken URLs",
+        "Expected Impact": "MEDIUM — recover lost link equity",
+        "Effort": "Easy",
+        "Keyword / Volume": "N/A",
+        "Current Pos": "404",
+        "Details": "Redirect deleted blog posts to most relevant existing pages."
+      },
+      {
+        "Rank": 14,
+        "Action": "Add FAQ schema to top pages",
+        "Page / Target": "5-10 key landing pages",
+        "Expected Impact": "MEDIUM — get FAQ dropdowns in Google",
+        "Effort": "Easy",
+        "Keyword / Volume": "Multiple",
+        "Current Pos": "Multiple",
+        "Details": "Paste FAQ JSON-LD into <head> of key pages. Shows expandable Q&A in search results."
+      },
+      {
+        "Rank": 15,
+        "Action": "Create llms.txt for AI search",
+        "Page / Target": "codakid.com/llms.txt (new)",
+        "Expected Impact": "MEDIUM-LONG TERM — visibility in AI answers",
+        "Effort": "Easy",
+        "Keyword / Volume": "N/A",
+        "Current Pos": "N/A",
+        "Details": "Upload llms.txt to site root. Tells AI systems what CodaKid is and what it offers. File provided in deliverables."
+      }
+    ],
+    "competitorIntel": [
+      {
+        "Competitor": "--- TRAFFIC OVERVIEW ---"
+      },
+      {
+        "Competitor": "CodaKid",
+        "Metric": "Monthly Organic Traffic",
+        "Value": "15,500",
+        "CodaKid Comparison": "BASELINE",
+        "Opportunity / Takeaway": "Declining 22.3% — needs urgent action"
+      },
+      {
+        "Competitor": "Tynker",
+        "Metric": "Monthly Organic Traffic",
+        "Value": "289,000",
+        "CodaKid Comparison": "19x more than CodaKid",
+        "Opportunity / Takeaway": "But 50% is from games/soundboards, not education. Real education traffic is ~5K."
+      },
+      {
+        "Competitor": "CodingWithKids",
+        "Metric": "Monthly Organic Traffic",
+        "Value": "7,900 (was 15,900)",
+        "CodaKid Comparison": "Was similar, now half of CodaKid",
+        "Opportunity / Takeaway": "Collapsing — down 50% in 6 months. Their #2 ranking for 'coding for kids' is vulnerable."
+      },
+      {
+        "Competitor": "CodeWizardsHQ",
+        "Metric": "Monthly Organic Traffic",
+        "Value": "~15,000",
+        "CodaKid Comparison": "Similar to CodaKid",
+        "Opportunity / Takeaway": "Driven by Scratch tutorials. Their content strategy is the most mature."
+      },
+      {
+        "Competitor": "CodeMonkey",
+        "Metric": "Monthly Organic Traffic",
+        "Value": "60,000",
+        "CodaKid Comparison": "4x more than CodaKid",
+        "Opportunity / Takeaway": "But 76-81% is homepage. Their blog (180 posts) averages just 8 visits per post."
+      },
+      {
+        "Competitor": "--- 'CODING FOR KIDS' (15K VOLUME) ---"
+      },
+      {
+        "Competitor": "CodeMonkey",
+        "Metric": "Position for 'coding for kids'",
+        "Value": "#1 (3,175 traffic)",
+        "CodaKid Comparison": "CodaKid is #30",
+        "Opportunity / Takeaway": "Strongest position. Will take 6-12 months to challenge."
+      },
+      {
+        "Competitor": "CodingWithKids",
+        "Metric": "Position for 'coding for kids'",
+        "Value": "#2 (2,540 traffic)",
+        "CodaKid Comparison": "CodaKid is #30",
+        "Opportunity / Takeaway": "CRASHING — traffic down 50%. This position is becoming available."
+      },
+      {
+        "Competitor": "CodeWizardsHQ",
+        "Metric": "Position for 'coding for kids'",
+        "Value": "#9 (~100 traffic)",
+        "CodaKid Comparison": "CodaKid is #30",
+        "Opportunity / Takeaway": "Modest position. CodaKid could reach #9 within 3-6 months."
+      },
+      {
+        "Competitor": "CodaKid",
+        "Metric": "Position for 'coding for kids'",
+        "Value": "#30 (~0 traffic)",
+        "CodaKid Comparison": "BASELINE",
+        "Opportunity / Takeaway": "Needs dedicated pillar page, internal links, and content cluster."
+      },
+      {
+        "Competitor": "--- COMPETITOR VULNERABILITIES ---"
+      },
+      {
+        "Competitor": "CodingWithKids",
+        "Metric": "Homepage dependency",
+        "Value": "86% of traffic on homepage",
+        "CodaKid Comparison": "CodaKid: ~8% on homepage",
+        "Opportunity / Takeaway": "One algorithm hit = wipeout. CodaKid's distributed traffic is actually safer."
+      },
+      {
+        "Competitor": "CodingWithKids",
+        "Metric": "Content depth",
+        "Value": "ZERO blog posts, 16 total URLs",
+        "CodaKid Comparison": "CodaKid: 70+ blog posts",
+        "Opportunity / Takeaway": "They have no content strategy at all. Easy to out-content them."
+      },
+      {
+        "Competitor": "CodingWithKids",
+        "Metric": "Traffic trend",
+        "Value": "Down 50% in 6 months",
+        "CodaKid Comparison": "CodaKid: Down 22%",
+        "Opportunity / Takeaway": "They're falling faster. CodaKid can overtake them with action."
+      },
+      {
+        "Competitor": "CodeMonkey",
+        "Metric": "Blog effectiveness",
+        "Value": "180 posts averaging 8 visits each",
+        "CodaKid Comparison": "CodaKid blog avg higher",
+        "Opportunity / Takeaway": "Their content marketing is terrible. Quality > quantity opportunity."
+      },
+      {
+        "Competitor": "CodeMonkey",
+        "Metric": "Homepage dependency",
+        "Value": "76-81% of traffic on homepage",
+        "CodaKid Comparison": "CodaKid more distributed",
+        "Opportunity / Takeaway": "Brand-dependent. If CodaKid builds better content, they can steal queries."
+      },
+      {
+        "Competitor": "CodeMonkey",
+        "Metric": "Minecraft coverage",
+        "Value": "16 total traffic from Minecraft",
+        "CodaKid Comparison": "CodaKid: 3,688 from Minecraft",
+        "Opportunity / Takeaway": "CodaKid already dominates them in Minecraft — protect & expand this."
+      },
+      {
+        "Competitor": "CodeWizardsHQ",
+        "Metric": "Minecraft/Roblox coverage",
+        "Value": "Weak in both",
+        "CodaKid Comparison": "CodaKid strong in both",
+        "Opportunity / Takeaway": "CodeWizardsHQ is Scratch-focused. CodaKid can own Minecraft & Roblox."
+      },
+      {
+        "Competitor": "CodeWizardsHQ",
+        "Metric": "Location pages",
+        "Value": "32 pages, only 34 total traffic",
+        "CodaKid Comparison": "CodaKid: no location pages",
+        "Opportunity / Takeaway": "Location pages are failing industry-wide. Don't waste time on these."
+      },
+      {
+        "Competitor": "Tynker",
+        "Metric": "Education traffic",
+        "Value": "Only 1,209 from coding keywords",
+        "CodaKid Comparison": "CodaKid: more education traffic",
+        "Opportunity / Takeaway": "Tynker's traffic is kids playing games, not parents buying. Not a real content threat."
+      },
+      {
+        "Competitor": "--- WHAT TO STEAL / REPLICATE ---"
+      },
+      {
+        "Competitor": "CodeWizardsHQ",
+        "Metric": "Best Scratch Games post",
+        "Value": "1,843 traffic from 246 keywords",
+        "CodaKid Comparison": "CodaKid: nothing similar",
+        "Opportunity / Takeaway": "PROVEN format. Create a better version at /best-scratch-games/. Quick win."
+      },
+      {
+        "Competitor": "CodeWizardsHQ",
+        "Metric": "Coding for Kids Free page",
+        "Value": "+390 traffic growth",
+        "CodaKid Comparison": "CodaKid: no free resources page",
+        "Opportunity / Takeaway": "Create /coding-for-kids-free/ with free resources + free trial funnel."
+      },
+      {
+        "Competitor": "CodeWizardsHQ",
+        "Metric": "Scratch tutorials cluster",
+        "Value": "4,976 traffic from 869 keywords",
+        "CodaKid Comparison": "CodaKid: ~90 from 2 Scratch posts",
+        "Opportunity / Takeaway": "Build a Scratch content cluster: project ideas, tutorials, game lists."
+      },
+      {
+        "Competitor": "CodeMonkey",
+        "Metric": "Hour of Code content",
+        "Value": "528 traffic (declining)",
+        "CodaKid Comparison": "CodaKid: not ranking",
+        "Opportunity / Takeaway": "86K volume keyword. Create comprehensive /hour-of-code/ guide."
+      },
+      {
+        "Competitor": "CodingWithKids",
+        "Metric": "Coding camps page",
+        "Value": "#1 for 'coding camp online'",
+        "CodaKid Comparison": "CodaKid: not ranking",
+        "Opportunity / Takeaway": "Their grip is slipping (traffic crashing). Create /coding-camps/ now."
+      },
+      {
+        "Competitor": "CodeWizardsHQ",
+        "Metric": "Teens targeting",
+        "Value": "#1 for 'online coding classes for teens'",
+        "CodaKid Comparison": "CodaKid: not targeting teens",
+        "Opportunity / Takeaway": "If CodaKid serves teens, create dedicated teens content."
+      },
+      {
+        "Competitor": "--- COMMERCIAL KEYWORDS (BUYERS) ---"
+      },
+      {
+        "Competitor": "All competitors",
+        "Metric": "'coding classes for kids' (3K vol)",
+        "Value": "CodingWithKids #3, CodeWizardsHQ #10, CodeMonkey #12",
+        "CodaKid Comparison": "CodaKid: not ranking",
+        "Opportunity / Takeaway": "WIDE OPEN. Create /coding-classes-for-kids/ landing page."
+      },
+      {
+        "Competitor": "All competitors",
+        "Metric": "'online coding classes for kids' (600 vol)",
+        "Value": "CodeMonkey #1, CodeWizardsHQ #3",
+        "CodaKid Comparison": "CodaKid: not ranking",
+        "Opportunity / Takeaway": "High-intent buyer keyword. Create dedicated landing page."
+      },
+      {
+        "Competitor": "All competitors",
+        "Metric": "'best online coding classes for kids' (500 vol)",
+        "Value": "CodeMonkey #1 (GB), CodeWizardsHQ has content",
+        "CodaKid Comparison": "CodaKid: not ranking",
+        "Opportunity / Takeaway": "Create comparison/roundup content. Position CodaKid as leader."
+      },
+      {
+        "Competitor": "All competitors",
+        "Metric": "'coding for kids free' (16K vol)",
+        "Value": "CodeWizardsHQ growing +390",
+        "CodaKid Comparison": "CodaKid: not ranking",
+        "Opportunity / Takeaway": "Massive volume. Create free resources page + free trial funnel."
+      }
+    ],
+    "summary": {
+      "confirmedPillars": 1,
+      "technicalIssues": 12,
+      "keywordTargets": 45,
+      "plannedContent": 30,
+      "metaTasks": 14,
+      "internalLinkTasks": 46,
+      "schemaTasks": 8,
+      "quickWins": 15
+    }
+  },
+  "integrationStatus": [
+    {
+      "name": "WordPress REST API",
+      "status": "connected",
+      "detail": "339 posts crawled"
+    },
+    {
+      "name": "SEO Gameplan",
+      "status": "connected",
+      "detail": "15 quick wins imported"
+    },
+    {
+      "name": "Google Search Console",
+      "status": "pending",
+      "detail": "Connect API to add rankings, CTR, and query movement"
+    },
+    {
+      "name": "GA4",
+      "status": "pending",
+      "detail": "Connect Data API to add sessions, engagement, and conversions"
+    },
+    {
+      "name": "OpenAI",
+      "status": "pending",
+      "detail": "Add OPENAI_API_KEY for generated strategy briefs"
+    }
+  ],
+  "bundledAt": "2026-06-15T22:57:28.710Z"
+};

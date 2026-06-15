@@ -1,5 +1,6 @@
-import { readFileSync } from 'node:fs';
 import { requireUser } from './_auth.mjs';
+import fallbackSnapshotData from './content-snapshot-fallback-data.mjs';
+import seoGameplanData from './seo-gameplan-data.mjs';
 
 const WP_BASE = process.env.VITE_WORDPRESS_BASE || 'https://codakid.com';
 const WP_API = `${WP_BASE.replace(/\/$/, '')}/wp-json/wp/v2`;
@@ -7,8 +8,8 @@ const WP_HEADERS = {
   accept: 'application/json',
   'user-agent': 'CodaKidContentDashboard/1.0 (+https://codakidblogdashboard.netlify.app)',
 };
-const fallbackSnapshot = readFallbackSnapshot();
-const seoGameplan = readJsonFile('./seo-gameplan.json');
+const fallbackSnapshot = fallbackSnapshotData;
+const seoGameplan = seoGameplanData;
 const confirmedPillarUrls = new Set((seoGameplan?.confirmedPillars || []).map((pillar) => normalizeUrl(pillar.url)));
 
 const evergreenSignals = [
@@ -447,17 +448,4 @@ function json(statusCode, body, headers = {}) {
     },
     body: JSON.stringify(body),
   };
-}
-
-function readFallbackSnapshot() {
-  return readJsonFile('./content-snapshot-fallback.json');
-}
-
-function readJsonFile(relativePath) {
-  try {
-    const filePath = new URL(relativePath, import.meta.url);
-    return JSON.parse(readFileSync(filePath, 'utf8'));
-  } catch {
-    return null;
-  }
 }
