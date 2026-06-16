@@ -1,4 +1,5 @@
-import { requireUser } from './_auth.mjs';
+import { randomUUID } from 'node:crypto';
+import { requireUser, getSql } from './_auth.mjs';
 import fallbackSnapshotData from './content-snapshot-fallback-data.mjs';
 import seoGameplanData from './seo-gameplan-data.mjs';
 
@@ -77,19 +78,88 @@ export async function handler(event) {
 }
 
 async function getSnapshot() {
+  const markedPillarUrls = await fetchMarkedPillarUrls();
   try {
-    return await buildSnapshot();
+    const snapshot = await buildSnapshot(markedPillarUrls);
+    await saveWordPressSnapshot(snapshot);
+    return snapshot;
   } catch (error) {
+    const cached = await fetchLatestWordPressSnapshot();
+    if (cached?.data?.kpis) {
+      return {
+        ...cached.data,
+        generatedAt: cached.created_at || cached.data.generatedAt,
+        source: 'cached-wordpress-snapshot',
+        sourceDetail: `Live WordPress crawl failed: ${error instanceof Error ? error.message : String(error)}`,
+      };
+    }
     if (!fallbackSnapshot?.kpis) throw error;
     return {
       ...fallbackSnapshot,
-      source: 'cached-wordpress-snapshot',
+      source: 'bundled-fallback-snapshot',
       sourceDetail: error instanceof Error ? error.message : String(error),
     };
   }
 }
 
-export async function buildSnapshot() {
+async function saveWordPressSnapshot(snapshot) {
+  try {
+    const sql = getSql();
+    const postCount = snapshot?.kpis?.postsCrawled || 0;
+    const recentRows = await sql`
+      select id
+      from wordpress_snapshots
+      where ok = true
+        and post_count = ${postCount}
+        and created_at >= now() - interval '6 hours'
+      limit 1
+    `;
+    if (recentRows[0]) return;
+
+    await sql`
+      insert into wordpress_snapshots (id, source, ok, post_count, data)
+      values (
+        ${randomUUID()},
+        'wordpress-rest',
+        true,
+        ${postCount},
+        ${JSON.stringify(snapshot)}
+      )
+    `;
+    await sql`delete from wordpress_snapshots where created_at < now() - interval '180 days'`;
+  } catch {
+    // The live dashboard should still work if history persistence has a problem.
+  }
+}
+
+async function fetchLatestWordPressSnapshot() {
+  try {
+    const sql = getSql();
+    const rows = await sql`
+      select data, created_at
+      from wordpress_snapshots
+      where ok = true
+      order by created_at desc
+      limit 1
+    `;
+    return rows[0] || null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchMarkedPillarUrls() {
+  try {
+    const sql = getSql();
+    const rows = await sql`select url from dashboard_pillars`;
+    return new Set(rows.map((row) => normalizeUrl(row.url)));
+  } catch {
+    return new Set();
+  }
+}
+
+export async function buildSnapshot(markedPillarUrls = new Set()) {
+  const isConfirmed = (url) => confirmedPillarUrls.has(url) || markedPillarUrls.has(url);
   const [categories, totalPages] = await Promise.all([fetchCategories(), fetchTotalPages()]);
   const posts = await fetchPosts(totalPages);
   const categoryMap = new Map(categories.map((category) => [category.id, category]));
@@ -125,16 +195,21 @@ export async function buildSnapshot() {
       health,
       freshnessDays,
       status: getStatus(health),
-      confirmedPillar: confirmedPillarUrls.has(post.normalizedUrl),
+      confirmedPillar: isConfirmed(post.normalizedUrl),
     };
   });
 
-  const inferredPillars = enriched
-    .filter((post) => post.confirmedPillar || starterPillarSlugs.has(post.slug) || post.pillarScore >= 52)
-    .sort((a, b) => Number(b.confirmedPillar) - Number(a.confirmedPillar) || b.pillarScore - a.pillarScore)
-    .slice(0, 18);
+  const confirmedPillars = enriched
+    .filter((post) => post.confirmedPillar)
+    .sort((a, b) => b.pillarScore - a.pillarScore);
 
-  const pillarUrls = new Set(inferredPillars.map((post) => post.normalizedUrl));
+  const suggestedPillars = enriched
+    .filter((post) => !post.confirmedPillar && (starterPillarSlugs.has(post.slug) || post.pillarScore >= 52))
+    .sort((a, b) => b.pillarScore - a.pillarScore)
+    .slice(0, 12);
+
+  const inferredPillars = [...confirmedPillars, ...suggestedPillars];
+
   const underlinkedPillars = inferredPillars
     .filter((post) => post.inboundCount < 12 || post.missingRelatedLinks.length > 3)
     .map((post) => ({
@@ -164,6 +239,7 @@ export async function buildSnapshot() {
 
   const clusters = summarizeClusters(enriched, inferredPillars);
   const postsUpdatedRecently = enriched.filter((post) => daysSince(post.date) <= 90).length;
+  const searchConsoleStatus = await getSearchConsoleStatusSummary();
 
   return {
     generatedAt: new Date().toISOString(),
@@ -177,11 +253,12 @@ export async function buildSnapshot() {
       postsCrawled: enriched.length,
       categories: categories.length,
       inferredPillars: inferredPillars.length,
+      suggestedPillars: suggestedPillars.length,
       internalLinks: enriched.reduce((sum, post) => sum + post.outboundCount, 0),
       orphanPosts: orphanPosts.length,
       linkGaps: linkGaps.length,
       postsUpdatedRecently,
-      confirmedPillars: seoGameplan?.summary?.confirmedPillars || 0,
+      confirmedPillars: confirmedPillars.length,
       quickWins: seoGameplan?.summary?.quickWins || 0,
       keywordTargets: seoGameplan?.summary?.keywordTargets || 0,
       plannedContent: seoGameplan?.summary?.plannedContent || 0,
@@ -192,6 +269,24 @@ export async function buildSnapshot() {
       .map(({ id, name, slug, count, link }) => ({ id, name, slug, count, link })),
     clusters,
     pillars: inferredPillars,
+    allPosts: enriched
+      .slice()
+      .sort((a, b) => b.pillarScore - a.pillarScore)
+      .map((post) => ({
+        title: post.title,
+        url: post.url,
+        slug: post.slug,
+        cluster: post.cluster,
+        date: post.date,
+        modified: post.modified,
+        inboundCount: post.inboundCount,
+        outboundCount: post.outboundCount,
+        relatedPostCount: post.relatedPostCount,
+        pillarScore: post.pillarScore,
+        health: post.health,
+        status: post.status,
+        confirmedPillar: post.confirmedPillar,
+      })),
     underlinkedPillars,
     linkGaps,
     orphanPosts: orphanPosts.map(({ title, url, cluster, date, inboundCount, outboundCount }) => ({
@@ -207,11 +302,37 @@ export async function buildSnapshot() {
     integrationStatus: [
       { name: 'WordPress REST API', status: 'connected', detail: `${enriched.length} posts crawled` },
       { name: 'SEO Gameplan', status: 'connected', detail: `${seoGameplan?.summary?.quickWins || 0} quick wins imported` },
-      { name: 'Google Search Console', status: 'pending', detail: 'Connect API to add rankings, CTR, and query movement' },
+      {
+        name: 'Google Search Console',
+        status: searchConsoleStatus.status,
+        detail: searchConsoleStatus.detail,
+      },
       { name: 'GA4', status: 'pending', detail: 'Connect Data API to add sessions, engagement, and conversions' },
       { name: 'OpenAI', status: process.env.OPENAI_API_KEY ? 'connected' : 'pending', detail: 'Add OPENAI_API_KEY for generated strategy briefs' },
     ],
   };
+}
+
+async function getSearchConsoleStatusSummary() {
+  try {
+    const sql = getSql();
+    const rows = await sql`
+      select dimensions, data, created_at
+      from google_search_console_snapshots
+      order by created_at desc
+      limit 1
+    `;
+    if (rows[0]) {
+      const count = Array.isArray(rows[0].data?.rows) ? rows[0].data.rows.length : 0;
+      return {
+        status: 'connected',
+        detail: `${count} ${rows[0].dimensions} rows imported`,
+      };
+    }
+  } catch {
+    // Snapshot status is advisory; never fail the WordPress crawl because of it.
+  }
+  return { status: 'pending', detail: 'Import Search Console rows to add rankings, CTR, and query movement' };
 }
 
 async function fetchCategories() {

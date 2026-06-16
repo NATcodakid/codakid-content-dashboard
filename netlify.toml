@@ -10,6 +10,12 @@
     "netlify/functions/seo-gameplan.json"
   ]
 
+[functions."keyword-weekly-sync"]
+  schedule = "@weekly"
+
+[functions."ga4"]
+  schedule = "@daily"
+
 [[redirects]]
   from = "/api/content-snapshot"
   to = "/.netlify/functions/content-snapshot"
@@ -76,6 +82,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/ga4"
+  to = "/.netlify/functions/ga4"
+  status = 200
+
+[[redirects]]
   from = "/api/google/search-console/sync"
   to = "/.netlify/functions/google-search-console-sync"
   status = 200
@@ -84,6 +95,50 @@
   from = "/api/gsc/import"
   to = "/.netlify/functions/gsc-import"
   status = 200
+
+[[redirects]]
+  from = "/api/search-opportunities"
+  to = "/.netlify/functions/search-opportunities"
+  status = 200
+
+[[redirects]]
+  from = "/api/pillars"
+  to = "/.netlify/functions/pillars"
+  status = 200
+
+[[redirects]]
+  from = "/api/action-items"
+  to = "/.netlify/functions/action-items"
+  status = 200
+
+[[redirects]]
+  from = "/api/serp-tracker"
+  to = "/.netlify/functions/serp-tracker"
+  status = 200
+
+[[redirects]]
+  from = "/api/tracked-keywords"
+  to = "/.netlify/functions/tracked-keywords"
+  status = 200
+
+[[redirects]]
+  from = "/api/keyword-weekly-sync"
+  to = "/.netlify/functions/keyword-weekly-sync"
+  status = 200
+
+[[redirects]]
+  from = "/api/diagnostics"
+  to = "/.netlify/functions/diagnostics"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; connect-src 'self' https://codakid.com https://*.codakid.com https://google.serper.dev https://api.openai.com https://www.googleapis.com https://oauth2.googleapis.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
 
 [[redirects]]
   from = "/*"

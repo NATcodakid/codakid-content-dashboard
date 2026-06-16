@@ -1,17 +1,17 @@
-import { requireUser } from './_auth.mjs';
+import { assertRateLimit, errorResponse, json, requireCsrf, requireUser } from './_auth.mjs';
 
 export async function handler(event) {
   if (event.httpMethod !== 'POST') {
     return json(405, { error: 'POST required' });
   }
 
+  let user;
   try {
-    await requireUser(event);
+    requireCsrf(event);
+    user = await requireUser(event);
+    await assertRateLimit(`openai:user:${user.id}`, { limit: 30, windowSeconds: 24 * 60 * 60 });
   } catch (error) {
-    return json(error?.statusCode || 500, {
-      error: error?.statusCode ? error.message : 'Server error',
-      detail: error instanceof Error ? error.message : String(error),
-    });
+    return errorResponse(error);
   }
 
   const payload = safeParse(event.body || '{}');
@@ -42,7 +42,7 @@ export async function handler(event) {
           },
           {
             role: 'user',
-            content: `Create a weekly executive SEO insight brief for this WordPress-only content snapshot. Return 5 bullets with clear next actions.\n\n${JSON.stringify(trimPayload(payload), null, 2)}`,
+            content: `Create a weekly executive SEO insight brief for this CodaKid blog dashboard. Return 5 bullets with clear next actions. Use Search Console, WordPress crawl, competitors, and open action items when present.\n\n${JSON.stringify(trimPayload(payload), null, 2)}`,
           },
         ],
       }),
@@ -79,27 +79,64 @@ export async function handler(event) {
 }
 
 function buildFallback(payload) {
-  const kpis = payload?.kpis || {};
-  const pillars = payload?.pillars || [];
-  const linkGaps = payload?.linkGaps || [];
-  const underlinked = payload?.underlinkedPillars || [];
+  const snapshot = payload?.snapshot || payload;
+  const opportunities = payload?.searchOpportunities || {};
+  const competitors = payload?.competitors || {};
+  const actions = payload?.actionItems || [];
+  const trackedKeywords = payload?.trackedKeywords || [];
+  const ga4 = payload?.ga4?.latest;
+  const kpis = snapshot?.kpis || {};
+  const pillars = snapshot?.pillars || [];
+  const linkGaps = snapshot?.linkGaps || [];
+  const underlinked = snapshot?.underlinkedPillars || [];
+  const searchClicks = opportunities?.summary?.totalClicks || 0;
+  const topQuery = opportunities?.queryOpportunities?.[0]?.label || opportunities?.topQueries?.[0]?.label;
+  const topCompetitor = competitors?.competitors?.[0]?.domain;
+  const trackedKeyword = trackedKeywords.find((keyword) => keyword.latestSerp?.position);
+  const topGa4Page = ga4?.topPages?.[0];
 
   return [
     `Start with internal links: ${linkGaps.length || 0} link gaps are visible from WordPress alone.`,
     `Review the top pillar "${pillars[0]?.title || 'Coding for Kids'}" and mirror its linking pattern across weaker clusters.`,
-    `${underlinked.length || 0} inferred pillars need more supporting posts or stronger anchor text.`,
-    `Use Search Console next so the dashboard can separate real ranking losses from structural SEO issues.`,
-    `Current crawl covers ${kpis.postsCrawled || 0} posts and ${kpis.internalLinks || 0} internal links.`,
+    trackedKeyword
+      ? `Rank tracking: "${trackedKeyword.keyword}" is currently ${trackedKeyword.latestSerp.position ? `#${trackedKeyword.latestSerp.position}` : 'outside the tracked range'}; keep its target page mapped.`
+      : topQuery
+      ? `Use Search Console next: "${topQuery}" is the clearest keyword opportunity in the current data.`
+      : `Search Console has ${searchClicks} clicks in the current loaded period.`,
+    topCompetitor
+      ? `Competitor watch: ${topCompetitor} has the strongest sampled overlap, so use it for content gap review.`
+      : `${underlinked.length || 0} inferred pillars need more supporting posts or stronger anchor text.`,
+    topGa4Page
+      ? `GA4 traffic: "${topGa4Page.title || topGa4Page.path}" has ${topGa4Page.views} views; compare engagement before changing major copy.`
+      : actions.length
+      ? `${actions.filter((action) => action.status !== 'done').length} open action items are ready for follow-up.`
+      : `Current crawl covers ${kpis.postsCrawled || 0} posts and ${kpis.internalLinks || 0} internal links.`,
   ];
 }
 
 function trimPayload(payload) {
+  const snapshot = payload?.snapshot || payload;
   return {
-    generatedAt: payload.generatedAt,
-    mode: payload.mode,
-    kpis: payload.kpis,
-    clusters: payload.clusters?.slice(0, 10),
-    pillars: payload.pillars?.slice(0, 12).map((pillar) => ({
+    generatedAt: snapshot.generatedAt,
+    mode: snapshot.mode,
+    kpis: snapshot.kpis,
+    search: {
+      summary: payload?.searchOpportunities?.summary,
+      pageOpportunities: payload?.searchOpportunities?.pageOpportunities?.slice(0, 8),
+      queryOpportunities: payload?.searchOpportunities?.queryOpportunities?.slice(0, 8),
+      pageQueryOpportunities: payload?.searchOpportunities?.pageQueryOpportunities?.slice(0, 8),
+    },
+    competitors: payload?.competitors?.competitors?.slice(0, 6),
+    actionItems: payload?.actionItems?.slice(0, 10),
+    trackedKeywords: payload?.trackedKeywords?.slice(0, 20),
+    ga4: payload?.ga4?.latest
+      ? {
+          summary: payload.ga4.latest.summary,
+          topPages: payload.ga4.latest.topPages?.slice(0, 10),
+        }
+      : null,
+    clusters: snapshot.clusters?.slice(0, 10),
+    pillars: snapshot.pillars?.slice(0, 12).map((pillar) => ({
       title: pillar.title,
       cluster: pillar.cluster,
       inboundCount: pillar.inboundCount,
@@ -108,8 +145,8 @@ function trimPayload(payload) {
       status: pillar.status,
       url: pillar.url,
     })),
-    linkGaps: payload.linkGaps?.slice(0, 12),
-    underlinkedPillars: payload.underlinkedPillars?.slice(0, 10),
+    linkGaps: snapshot.linkGaps?.slice(0, 12),
+    underlinkedPillars: snapshot.underlinkedPillars?.slice(0, 10),
   };
 }
 
@@ -127,12 +164,4 @@ function extractOutputText(data) {
     ?.map((content) => content.text || '')
     ?.join('\n')
     ?.trim();
-}
-
-function json(statusCode, body) {
-  return {
-    statusCode,
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(body),
-  };
 }

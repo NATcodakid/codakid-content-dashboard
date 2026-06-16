@@ -1,4 +1,4 @@
-import { clearSessionCookie, destroySession, errorResponse, json } from './_auth.mjs';
+import { clearCsrfCookie, clearSessionCookie, destroySession, errorResponse, json } from './_auth.mjs';
 
 export async function handler(event) {
   if (event.httpMethod !== 'POST') return json(405, { error: 'POST required' });
@@ -6,7 +6,7 @@ export async function handler(event) {
   try {
     await destroySession(event);
     return json(200, { authenticated: false }, {
-      'set-cookie': clearSessionCookie(event),
+      'set-cookie': [clearSessionCookie(event), clearCsrfCookie(event)],
     });
   } catch (error) {
     return errorResponse(error);

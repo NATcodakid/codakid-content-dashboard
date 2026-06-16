@@ -1,5 +1,7 @@
 import {
   createSession,
+  createCsrfToken,
+  csrfCookie,
   errorResponse,
   getSql,
   hashPassword,
@@ -48,9 +50,10 @@ export async function handler(event) {
     await sql`update dashboard_invitations set accepted_at = now() where id = ${invite.id}`;
     const user = users[0];
     const sessionToken = await createSession(user.id);
+    const csrfToken = createCsrfToken();
 
-    return json(200, { authenticated: true, user: publicUser(user) }, {
-      'set-cookie': sessionCookie(event, sessionToken),
+    return json(200, { authenticated: true, user: publicUser(user), csrfToken }, {
+      'set-cookie': [sessionCookie(event, sessionToken), csrfCookie(event, csrfToken)],
     });
   } catch (error) {
     return errorResponse(error);

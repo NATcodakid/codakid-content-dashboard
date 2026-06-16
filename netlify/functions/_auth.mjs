@@ -8,6 +8,7 @@ import {
 } from 'node:crypto';
 
 const SESSION_COOKIE = 'ck_content_session';
+const CSRF_COOKIE = 'ck_content_csrf';
 const SESSION_DAYS = 30;
 const DATABASE_ENV_KEYS = [
   'NETLIFY_DATABASE_URL',
@@ -147,10 +148,138 @@ export async function ensureAuthSchema() {
     )
   `;
 
+  await sql`
+    create table if not exists dashboard_pillars (
+      url text primary key,
+      raw_url text not null default '',
+      title text not null default '',
+      cluster text not null default '',
+      note text not null default '',
+      marked_by text,
+      created_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists dashboard_action_items (
+      id text primary key,
+      fingerprint text not null unique,
+      type text not null default 'general',
+      source text not null default 'manual',
+      title text not null default '',
+      detail text not null default '',
+      page_url text not null default '',
+      keyword text not null default '',
+      cluster text not null default '',
+      priority_score integer not null default 0,
+      status text not null default 'todo',
+      owner text not null default '',
+      due_date date,
+      completed_at timestamptz,
+      created_by text,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists serp_snapshots (
+      id text primary key,
+      keyword text not null,
+      location text not null default 'United States',
+      country text not null default 'us',
+      language text not null default 'en',
+      codakid_position integer,
+      codakid_url text not null default '',
+      organic jsonb not null default '[]'::jsonb,
+      people_also_ask jsonb not null default '[]'::jsonb,
+      related_searches jsonb not null default '[]'::jsonb,
+      credits_used integer not null default 1,
+      fetched_at timestamptz not null default now(),
+      created_by text
+    )
+  `;
+
+  await sql`
+    create table if not exists tracked_keywords (
+      id text primary key,
+      keyword text not null unique,
+      cluster text not null default '',
+      target_url text not null default '',
+      intent text not null default 'informational',
+      priority integer not null default 50,
+      cadence text not null default 'weekly',
+      status text not null default 'active',
+      source text not null default 'seed',
+      notes text not null default '',
+      last_tracked_at timestamptz,
+      created_by text,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists wordpress_snapshots (
+      id text primary key,
+      source text not null default 'wordpress-rest',
+      ok boolean not null default true,
+      post_count integer not null default 0,
+      data jsonb not null,
+      error text not null default '',
+      created_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists ga4_snapshots (
+      id text primary key,
+      property_id text not null,
+      start_date date not null,
+      end_date date not null,
+      dimensions text not null,
+      metrics text not null,
+      data jsonb not null,
+      created_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists dashboard_audit_log (
+      id text primary key,
+      user_id text,
+      email text not null default '',
+      action text not null,
+      resource text not null default '',
+      detail jsonb not null default '{}'::jsonb,
+      ip text not null default '',
+      user_agent text not null default '',
+      created_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists dashboard_rate_limits (
+      key text primary key,
+      count integer not null default 0,
+      reset_at timestamptz not null
+    )
+  `;
+
   await sql`create index if not exists dashboard_sessions_user_id_idx on dashboard_sessions(user_id)`;
   await sql`create index if not exists dashboard_sessions_expires_at_idx on dashboard_sessions(expires_at)`;
   await sql`create index if not exists google_oauth_states_expires_at_idx on google_oauth_states(expires_at)`;
   await sql`create index if not exists gsc_snapshots_site_dates_idx on google_search_console_snapshots(site_url, start_date, end_date)`;
+  await sql`create index if not exists dashboard_action_items_status_idx on dashboard_action_items(status, priority_score desc)`;
+  await sql`create index if not exists dashboard_action_items_type_idx on dashboard_action_items(type, source)`;
+  await sql`create index if not exists serp_snapshots_keyword_fetched_idx on serp_snapshots(keyword, fetched_at desc)`;
+  await sql`create index if not exists tracked_keywords_status_priority_idx on tracked_keywords(status, priority desc)`;
+  await sql`create index if not exists tracked_keywords_last_tracked_idx on tracked_keywords(last_tracked_at asc nulls first)`;
+  await sql`create index if not exists wordpress_snapshots_created_idx on wordpress_snapshots(created_at desc)`;
+  await sql`create index if not exists ga4_snapshots_property_dates_idx on ga4_snapshots(property_id, start_date, end_date, created_at desc)`;
+  await sql`create index if not exists dashboard_audit_log_created_idx on dashboard_audit_log(created_at desc)`;
+  await sql`create index if not exists dashboard_rate_limits_reset_idx on dashboard_rate_limits(reset_at)`;
+  await seedTrackedKeywords(sql);
   await syncEnvAdmin(sql);
   schemaReady = true;
 }
@@ -226,12 +355,54 @@ export function sessionCookie(event, token) {
   return `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_DAYS * 24 * 60 * 60}${secure}`;
 }
 
+export function createCsrfToken() {
+  return randomBytes(24).toString('base64url');
+}
+
+export function csrfCookie(event, token) {
+  const secure = isSecureRequest(event) ? '; Secure' : '';
+  return `${CSRF_COOKIE}=${token}; Path=/; SameSite=Lax; Max-Age=${SESSION_DAYS * 24 * 60 * 60}${secure}`;
+}
+
+export function getCsrfToken(event) {
+  return getCookie(event, CSRF_COOKIE);
+}
+
 export function clearSessionCookie(event) {
   const secure = isSecureRequest(event) ? '; Secure' : '';
   return `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`;
 }
 
+export function clearCsrfCookie(event) {
+  const secure = isSecureRequest(event) ? '; Secure' : '';
+  return `${CSRF_COOKIE}=; Path=/; SameSite=Lax; Max-Age=0${secure}`;
+}
+
 export function json(statusCode, body, headers = {}) {
+  const nextHeaders = {
+    'content-type': 'application/json',
+    ...headers,
+  };
+  const setCookie = nextHeaders['set-cookie'] || nextHeaders['Set-Cookie'];
+  delete nextHeaders['set-cookie'];
+  delete nextHeaders['Set-Cookie'];
+
+  const response = {
+    statusCode,
+    headers: nextHeaders,
+    body: JSON.stringify(body),
+  };
+
+  if (setCookie) {
+    response.multiValueHeaders = {
+      'set-cookie': Array.isArray(setCookie) ? setCookie : [setCookie],
+    };
+  }
+
+  return response;
+}
+
+export function secureJson(statusCode, body, headers = {}) {
   return {
     statusCode,
     headers: {
@@ -257,6 +428,62 @@ export function parseJsonBody(event) {
   } catch {
     throw new HttpError(400, 'Invalid JSON body.');
   }
+}
+
+export function requireCsrf(event) {
+  if (!['POST', 'PATCH', 'PUT', 'DELETE'].includes(event.httpMethod)) return;
+  const cookieToken = getCookie(event, CSRF_COOKIE);
+  const headerToken = event.headers?.['x-codakid-csrf'] || event.headers?.['X-Codakid-Csrf'];
+  if (!cookieToken || !headerToken || !safeStringEqual(String(cookieToken), String(headerToken))) {
+    throw new HttpError(403, 'Security check failed. Refresh the dashboard and try again.');
+  }
+}
+
+export async function audit(event, user, action, resource = '', detail = {}) {
+  try {
+    const sql = getSql();
+    await sql`
+      insert into dashboard_audit_log (id, user_id, email, action, resource, detail, ip, user_agent)
+      values (
+        ${randomUUID()},
+        ${user?.id || ''},
+        ${user?.email || ''},
+        ${action},
+        ${resource},
+        ${JSON.stringify(detail || {})},
+        ${clientIp(event)},
+        ${event.headers?.['user-agent'] || event.headers?.['User-Agent'] || ''}
+      )
+    `;
+  } catch {
+    // Auditing should not break the user workflow.
+  }
+}
+
+export async function assertRateLimit(key, { limit, windowSeconds }) {
+  const sql = getSql();
+  await sql`delete from dashboard_rate_limits where reset_at <= now()`;
+  const rows = await sql`
+    insert into dashboard_rate_limits (key, count, reset_at)
+    values (${key}, 1, now() + (${windowSeconds} * interval '1 second'))
+    on conflict (key) do update set
+      count = case
+        when dashboard_rate_limits.reset_at <= now() then 1
+        else dashboard_rate_limits.count + 1
+      end,
+      reset_at = case
+        when dashboard_rate_limits.reset_at <= now() then now() + (${windowSeconds} * interval '1 second')
+        else dashboard_rate_limits.reset_at
+      end
+    returning count, reset_at
+  `;
+  const current = rows[0];
+  if (current?.count > limit) {
+    const error = new HttpError(429, `Rate limit reached. Try again after ${new Date(current.reset_at).toLocaleString()}.`);
+    error.meta = { limit, resetAt: current.reset_at };
+    throw error;
+  }
+  return current;
 }
 
 export function normalizeEmail(email) {
@@ -296,11 +523,69 @@ export function publicUser(user) {
   };
 }
 
+async function seedTrackedKeywords(sql) {
+  const rows = await sql`select count(*)::int as count from tracked_keywords`;
+  if (Number(rows[0]?.count || 0) > 0) return;
+
+  const starterKeywords = [
+    ['coding for kids', 'Coding for Kids', 'https://codakid.com/coding-for-kids-the-ultimate-guide-for-parents-2/', 'pillar', 100],
+    ['online coding classes for kids', 'Coding for Kids', '', 'commercial', 95],
+    ['coding classes for kids', 'Coding for Kids', '', 'commercial', 94],
+    ['kids coding', 'Coding for Kids', 'https://codakid.com/coding-for-kids-the-ultimate-guide-for-parents-2/', 'informational', 88],
+    ['computer coding for kids', 'Coding for Kids', 'https://codakid.com/coding-for-kids-the-ultimate-guide-for-parents-2/', 'informational', 86],
+    ['programming for kids', 'Coding for Kids', '', 'informational', 82],
+    ['coding for teens', 'Coding for Kids', '', 'commercial', 72],
+    ['python for kids', 'Python', '', 'commercial', 86],
+    ['python coding for kids', 'Python', '', 'commercial', 84],
+    ['minecraft coding for kids', 'Minecraft', '', 'commercial', 90],
+    ['minecraft modding for kids', 'Minecraft', '', 'commercial', 88],
+    ['minecraft java coding for kids', 'Minecraft', '', 'commercial', 78],
+    ['roblox coding for kids', 'Roblox', '', 'commercial', 88],
+    ['roblox scripting for kids', 'Roblox', '', 'commercial', 82],
+    ['lua coding for kids', 'Roblox', '', 'informational', 70],
+    ['scratch coding for kids', 'Scratch', '', 'commercial', 72],
+    ['game coding for kids', 'Game Development', '', 'commercial', 80],
+    ['coding camps for kids', 'Camps', '', 'commercial', 82],
+    ['online coding camp for kids', 'Camps', '', 'commercial', 78],
+    ['homeschool coding curriculum', 'Homeschool', '', 'commercial', 70],
+    ['ai classes for kids', 'AI', '', 'commercial', 84],
+    ['artificial intelligence for kids', 'AI', '', 'informational', 78],
+    ['ai for kids', 'AI', '', 'informational', 76],
+  ];
+
+  for (const [keyword, cluster, targetUrl, intent, priority] of starterKeywords) {
+    await sql`
+      insert into tracked_keywords (id, keyword, cluster, target_url, intent, priority, source)
+      values (${randomUUID()}, ${keyword}, ${cluster}, ${targetUrl}, ${intent}, ${priority}, 'seed')
+      on conflict (keyword) do nothing
+    `;
+  }
+}
+
 async function syncEnvAdmin(sql) {
   const email = normalizeEmail(process.env.DASHBOARD_ADMIN_EMAIL);
   const password = process.env.DASHBOARD_ADMIN_PASSWORD;
   if (!email || !password) return;
   validatePassword(password);
+
+  const existingRows = await sql`
+    select id, password_hash, password_salt
+    from dashboard_users
+    where email = ${email}
+    limit 1
+  `;
+  const existing = existingRows[0];
+
+  if (existing && verifyPassword(password, existing.password_salt, existing.password_hash)) {
+    await sql`
+      update dashboard_users
+      set role = 'admin',
+          status = 'active',
+          accepted_at = coalesce(accepted_at, now())
+      where id = ${existing.id}
+    `;
+    return;
+  }
 
   const { salt, hash } = hashPassword(password);
   const users = await sql`
@@ -327,6 +612,21 @@ function getCookie(event, name) {
     .map((part) => part.trim())
     .find((part) => part.startsWith(`${name}=`))
     ?.slice(name.length + 1);
+}
+
+function clientIp(event) {
+  return String(
+    event.headers?.['x-nf-client-connection-ip'] ||
+      event.headers?.['client-ip'] ||
+      event.headers?.['x-forwarded-for'] ||
+      '',
+  ).split(',')[0].trim();
+}
+
+function safeStringEqual(a, b) {
+  const aBuffer = Buffer.from(a);
+  const bBuffer = Buffer.from(b);
+  return aBuffer.length === bBuffer.length && timingSafeEqual(aBuffer, bBuffer);
 }
 
 function isSecureRequest(event) {

@@ -6,6 +6,7 @@ import {
   normalizeEmail,
   parseJsonBody,
   requireAdmin,
+  requireCsrf,
 } from './_auth.mjs';
 import { randomBytes, randomUUID } from 'node:crypto';
 
@@ -13,6 +14,7 @@ export async function handler(event) {
   if (event.httpMethod !== 'POST') return json(405, { error: 'POST required' });
 
   try {
+    requireCsrf(event);
     const admin = await requireAdmin(event);
     const { email, name = '', role = 'viewer' } = parseJsonBody(event);
     const normalizedEmail = normalizeEmail(email);

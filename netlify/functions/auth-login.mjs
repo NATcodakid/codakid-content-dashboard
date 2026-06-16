@@ -1,5 +1,7 @@
 import {
   createSession,
+  createCsrfToken,
+  csrfCookie,
   ensureAuthSchema,
   errorResponse,
   getSql,
@@ -32,8 +34,9 @@ export async function handler(event) {
     }
 
     const token = await createSession(user.id);
-    return json(200, { authenticated: true, user: publicUser(user) }, {
-      'set-cookie': sessionCookie(event, token),
+    const csrfToken = createCsrfToken();
+    return json(200, { authenticated: true, user: publicUser(user), csrfToken }, {
+      'set-cookie': [sessionCookie(event, token), csrfCookie(event, csrfToken)],
     });
   } catch (error) {
     return errorResponse(error);

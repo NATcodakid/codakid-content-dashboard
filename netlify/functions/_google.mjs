@@ -5,7 +5,9 @@ const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo';
 const GSC_API_BASE = 'https://www.googleapis.com/webmasters/v3';
+const GA4_API_BASE = 'https://analyticsdata.googleapis.com/v1beta';
 const GSC_SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
+const GA4_SCOPE = 'https://www.googleapis.com/auth/analytics.readonly';
 const USER_SCOPE = 'openid email';
 
 export function googleOAuthConfigured() {
@@ -40,7 +42,7 @@ export async function createGoogleAuthUrl(event, userId) {
     client_id: process.env.GOOGLE_CLIENT_ID,
     redirect_uri: getRedirectUri(event),
     response_type: 'code',
-    scope: `${GSC_SCOPE} ${USER_SCOPE}`,
+    scope: `${GSC_SCOPE} ${GA4_SCOPE} ${USER_SCOPE}`,
     access_type: 'offline',
     prompt: 'consent',
     include_granted_scopes: 'true',
@@ -92,6 +94,7 @@ export async function googleConnectionStatus() {
   return {
     configured: googleOAuthConfigured(),
     connected: Boolean(rows[0]),
+    analyticsScopeReady: hasScope(rows[0]?.scope, GA4_SCOPE),
     connection: rows[0] || null,
     properties,
     redirectUri: process.env.URL ? `${process.env.URL.replace(/\/$/, '')}/api/google/oauth/callback` : 'https://codakidblogdashboard.netlify.app/api/google/oauth/callback',
@@ -180,9 +183,47 @@ export async function latestSearchConsoleSnapshot() {
   return rows;
 }
 
+export function ga4Configured() {
+  return Boolean(ga4PropertyId());
+}
+
+export function ga4PropertyId() {
+  return String(
+    process.env.GA4_PROPERTY_ID ||
+      process.env.GOOGLE_ANALYTICS_PROPERTY_ID ||
+      process.env.VITE_GA4_PROPERTY_ID ||
+      '',
+  ).trim();
+}
+
+export async function ga4RunReport(body) {
+  const propertyId = ga4PropertyId();
+  if (!propertyId) throw new HttpError(500, 'GA4_PROPERTY_ID is not configured.');
+  const data = await googleFetch(`${GA4_API_BASE}/properties/${propertyId}:runReport`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  return { propertyId, data };
+}
+
+export async function googleConnectionHasAnalyticsScope() {
+  const sql = getSql();
+  const rows = await sql`
+    select scope
+    from google_search_console_connections
+    order by updated_at desc
+    limit 1
+  `;
+  return hasScope(rows[0]?.scope, GA4_SCOPE);
+}
+
 async function gscFetch(path, options = {}) {
+  return googleFetch(`${GSC_API_BASE}${path}`, options, 'Google Search Console request failed.');
+}
+
+async function googleFetch(url, options = {}, fallbackMessage = 'Google API request failed.') {
   const accessToken = await getValidAccessToken();
-  const response = await fetch(`${GSC_API_BASE}${path}`, {
+  const response = await fetch(url, {
     ...options,
     headers: {
       authorization: `Bearer ${accessToken}`,
@@ -192,7 +233,7 @@ async function gscFetch(path, options = {}) {
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new HttpError(response.status, data.error?.message || 'Google Search Console request failed.');
+    throw new HttpError(response.status, data.error?.message || fallbackMessage);
   }
   return data;
 }
@@ -329,6 +370,10 @@ function getSqlSecretFallback() {
 
 function isLikelyCodakidProperty(siteUrl) {
   return /codakid\.com/i.test(siteUrl || '');
+}
+
+function hasScope(scopeValue, requiredScope) {
+  return String(scopeValue || '').split(/\s+/).includes(requiredScope);
 }
 
 function dateDaysAgo(days) {

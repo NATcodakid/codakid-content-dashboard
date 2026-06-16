@@ -75,21 +75,49 @@ async function sampleCompetitor(domain) {
   }
 
   const blogUrls = urls.filter((url) => /blog|article|resources|learn|guide/i.test(url)).slice(0, 80);
-  const topicMatches = countTopics(blogUrls);
+  const sampledPages = await samplePageTitles(blogUrls.slice(0, 14));
+  const topicMatches = countTopics([...blogUrls, ...sampledPages.map((page) => `${page.url} ${page.title}`)]);
 
   return {
     domain: new URL(base).hostname.replace(/^www\./, ''),
     source,
     urlsSampled: urls.length,
     blogUrls: blogUrls.length,
+    sampledPages,
     visibleTopics: Object.entries(topicMatches)
       .filter(([, count]) => count > 0)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 6)
       .map(([topic, count]) => ({ topic, count })),
+    contentAngles: buildContentAngles(sampledPages),
     opportunities: buildOpportunities(topicMatches),
     status: urls.length ? 'sampled' : 'needs review',
   };
+}
+
+async function samplePageTitles(urls) {
+  const pages = await Promise.all(
+    urls.map(async (url) => {
+      try {
+        const response = await fetch(url, {
+          headers: { 'user-agent': 'CodaKidContentDashboard/0.1' },
+          signal: AbortSignal.timeout(4500),
+        });
+        if (!response.ok) return null;
+        const html = await response.text();
+        const title = cleanHtml(
+          html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ||
+            html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ||
+            '',
+        );
+        if (!title) return null;
+        return { url, title: title.slice(0, 140) };
+      } catch {
+        return null;
+      }
+    }),
+  );
+  return pages.filter(Boolean).slice(0, 10);
 }
 
 function extractUrls(xml) {
@@ -117,6 +145,32 @@ function buildOpportunities(counts) {
   if ((counts.camp || 0) > 0) ideas.push('Review seasonal camp pages before summer search demand peaks.');
   if (!ideas.length) ideas.push('Sitemap sampled, but topic overlap needs deeper crawl or SERP data.');
   return ideas.slice(0, 3);
+}
+
+function buildContentAngles(pages) {
+  const titleText = pages.map((page) => page.title.toLowerCase()).join(' ');
+  const angles = [];
+  if (/free|lesson|activity|project/.test(titleText)) angles.push('Free lessons/projects');
+  if (/parent|guide|age|beginner/.test(titleText)) angles.push('Parent/beginner guides');
+  if (/minecraft|roblox|python|scratch/.test(titleText)) angles.push('Platform-specific learning paths');
+  if (/camp|summer|class|course/.test(titleText)) angles.push('Course and camp landing content');
+  if (/ai|artificial intelligence|chatgpt/.test(titleText)) angles.push('AI education content');
+  return angles.slice(0, 4);
+}
+
+function cleanHtml(value) {
+  return String(value)
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#8217;/g, "'")
+    .replace(/&#8211;/g, '-')
+    .replace(/&#038;|&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#8220;|&#8221;/g, '"')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function json(statusCode, body, headers = {}) {
