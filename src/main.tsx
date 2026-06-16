@@ -131,6 +131,7 @@ type AiResponse = {
 type GoogleStatus = {
   configured: boolean;
   connected: boolean;
+  imported?: boolean;
   redirectUri: string;
   connection: {
     google_email?: string;
@@ -480,45 +481,56 @@ function GoogleSearchConsolePanel({
   onSync: () => void;
 }) {
   const latestPageSnapshot = status?.latestSnapshots?.find((snapshot) => snapshot.dimensions === 'page');
+  const hasSearchConsoleData = Boolean(status?.connected || status?.imported || status?.latestSnapshots?.length);
   return (
     <div className="google-panel">
       <div className="google-panel-header">
         <div>
           <strong>Google Search Console</strong>
-          <span>{status?.connected ? `Connected${status.connection?.google_email ? ` as ${status.connection.google_email}` : ''}` : 'OAuth connection'}</span>
+          <span>
+            {status?.connected
+              ? `Connected${status.connection?.google_email ? ` as ${status.connection.google_email}` : ''}`
+              : hasSearchConsoleData
+                ? 'Imported by Google Apps Script'
+                : 'OAuth or Apps Script connection'}
+          </span>
         </div>
-        <span className={status?.connected ? 'connection-badge connected' : 'connection-badge'}>
-          {status?.connected ? 'Connected' : status?.configured ? 'Ready' : 'Needs env'}
+        <span className={hasSearchConsoleData ? 'connection-badge connected' : 'connection-badge'}>
+          {hasSearchConsoleData ? 'Connected' : status?.configured ? 'Ready' : 'Needs import'}
         </span>
       </div>
 
-      {!status?.configured && (
+      {!status?.configured && !hasSearchConsoleData && (
         <div className="setup-box">
-          <strong>Netlify needs Google OAuth credentials first</strong>
-          <p>Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in Netlify. Use this redirect URI in Google Cloud:</p>
+          <strong>Use the Apps Script import first</strong>
+          <p>The dashboard is ready for Search Console rows from Google Apps Script. OAuth can be added later with this redirect URI:</p>
           <code>{status?.redirectUri || 'https://codakidblogdashboard.netlify.app/api/google/oauth/callback'}</code>
         </div>
       )}
 
-      {status?.configured && !status.connected && (
+      {status?.configured && !hasSearchConsoleData && (
         <a className="secondary-button full-width" href="/api/google/oauth/start">
           <Search size={16} />
           Connect Google Search Console
         </a>
       )}
 
-      {status?.connected && (
+      {hasSearchConsoleData && (
         <>
           <div className="gsc-stats">
-            <MetricPill label="GSC properties" value={status.properties.length} />
+            <MetricPill label="GSC properties" value={status?.properties.length || 0} />
             <MetricPill label="Latest page rows" value={latestPageSnapshot?.rowCount || 0} />
           </div>
-          <button className="secondary-button full-width" onClick={onSync} disabled={isSyncing}>
-            <RefreshCw size={16} className={isSyncing ? 'spin' : ''} />
-            {isSyncing ? 'Syncing Search Console' : 'Sync Search Console now'}
-          </button>
+          {status?.connected ? (
+            <button className="secondary-button full-width" onClick={onSync} disabled={isSyncing}>
+              <RefreshCw size={16} className={isSyncing ? 'spin' : ''} />
+              {isSyncing ? 'Syncing Search Console' : 'Sync Search Console now'}
+            </button>
+          ) : (
+            <p className="panel-note">Automatic refresh is handled by the Google Apps Script daily trigger.</p>
+          )}
           <div className="property-list">
-            {status.properties.slice(0, 4).map((property) => (
+            {(status?.properties || []).slice(0, 4).map((property) => (
               <article key={property.site_url}>
                 <strong>{property.site_url}</strong>
                 <span>{property.permission_level || 'permission unknown'}{property.selected ? ' · selected' : ''}</span>

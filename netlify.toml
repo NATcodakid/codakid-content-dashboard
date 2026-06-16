@@ -81,6 +81,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/gsc/import"
+  to = "/.netlify/functions/gsc-import"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

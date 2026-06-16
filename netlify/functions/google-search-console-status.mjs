@@ -6,9 +6,11 @@ export async function handler(event) {
     await requireUser(event);
     const status = await googleConnectionStatus();
     const snapshots = await latestSearchConsoleSnapshot();
+    const latestSnapshots = summarizeSnapshots(snapshots);
     return json(200, {
       ...status,
-      latestSnapshots: summarizeSnapshots(snapshots),
+      imported: latestSnapshots.length > 0,
+      latestSnapshots,
     }, {
       'cache-control': 'private, no-store',
     });
