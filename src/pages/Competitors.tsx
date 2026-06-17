@@ -1,11 +1,11 @@
 import React from 'react';
-import { Archive, ExternalLink, Globe2, Plus, RefreshCw, Search } from 'lucide-react';
+import { Archive, ExternalLink, Globe2, Plus, RefreshCw, Search, Award } from 'lucide-react';
 import { useDashboard } from '../data';
 import { LoadingState, PageHeading, PanelHeader } from '../components';
-import type { Cluster, CompetitorInput, CompetitorSnapshot } from '../types';
+import type { Cluster, CompetitorInput, CompetitorSnapshot, DomainAuthorityReport } from '../types';
 
 export function CompetitorsPage() {
-  const { competitors, isLoading, snapshot, saveCompetitor, archiveCompetitor, refresh } = useDashboard();
+  const { competitors, isLoading, snapshot, saveCompetitor, archiveCompetitor, refresh, domainAuthority, refreshAuthority } = useDashboard();
   const [form, setForm] = React.useState<CompetitorInput>({ domain: '', label: '', category: '', notes: '' });
   const [query, setQuery] = React.useState('');
   const [isSaving, setIsSaving] = React.useState(false);
@@ -128,6 +128,8 @@ export function CompetitorsPage() {
           </section>
         </section>
 
+        <DomainAuthorityPanel domainAuthority={domainAuthority} refreshAuthority={refreshAuthority} />
+
         {competitors && snapshot && (
           <section className="panel">
             <PanelHeader icon={<Globe2 />} title="Content Gap Matrix" action="public sitemap/title sample" />
@@ -175,6 +177,75 @@ export function CompetitorsPage() {
       </section>
       </div>
     </>
+  );
+}
+
+function DomainAuthorityPanel({
+  domainAuthority,
+  refreshAuthority,
+}: {
+  domainAuthority: DomainAuthorityReport | null;
+  refreshAuthority: () => Promise<void>;
+}) {
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    try {
+      await refreshAuthority();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
+
+  if (!domainAuthority?.configured) {
+    return (
+      <section className="panel">
+        <PanelHeader icon={<Award />} title="Domain Authority" action="OpenPageRank" />
+        <p className="panel-note">
+          Add <code>OPENPAGERANK_API_KEY</code> in Netlify environment variables to score your domain and every competitor
+          on a 0–10 authority scale — free from OpenPageRank.
+        </p>
+      </section>
+    );
+  }
+
+  const domains = domainAuthority.domains || [];
+  const maxRank = Math.max(10, ...domains.map((d) => d.pageRank || 0));
+
+  return (
+    <section className="panel">
+      <PanelHeader icon={<Award />} title="Domain Authority" action={domainAuthority.source} />
+      <div className="filter-bar">
+        <span className="panel-note" style={{ margin: 0 }}>
+          PageRank 0–10 for your site vs. tracked competitors. Higher means stronger link authority.
+        </span>
+        <button type="button" className="chip-button" disabled={isRefreshing} onClick={() => void handleRefresh()}>
+          <RefreshCw size={13} className={isRefreshing ? 'spin' : ''} />
+          Refresh scores
+        </button>
+      </div>
+      <div className="authority-list">
+        {domains.map((entry) => (
+          <article key={entry.domain} className={`authority-row${entry.isOwn ? ' is-own' : ''}`}>
+            <div className="authority-label">
+              <strong>{entry.label || entry.domain}</strong>
+              <small>{entry.domain}{entry.isOwn ? ' · your site' : ''}</small>
+            </div>
+            <div className="authority-bar-track">
+              <span
+                className="authority-bar-fill"
+                style={{ width: `${Math.min(100, ((entry.pageRank || 0) / maxRank) * 100)}%` }}
+              />
+            </div>
+            <div className="authority-score">
+              {entry.pageRank != null ? entry.pageRank.toFixed(2) : '—'}
+              {entry.rank ? <small>#{entry.rank.toLocaleString()}</small> : null}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 

@@ -325,6 +325,41 @@ export async function ensureAuthSchema() {
   `;
 
   await sql`
+    create table if not exists pagespeed_snapshots (
+      id text primary key,
+      url text not null,
+      strategy text not null default 'mobile',
+      performance integer,
+      seo integer,
+      accessibility integer,
+      best_practices integer,
+      lcp_ms integer,
+      cls_x1000 integer,
+      inp_ms integer,
+      fcp_ms integer,
+      ttfb_ms integer,
+      field_lcp_ms integer,
+      field_cls_x1000 integer,
+      field_inp_ms integer,
+      overall_category text not null default '',
+      data jsonb not null default '{}'::jsonb,
+      created_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists domain_authority_snapshots (
+      id text primary key,
+      domain text not null,
+      page_rank numeric,
+      rank integer,
+      status_code integer not null default 0,
+      error text not null default '',
+      created_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
     create table if not exists dashboard_audit_log (
       id text primary key,
       user_id text,
@@ -362,6 +397,8 @@ export async function ensureAuthSchema() {
   await sql`create index if not exists tracked_keywords_last_tracked_idx on tracked_keywords(last_tracked_at asc nulls first)`;
   await sql`create index if not exists wordpress_snapshots_created_idx on wordpress_snapshots(created_at desc)`;
   await sql`create index if not exists ga4_snapshots_property_dates_idx on ga4_snapshots(property_id, start_date, end_date, created_at desc)`;
+  await sql`create index if not exists pagespeed_snapshots_url_created_idx on pagespeed_snapshots(url, strategy, created_at desc)`;
+  await sql`create index if not exists domain_authority_snapshots_domain_created_idx on domain_authority_snapshots(domain, created_at desc)`;
   await sql`create index if not exists dashboard_audit_log_created_idx on dashboard_audit_log(created_at desc)`;
   await sql`create index if not exists dashboard_rate_limits_reset_idx on dashboard_rate_limits(reset_at)`;
   await seedCompetitors(sql);

@@ -24,6 +24,7 @@ import {
   formatPosition,
   formatter,
   normalizeUrl,
+  periodDayCount,
   periodDelta,
   positionBuckets,
   shortUrl,
@@ -109,6 +110,8 @@ export function OverviewPage() {
   const hasRankings = buckets.some((bucket) => bucket.value > 0);
   const rankedTotal = buckets.reduce((sum, bucket) => sum + bucket.value, 0);
   const dateLabel = gscReady ? formatDateRange(searchData?.startDate, searchData?.endDate) : '';
+  const periodDays = gscReady ? periodDayCount(searchData?.startDate, searchData?.endDate) : null;
+  const periodScope = periodDays ? `${dateLabel} (${periodDays} days)` : dateLabel;
   const crawlDate = formatDate(snapshot.generatedAt);
   const trend = searchData?.trend || [];
   const periods = searchData?.periods || [];
@@ -175,13 +178,16 @@ export function OverviewPage() {
               Keywords <ArrowUpRight size={14} />
             </Link>
           </div>
+          <p className="dash-section-note">Google Search Console totals for {periodScope}</p>
 
           <SearchPeriodNav
             label={dateLabel}
             note={
               periods.length > 1
-                ? `Period ${periodIndex + 1} of ${periods.length}${clicksDelta ? ` · ${clicksDelta}` : ''}`
-                : 'Latest imported snapshot'
+                ? `Period ${periodIndex + 1} of ${periods.length}${periodDays ? ` · ${periodDays} days` : ''}${clicksDelta ? ` · ${clicksDelta}` : ''}`
+                : periodDays
+                  ? `Showing all clicks and impressions in this ${periodDays}-day window`
+                  : 'Latest imported snapshot'
             }
             canPrevious={periodIndex < periods.length - 1}
             canNext={periodIndex > 0}
@@ -196,7 +202,10 @@ export function OverviewPage() {
             }}
           />
 
-          <DashCard title="Weekly trend" subtitle="Clicks and impressions across imported reporting periods">
+          <DashCard
+            title="Search trend"
+            subtitle={`Clicks and impressions per imported period · selected range: ${dateLabel}`}
+          >
             <SearchTrendChart
               trend={trend}
               activeStart={searchData.startDate}
@@ -207,36 +216,44 @@ export function OverviewPage() {
           <div className="dash-metrics dash-metrics-search">
             <DashMetric
               label="Organic clicks"
+              period={dateLabel}
               value={searchData.summary?.totalClicks || 0}
-              detail={`${formatCompact(searchData.summary?.totalImpressions || 0)} impressions`}
+              valueNote="clicks in this range"
+              detail={`${formatCompact(searchData.summary?.totalImpressions || 0)} impressions in this range`}
               chart={<Sparkbars data={trendClicks(trend)} color="var(--tertiary)" />}
               to="/keywords"
             />
             <DashMetric
               label="Avg. position"
+              period={dateLabel}
               value={formatPosition(searchData.summary?.averagePosition || 0)}
-              detail="Lower is better · trend inverted"
+              valueNote="in this range"
+              detail="Weighted by impressions in the same window"
               chart={<Sparkbars data={trendPositions(trend)} color="var(--green)" />}
               to="/keywords"
             />
             <DashMetric
               label="Click rate"
+              period={dateLabel}
               value={formatPercent(searchData.summary?.averageCtr || 0)}
-              detail="Clicks ÷ impressions"
+              valueNote="in this range"
+              detail="Clicks ÷ impressions for this date range"
               chart={<Sparkbars data={trendCtrPercent(trend)} color="var(--amber)" />}
               to="/keywords"
             />
             <DashMetric
               label="Tracked keywords"
+              period={dateLabel}
               value={rankedTotal}
-              detail="Queries with position data"
+              valueNote="in this range"
+              detail="Queries with position data in this window"
               chart={<Sparkbars data={trendKeywords(trend)} color="var(--green)" />}
               to="/keywords"
             />
           </div>
 
           <div className="dash-grid dash-grid-search">
-            <DashCard title="Top pages" subtitle="Clicks in this reporting period">
+            <DashCard title="Top pages" subtitle={`Page clicks in ${dateLabel}`}>
               {searchData.topPages?.length ? (
                 <SearchClicksChart pages={searchData.topPages} />
               ) : (
@@ -248,7 +265,7 @@ export function OverviewPage() {
             </DashCard>
           </div>
 
-          <DashCard title="Top queries" subtitle="Click column headers to sort">
+          <DashCard title="Top queries" subtitle={`Query clicks in ${dateLabel}`}>
             <TopQueriesTable queries={topQueries} />
           </DashCard>
         </section>

@@ -191,13 +191,17 @@ export function DashCard({
 
 export function DashMetric({
   label,
+  period,
   value,
+  valueNote,
   detail,
   chart,
   to,
 }: {
   label: string;
+  period?: string;
   value: number | string;
+  valueNote?: string;
   detail?: string;
   chart?: React.ReactNode;
   to?: string;
@@ -205,11 +209,17 @@ export function DashMetric({
   const inner = (
     <>
       <div className="dash-metric-head">
-        <span className="dash-label">{label}</span>
+        <div className="dash-metric-title">
+          <span className="dash-label">{label}</span>
+          {period ? <span className="dash-metric-period">{period}</span> : null}
+        </div>
         {to && <ArrowUpRight size={14} className="dash-metric-go" />}
       </div>
       <div className="dash-metric-body">
-        <strong>{typeof value === 'number' ? formatter.format(value) : value}</strong>
+        <div className="dash-metric-value">
+          <strong>{typeof value === 'number' ? formatter.format(value) : value}</strong>
+          {valueNote ? <span className="dash-metric-value-note">{valueNote}</span> : null}
+        </div>
         {chart}
       </div>
       {detail && <p className="dash-metric-detail">{detail}</p>}

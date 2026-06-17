@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { formatCompact, formatter, shortUrl } from './lib';
+import { formatCompact, formatter, formatDateRange, formatShortPeriod, chartPageLabel, periodDayCount, shortUrl } from './lib';
 import type { Cluster, Pillar, SearchOpportunity, SearchTrendPoint } from './types';
 
 const PALETTE = ['#4f663c', '#a1b887', '#2d3b23', '#9a6b12', '#5e6b52', '#8b9f72', '#a94436', '#64748b'];
@@ -301,6 +301,55 @@ type TooltipEntry = {
   payload?: { fill?: string; name?: string };
 };
 
+function TrendPeriodTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload?: { rangeLabel?: string; periodDays?: number | null; clicks?: number; impressions?: number } }>;
+}) {
+  if (!active || !payload?.length) return null;
+  const point = payload[0]?.payload;
+  if (!point) return null;
+  return (
+    <div className="glass-tooltip">
+      {point.rangeLabel ? <p className="gt-label">{point.rangeLabel}</p> : null}
+      {point.periodDays ? <p className="gt-sub">{point.periodDays} days in this GSC import</p> : null}
+      <div className="gt-row">
+        <i style={{ background: '#4f663c' }} />
+        <span>Clicks</span>
+        <strong>{formatter.format(Number(point.clicks) || 0)}</strong>
+      </div>
+      <div className="gt-row">
+        <i style={{ background: '#a1b887' }} />
+        <span>Impressions</span>
+        <strong>{formatter.format(Number(point.impressions) || 0)}</strong>
+      </div>
+    </div>
+  );
+}
+
+function PageClicksTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload?: { fullPath?: string; name?: string }; value?: number; color?: string }>;
+}) {
+  if (!active || !payload?.length) return null;
+  const point = payload[0]?.payload;
+  return (
+    <div className="glass-tooltip">
+      {point?.fullPath ? <p className="gt-label">{point.fullPath}</p> : null}
+      <div className="gt-row">
+        <i style={{ background: payload[0]?.color || '#4f663c' }} />
+        <span>Clicks</span>
+        <strong>{formatter.format(Number(payload[0]?.value) || 0)}</strong>
+      </div>
+    </div>
+  );
+}
+
 function GlassTooltip({
   active,
   payload,
@@ -445,7 +494,9 @@ export function SearchTrendChart({
   }
 
   const data = trend.map((point) => ({
-    label: point.label,
+    label: formatShortPeriod(point.startDate, point.endDate),
+    rangeLabel: formatDateRange(point.startDate, point.endDate),
+    periodDays: periodDayCount(point.startDate, point.endDate),
     clicks: point.totalClicks,
     impressions: point.totalImpressions,
     active: point.startDate === activeStart && point.endDate === activeEnd,
@@ -454,7 +505,7 @@ export function SearchTrendChart({
   return (
     <div className="search-trend-chart">
       <ResponsiveContainer width="100%" height={240}>
-        <ComposedChart data={data} margin={{ top: 8, right: 12, left: -8, bottom: 0 }}>
+        <ComposedChart data={data} margin={{ top: 8, right: 12, left: -4, bottom: 0 }}>
           <XAxis dataKey="label" tick={AXIS} interval="preserveStartEnd" />
           <YAxis
             yAxisId="clicks"
@@ -469,7 +520,7 @@ export function SearchTrendChart({
             tickFormatter={(value) => formatCompact(Number(value))}
             width={52}
           />
-          <Tooltip content={<GlassTooltip />} />
+          <Tooltip content={<TrendPeriodTooltip />} />
           <Bar
             yAxisId="clicks"
             dataKey="clicks"
@@ -509,20 +560,29 @@ export function SearchTrendChart({
 export function SearchClicksChart({ pages }: { pages: SearchOpportunity[] }) {
   const data = pages
     .slice(0, 8)
-    .map((page) => ({
-      name: shortUrl(page.page || page.label),
-      clicks: page.clicks,
-      impressions: page.impressions,
-    }))
+    .map((page) => {
+      const fullPath = shortUrl(page.page || page.label);
+      return {
+        name: chartPageLabel(page.page || page.label),
+        fullPath,
+        clicks: page.clicks,
+        impressions: page.impressions,
+      };
+    })
     .reverse();
 
+  const yAxisWidth = Math.min(
+    220,
+    Math.max(132, ...data.map((row) => Math.min(row.name.length, 28) * 7)),
+  );
+
   return (
-    <div className="chart-scroll">
-      <ResponsiveContainer width="100%" height={Math.max(220, data.length * 36)}>
-        <BarChart data={data} layout="vertical" margin={{ top: 4, right: 8, left: 0, bottom: 4 }}>
+    <div className="chart-scroll chart-scroll-pages">
+      <ResponsiveContainer width="100%" height={Math.max(240, data.length * 40)}>
+        <BarChart data={data} layout="vertical" margin={{ top: 4, right: 12, left: 8, bottom: 4 }}>
           <XAxis type="number" tick={AXIS} tickFormatter={(value) => formatCompact(Number(value))} />
-          <YAxis type="category" dataKey="name" tick={AXIS} width={110} />
-          <Tooltip content={<GlassTooltip />} cursor={tooltipCursor} />
+          <YAxis type="category" dataKey="name" tick={AXIS} width={yAxisWidth} />
+          <Tooltip content={<PageClicksTooltip />} cursor={tooltipCursor} />
           <Bar dataKey="clicks" name="Clicks" fill="#4f663c" radius={[0, 6, 6, 0]} maxBarSize={20} />
         </BarChart>
       </ResponsiveContainer>

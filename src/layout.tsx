@@ -18,18 +18,39 @@ import {
 } from 'lucide-react';
 import { useDashboard } from './data';
 
-const NAV_ITEMS = [
-  { to: '/', label: 'Overview', icon: <BarChart3 />, end: true },
-  { to: '/pillars', label: 'Pillars', icon: <FileText /> },
-  { to: '/keywords', label: 'Keywords', icon: <TrendingUp /> },
-  { to: '/actions', label: 'Actions', icon: <ListChecks /> },
-  { to: '/audit', label: 'Audit', icon: <FileWarning /> },
-  { to: '/intelligence', label: 'AI Lab', icon: <Sparkles /> },
-  { to: '/reports', label: 'Reports', icon: <ScrollText /> },
-  { to: '/gameplan', label: 'Gameplan', icon: <ClipboardList /> },
-  { to: '/links', label: 'Links', icon: <GitBranch /> },
-  { to: '/competitors', label: 'Competitors', icon: <Globe2 /> },
-  { to: '/settings', label: 'Settings', icon: <Settings /> },
+const NAV_GROUPS = [
+  {
+    label: 'Performance',
+    items: [
+      { to: '/', label: 'Overview', icon: <BarChart3 />, end: true },
+      { to: '/keywords', label: 'Keywords', icon: <TrendingUp /> },
+      { to: '/reports', label: 'Reports', icon: <ScrollText /> },
+    ],
+  },
+  {
+    label: 'Content',
+    items: [
+      { to: '/pillars', label: 'Pillars', icon: <FileText /> },
+      { to: '/audit', label: 'Audit', icon: <FileWarning /> },
+      { to: '/links', label: 'Links', icon: <GitBranch /> },
+    ],
+  },
+  {
+    label: 'Strategy',
+    items: [
+      { to: '/actions', label: 'Actions', icon: <ListChecks /> },
+      { to: '/gameplan', label: 'Gameplan', icon: <ClipboardList /> },
+      { to: '/intelligence', label: 'AI Lab', icon: <Sparkles /> },
+    ],
+  },
+  {
+    label: 'Market',
+    items: [{ to: '/competitors', label: 'Competitors', icon: <Globe2 /> }],
+  },
+  {
+    label: 'Workspace',
+    items: [{ to: '/settings', label: 'Settings', icon: <Settings /> }],
+  },
 ];
 
 export function DashboardLayout() {
@@ -65,16 +86,21 @@ export function DashboardLayout() {
           </span>
         </div>
         <nav className="nav-list" aria-label="Dashboard navigation">
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </NavLink>
+          {NAV_GROUPS.map((group) => (
+            <div className="nav-group" key={group.label}>
+              <span className="nav-group-label">{group.label}</span>
+              {group.items.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={'end' in item ? item.end : undefined}
+                  className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </NavLink>
+              ))}
+            </div>
           ))}
         </nav>
         <div className="sidebar-note">

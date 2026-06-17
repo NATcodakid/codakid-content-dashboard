@@ -1,10 +1,10 @@
 import React from 'react';
-import { AlertTriangle, ArrowRight, FileWarning, Gauge, Link2Off, ListChecks, Search } from 'lucide-react';
+import { AlertTriangle, ArrowRight, FileWarning, Gauge, Link2Off, ListChecks, Search, Smartphone, Monitor, Zap, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDashboard } from '../data';
 import { KpiCard, LoadingState, PageHeading, PanelHeader } from '../components';
 import { formatter, shortUrl } from '../lib';
-import type { TechnicalAuditIssue } from '../types';
+import type { TechnicalAuditIssue, PageSpeedResult } from '../types';
 
 const ISSUE_LABELS: Record<string, string> = {
   'thin-content': 'Thin content',
@@ -23,7 +23,7 @@ const ISSUE_LABELS: Record<string, string> = {
 };
 
 export function AuditPage() {
-  const { technicalAudit, snapshot, isLoading, saveActionItem } = useDashboard();
+  const { technicalAudit, snapshot, isLoading, saveActionItem, pageSpeed, runPageSpeed } = useDashboard();
   const [type, setType] = React.useState('all');
   const [query, setQuery] = React.useState('');
 
@@ -56,6 +56,8 @@ export function AuditPage() {
             <AuditTrend trend={technicalAudit.trend} />
           </section>
         ) : null}
+
+        <PageSpeedPanel pageSpeed={pageSpeed} runPageSpeed={runPageSpeed} />
 
         {topActions.length ? (
           <section className="next-action-grid">
@@ -161,6 +163,131 @@ function AuditTrend({ trend }: { trend: NonNullable<ReturnType<typeof useDashboa
       ))}
     </div>
   );
+}
+
+type RunPageSpeed = ReturnType<typeof useDashboard>['runPageSpeed'];
+
+function PageSpeedPanel({
+  pageSpeed,
+  runPageSpeed,
+}: {
+  pageSpeed: ReturnType<typeof useDashboard>['pageSpeed'];
+  runPageSpeed: RunPageSpeed;
+}) {
+  const [strategy, setStrategy] = React.useState<'mobile' | 'desktop'>('mobile');
+  const [busyUrl, setBusyUrl] = React.useState<string | null>(null);
+
+  const candidates = pageSpeed?.candidates || [];
+  const resultByUrl = React.useMemo(() => {
+    const map = new Map<string, PageSpeedResult>();
+    for (const result of pageSpeed?.results || []) {
+      if (result.strategy === strategy) map.set(stripUrl(result.url), result);
+    }
+    return map;
+  }, [pageSpeed, strategy]);
+
+  async function test(url: string) {
+    setBusyUrl(url);
+    try {
+      await runPageSpeed(url, strategy);
+    } finally {
+      setBusyUrl(null);
+    }
+  }
+
+  if (!pageSpeed?.configured) {
+    return (
+      <section className="panel">
+        <PanelHeader icon={<Zap />} title="Core Web Vitals" action="PageSpeed Insights" />
+        <p className="panel-note">
+          Add <code>PAGESPEED_API_KEY</code> in Netlify environment variables to pull Lighthouse scores and Core Web Vitals
+          (LCP, CLS, INP) for your key pages — free from Google.
+        </p>
+      </section>
+    );
+  }
+
+  const rows = candidates.length
+    ? candidates
+    : Array.from(resultByUrl.values()).map((r) => ({ url: r.url, title: shortUrl(r.url) }));
+
+  return (
+    <section className="panel">
+      <PanelHeader icon={<Zap />} title="Core Web Vitals" action="PageSpeed Insights · Google" />
+      <div className="filter-bar">
+        <div className="seg-toggle">
+          <button type="button" className={strategy === 'mobile' ? 'active' : ''} onClick={() => setStrategy('mobile')}>
+            <Smartphone size={14} /> Mobile
+          </button>
+          <button type="button" className={strategy === 'desktop' ? 'active' : ''} onClick={() => setStrategy('desktop')}>
+            <Monitor size={14} /> Desktop
+          </button>
+        </div>
+        <span className="panel-note" style={{ margin: 0 }}>Lab scores + real-user field data (CrUX) when available.</span>
+      </div>
+      <div className="dash-table-wrap">
+        <table className="dash-table">
+          <thead>
+            <tr>
+              <th>Page</th>
+              <th className="num">Perf</th>
+              <th className="num">SEO</th>
+              <th className="num">A11y</th>
+              <th className="num">Best</th>
+              <th className="num">LCP</th>
+              <th className="num">CLS</th>
+              <th className="num">INP</th>
+              <th>Test</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((page) => {
+              const result = resultByUrl.get(stripUrl(page.url));
+              const lcp = result?.fieldLcpMs ?? result?.lcpMs ?? null;
+              const cls = result?.fieldClsX1000 ?? result?.clsX1000 ?? null;
+              const inp = result?.fieldInpMs ?? null;
+              return (
+                <tr key={page.url}>
+                  <td>
+                    <strong>{page.title}</strong>
+                    <small>{shortUrl(page.url)}</small>
+                  </td>
+                  <td className="num"><ScoreDot value={result?.performance} /></td>
+                  <td className="num"><ScoreDot value={result?.seo} /></td>
+                  <td className="num"><ScoreDot value={result?.accessibility} /></td>
+                  <td className="num"><ScoreDot value={result?.bestPractices} /></td>
+                  <td className="num">{lcp != null ? `${(lcp / 1000).toFixed(1)}s` : '—'}</td>
+                  <td className="num">{cls != null ? (cls / 1000).toFixed(2) : '—'}</td>
+                  <td className="num">{inp != null ? `${inp}ms` : '—'}</td>
+                  <td>
+                    <button type="button" className="chip-button" disabled={busyUrl === page.url} onClick={() => void test(page.url)}>
+                      <RefreshCw size={13} className={busyUrl === page.url ? 'spin' : ''} />
+                      {result ? 'Re-test' : 'Test'}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function ScoreDot({ value }: { value?: number | null }) {
+  if (value == null) return <span className="muted">—</span>;
+  const tone = value >= 90 ? 'success' : value >= 50 ? 'warning' : 'danger';
+  return <span className={`score-dot score-${tone}`}>{value}</span>;
+}
+
+function stripUrl(url: string) {
+  try {
+    const u = new URL(url);
+    return `${u.origin}${u.pathname.replace(/\/$/, '')}`.toLowerCase();
+  } catch {
+    return url.toLowerCase().replace(/\/$/, '');
+  }
 }
 
 function actionFromIssue(issue: TechnicalAuditIssue) {

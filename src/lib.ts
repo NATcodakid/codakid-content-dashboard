@@ -47,6 +47,40 @@ export function formatDateRange(startDate?: string, endDate?: string) {
   return `${formatDate(startDate)} – ${formatDate(endDate)}`;
 }
 
+export function periodDayCount(startDate?: string, endDate?: string) {
+  if (!startDate || !endDate) return null;
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null;
+  return Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000) + 1);
+}
+
+export function formatShortPeriod(startDate?: string, endDate?: string) {
+  if (!startDate || !endDate) return '';
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return formatDateRange(startDate, endDate);
+  const sameYear = start.getFullYear() === end.getFullYear();
+  const sameMonth = sameYear && start.getMonth() === end.getMonth();
+  if (sameMonth) {
+    return `${start.toLocaleDateString('en-US', { month: 'short' })} ${start.getDate()}–${end.getDate()}`;
+  }
+  const startLabel = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const endLabel = end.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: sameYear ? undefined : 'numeric',
+  });
+  return `${startLabel} – ${endLabel}`;
+}
+
+export function chartPageLabel(url: string, maxLength = 26) {
+  const path = shortUrl(url);
+  const slug = path.split('/').filter(Boolean).pop() || path.replace(/^\//, '') || 'homepage';
+  if (slug.length <= maxLength) return slug;
+  return `${slug.slice(0, maxLength - 1)}…`;
+}
+
 export function trendClicks(trend?: Array<{ totalClicks: number }>) {
   return trend?.length ? trend.map((point) => point.totalClicks) : [0];
 }

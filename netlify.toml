@@ -151,6 +151,21 @@
   to = "/.netlify/functions/diagnostics"
   status = 200
 
+[[redirects]]
+  from = "/api/authority"
+  to = "/.netlify/functions/authority"
+  status = 200
+
+[[redirects]]
+  from = "/api/pagespeed"
+  to = "/.netlify/functions/pagespeed"
+  status = 200
+
+[[redirects]]
+  from = "/api/keyword-ideas"
+  to = "/.netlify/functions/keyword-ideas"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]

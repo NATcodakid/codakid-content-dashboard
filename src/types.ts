@@ -644,3 +644,61 @@ export type Diagnostics = {
     created_at: string;
   }>;
 };
+
+export type DomainAuthorityEntry = {
+  domain: string;
+  label: string;
+  isOwn: boolean;
+  pageRank: number | null;
+  rank: number | null;
+  updatedAt: string | null;
+};
+
+export type DomainAuthorityReport = {
+  configured: boolean;
+  generatedAt: string;
+  source: string;
+  ownDomain: string;
+  ownAuthority: number | null;
+  domains: DomainAuthorityEntry[];
+};
+
+export type PageSpeedResult = {
+  url: string;
+  strategy: string;
+  performance: number | null;
+  seo: number | null;
+  accessibility: number | null;
+  bestPractices: number | null;
+  lcpMs: number | null;
+  clsX1000: number | null;
+  fcpMs: number | null;
+  ttfbMs: number | null;
+  fieldLcpMs: number | null;
+  fieldClsX1000: number | null;
+  fieldInpMs: number | null;
+  overallCategory: string;
+  updatedAt?: string | null;
+};
+
+export type KeywordIdeas = {
+  seed: string;
+  generatedAt: string;
+  source: string;
+  total: number;
+  groups: {
+    questions: string[];
+    comparisons: string[];
+    modifiers: string[];
+    related: string[];
+  };
+};
+
+export type PageSpeedCandidate = { url: string; title: string };
+
+export type PageSpeedReport = {
+  configured: boolean;
+  generatedAt: string;
+  candidates: PageSpeedCandidate[];
+  results: PageSpeedResult[];
+};

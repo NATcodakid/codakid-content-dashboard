@@ -11,6 +11,10 @@ import type {
   CompetitorInput,
   CompetitorSnapshot,
   DashboardHistory,
+  DomainAuthorityReport,
+  KeywordIdeas,
+  PageSpeedReport,
+  PageSpeedResult,
   Ga4Report,
   GoogleStatus,
   HomeLayout,
@@ -40,6 +44,8 @@ type DashboardContextValue = {
   actionItems: ActionItem[];
   trackedKeywords: TrackedKeyword[];
   serpTracker: SerpTracker | null;
+  domainAuthority: DomainAuthorityReport | null;
+  pageSpeed: PageSpeedReport | null;
   isLoading: boolean;
   isRefreshingAi: boolean;
   isSyncingGsc: boolean;
@@ -62,6 +68,9 @@ type DashboardContextValue = {
   syncGa4: () => Promise<void>;
   saveCompetitor: (item: CompetitorInput) => Promise<void>;
   archiveCompetitor: (domain: string) => Promise<void>;
+  refreshAuthority: () => Promise<void>;
+  runPageSpeed: (url: string, strategy?: 'mobile' | 'desktop') => Promise<PageSpeedResult | null>;
+  fetchKeywordIdeas: (seed: string) => Promise<KeywordIdeas | null>;
   onLogout: () => void;
 };
 
@@ -103,6 +112,8 @@ export function DashboardProvider({
   const [actionItems, setActionItems] = React.useState<ActionItem[]>([]);
   const [trackedKeywords, setTrackedKeywords] = React.useState<TrackedKeyword[]>([]);
   const [serpTracker, setSerpTracker] = React.useState<SerpTracker | null>(null);
+  const [domainAuthority, setDomainAuthority] = React.useState<DomainAuthorityReport | null>(null);
+  const [pageSpeed, setPageSpeed] = React.useState<PageSpeedReport | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isRefreshingAi, setIsRefreshingAi] = React.useState(false);
   const [isSyncingGsc, setIsSyncingGsc] = React.useState(false);
@@ -157,6 +168,8 @@ export function DashboardProvider({
         aiWorkbenchResponse,
         homeLayoutResponse,
         historyResponse,
+        authorityResponse,
+        pageSpeedResponse,
       ] =
         await Promise.all([
           fetch(snapshotUrl, { credentials: 'include' }),
@@ -172,6 +185,8 @@ export function DashboardProvider({
           fetch('/api/ai-workbench', { credentials: 'include' }).catch(() => null),
           fetch('/api/dashboard-layout', { credentials: 'include' }).catch(() => null),
           fetch('/api/dashboard-history', { credentials: 'include' }).catch(() => null),
+          fetch('/api/authority', { credentials: 'include' }).catch(() => null),
+          fetch('/api/pagespeed', { credentials: 'include' }).catch(() => null),
         ]);
 
       if (contentResponse.status === 401) {
@@ -195,6 +210,8 @@ export function DashboardProvider({
       const aiWorkbenchData = aiWorkbenchResponse?.ok ? ((await aiWorkbenchResponse.json()) as AiWorkbench) : null;
       const homeLayoutData = homeLayoutResponse?.ok ? ((await homeLayoutResponse.json()) as { layout: HomeLayout }) : null;
       const historyData = historyResponse?.ok ? ((await historyResponse.json()) as DashboardHistory) : null;
+      const authorityData = authorityResponse?.ok ? ((await authorityResponse.json()) as DomainAuthorityReport) : null;
+      const pageSpeedData = pageSpeedResponse?.ok ? ((await pageSpeedResponse.json()) as PageSpeedReport) : null;
       setSnapshot(content);
       setCompetitors(competitorData);
       setTechnicalAudit(technicalAuditData);
@@ -204,6 +221,8 @@ export function DashboardProvider({
       setActionItems(actionData);
       setTrackedKeywords(trackedKeywordData);
       setSerpTracker(serpData);
+      setDomainAuthority(authorityData);
+      setPageSpeed(pageSpeedData);
       setAiWorkbench(aiWorkbenchData);
       setHomeLayout(normalizeHomeLayout(homeLayoutData?.layout));
       setDashboardHistory(historyData);
@@ -569,6 +588,51 @@ export function DashboardProvider({
     }
   }, [refreshCompetitors]);
 
+  const refreshAuthority = React.useCallback(async () => {
+    try {
+      const response = await fetch('/api/authority?refresh=1', { credentials: 'include' });
+      if (!response.ok) throw new Error('Could not refresh domain authority.');
+      const data = (await response.json()) as DomainAuthorityReport;
+      setDomainAuthority(data);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Could not refresh domain authority.');
+    }
+  }, []);
+
+  const runPageSpeed = React.useCallback(async (url: string, strategy: 'mobile' | 'desktop' = 'mobile') => {
+    try {
+      const response = await apiFetch('/api/pagespeed', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ url, strategy }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'PageSpeed test failed.');
+      const result = data.result as PageSpeedResult;
+      setPageSpeed((prev) => {
+        const base: PageSpeedReport = prev || { configured: true, generatedAt: new Date().toISOString(), candidates: [], results: [] };
+        const others = base.results.filter((r) => !(r.url === result.url && r.strategy === result.strategy));
+        return { ...base, generatedAt: new Date().toISOString(), results: [result, ...others] };
+      });
+      return result;
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'PageSpeed test failed.');
+      return null;
+    }
+  }, []);
+
+  const fetchKeywordIdeas = React.useCallback(async (seed: string) => {
+    try {
+      const response = await fetch(`/api/keyword-ideas?seed=${encodeURIComponent(seed)}`, { credentials: 'include' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not fetch keyword ideas.');
+      return data as KeywordIdeas;
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Could not fetch keyword ideas.');
+      return null;
+    }
+  }, []);
+
   const value: DashboardContextValue = {
     user,
     snapshot,
@@ -585,6 +649,8 @@ export function DashboardProvider({
     actionItems,
     trackedKeywords,
     serpTracker,
+    domainAuthority,
+    pageSpeed,
     isLoading,
     isRefreshingAi,
     isSyncingGsc,
@@ -607,6 +673,9 @@ export function DashboardProvider({
     syncGa4,
     saveCompetitor,
     archiveCompetitor,
+    refreshAuthority,
+    runPageSpeed,
+    fetchKeywordIdeas,
     onLogout,
   };
 

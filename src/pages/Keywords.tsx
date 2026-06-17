@@ -7,6 +7,7 @@ import {
   Clock,
   Download,
   GitBranch,
+  Lightbulb,
   Link2,
   ListChecks,
   MousePointerClick,
@@ -22,7 +23,7 @@ import { useDashboard } from '../data';
 import { KpiCard, LoadingState, MetricPill, PageHeading, PanelHeader } from '../components';
 import { SearchClicksChart } from '../charts';
 import { formatDate, formatDateRange, formatPercent, formatPosition, formatter, shortUrl } from '../lib';
-import type { CannibalizationOpportunity, ContentDecayOpportunity, Ga4Report, PostSummary, SearchOpportunity, TrackedKeyword } from '../types';
+import type { CannibalizationOpportunity, ContentDecayOpportunity, Ga4Report, KeywordIdeas, PostSummary, SearchOpportunity, TrackedKeyword } from '../types';
 
 export function KeywordsPage() {
   const {
@@ -39,6 +40,7 @@ export function KeywordsPage() {
     archiveTrackedKeyword,
     syncTrackedKeywords,
     syncGa4,
+    fetchKeywordIdeas,
   } = useDashboard();
   const [query, setQuery] = React.useState('');
   const [bucket, setBucket] = React.useState('all');
@@ -64,6 +66,10 @@ export function KeywordsPage() {
           onArchive={archiveTrackedKeyword}
           onTrack={(keyword) => void trackSerpKeywords([keyword])}
           onWeeklySync={() => void syncTrackedKeywords()}
+        />
+        <KeywordIdeasPanel
+          fetchKeywordIdeas={fetchKeywordIdeas}
+          onTrack={(keyword) => void saveTrackedKeyword({ keyword, source: 'keyword-ideas' })}
         />
         <Ga4Panel report={ga4} onSync={() => void syncGa4()} />
         <section className="panel">
@@ -111,6 +117,10 @@ export function KeywordsPage() {
         onArchive={archiveTrackedKeyword}
         onTrack={(keyword) => void trackSerpKeywords([keyword])}
         onWeeklySync={() => void syncTrackedKeywords()}
+      />
+      <KeywordIdeasPanel
+        fetchKeywordIdeas={fetchKeywordIdeas}
+        onTrack={(keyword) => void saveTrackedKeyword({ keyword, source: 'keyword-ideas' })}
       />
       <Ga4Panel report={ga4} onSync={() => void syncGa4()} />
 
@@ -524,6 +534,104 @@ function TrackedKeywordRow({
         </div>
       </td>
     </tr>
+  );
+}
+
+function KeywordIdeasPanel({
+  fetchKeywordIdeas,
+  onTrack,
+}: {
+  fetchKeywordIdeas: (seed: string) => Promise<KeywordIdeas | null>;
+  onTrack: (keyword: string) => void;
+}) {
+  const [seed, setSeed] = React.useState('');
+  const [ideas, setIdeas] = React.useState<KeywordIdeas | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [added, setAdded] = React.useState<Set<string>>(new Set());
+
+  async function run(event?: React.FormEvent) {
+    event?.preventDefault();
+    const term = seed.trim();
+    if (!term || isLoading) return;
+    setIsLoading(true);
+    const result = await fetchKeywordIdeas(term);
+    setIdeas(result);
+    setIsLoading(false);
+  }
+
+  function track(keyword: string) {
+    onTrack(keyword);
+    setAdded((prev) => new Set(prev).add(keyword));
+  }
+
+  const groups: Array<{ key: keyof KeywordIdeas['groups']; label: string; hint: string }> = [
+    { key: 'questions', label: 'Questions', hint: 'great for FAQ + blog headers' },
+    { key: 'comparisons', label: 'Comparisons', hint: '“vs / alternative” intent' },
+    { key: 'modifiers', label: 'Modifiers', hint: 'best / free / for kids…' },
+    { key: 'related', label: 'Related terms', hint: 'broaden the cluster' },
+  ];
+
+  return (
+    <section className="panel">
+      <PanelHeader icon={<Lightbulb />} title="Keyword Ideas" action="Google Autocomplete · free" />
+      <form className="filter-bar" onSubmit={run}>
+        <div className="search-field" style={{ flex: 1 }}>
+          <Search size={15} />
+          <input
+            value={seed}
+            placeholder="Enter a seed topic, e.g. coding for kids"
+            onChange={(event) => setSeed(event.target.value)}
+          />
+        </div>
+        <button type="submit" className="primary-button" disabled={isLoading || !seed.trim()}>
+          {isLoading ? <RefreshCw size={15} className="spin" /> : <Lightbulb size={15} />}
+          {isLoading ? 'Finding ideas…' : 'Get ideas'}
+        </button>
+      </form>
+
+      {!ideas && !isLoading ? (
+        <p className="panel-note">
+          Expand any topic into real Google searches — questions, comparisons, and long-tail variants — then track the
+          ones worth ranking for. No API key or credits required.
+        </p>
+      ) : null}
+
+      {ideas ? (
+        <>
+          <p className="panel-note">
+            {ideas.total} ideas for <strong>“{ideas.seed}”</strong>. Click a phrase to add it to tracked keywords.
+          </p>
+          <div className="idea-groups">
+            {groups.map(({ key, label, hint }) => {
+              const items = ideas.groups[key] || [];
+              if (!items.length) return null;
+              return (
+                <div key={key} className="idea-group">
+                  <header>
+                    <strong>{label}</strong>
+                    <small>{items.length} · {hint}</small>
+                  </header>
+                  <div className="idea-chips">
+                    {items.map((keyword) => (
+                      <button
+                        key={keyword}
+                        type="button"
+                        className={`idea-chip${added.has(keyword) ? ' added' : ''}`}
+                        title={added.has(keyword) ? 'Added to tracked keywords' : 'Add to tracked keywords'}
+                        onClick={() => track(keyword)}
+                      >
+                        {added.has(keyword) ? <ListChecks size={12} /> : <Plus size={12} />}
+                        {keyword}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      ) : null}
+    </section>
   );
 }
 
