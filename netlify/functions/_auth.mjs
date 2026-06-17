@@ -48,7 +48,7 @@ export function getSql() {
 }
 
 export function getDatabaseUrl() {
-  return DATABASE_ENV_KEYS.map((key) => process.env[key]).find(Boolean);
+  return DATABASE_ENV_KEYS.map((key) => process.env[key]).find(isPostgresUrl);
 }
 
 export function databaseEnvStatus() {
@@ -56,7 +56,18 @@ export function databaseEnvStatus() {
     configured: Boolean(getDatabaseUrl()),
     expectedKeys: DATABASE_ENV_KEYS,
     presentExpectedKeys: DATABASE_ENV_KEYS.filter((key) => Boolean(process.env[key])),
+    validExpectedKeys: DATABASE_ENV_KEYS.filter((key) => isPostgresUrl(process.env[key])),
   };
+}
+
+function isPostgresUrl(value) {
+  if (!value) return false;
+  try {
+    const parsed = new URL(value);
+    return (parsed.protocol === 'postgres:' || parsed.protocol === 'postgresql:') && Boolean(parsed.hostname);
+  } catch {
+    return false;
+  }
 }
 
 export async function ensureAuthSchema() {

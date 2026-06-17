@@ -98,9 +98,35 @@ function buildPeriods(snapshots) {
       });
     }
   }
-  return Array.from(map.values())
-    .sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())
-    .slice(0, MAX_PERIODS);
+  const distinct = Array.from(map.values()).sort(
+    (a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime(),
+  );
+  return dedupeOverlappingPeriods(distinct).slice(0, MAX_PERIODS);
+}
+
+// Search Console syncs a rolling window (e.g. last 90 days). Running the sync on
+// consecutive days produces windows that are nearly identical but shifted by a day,
+// which used to render as duplicate "periods" / flat trend bars. Collapse windows
+// that overlap heavily, keeping the most recently imported one.
+function dedupeOverlappingPeriods(periods) {
+  const kept = [];
+  for (const period of periods) {
+    const overlapsKept = kept.some((existing) => overlapRatio(period, existing) >= 0.85);
+    if (!overlapsKept) kept.push(period);
+  }
+  return kept;
+}
+
+function overlapRatio(a, b) {
+  const aStart = new Date(a.startDate).getTime();
+  const aEnd = new Date(a.endDate).getTime();
+  const bStart = new Date(b.startDate).getTime();
+  const bEnd = new Date(b.endDate).getTime();
+  if (!(aEnd > aStart) || !(bEnd > bStart)) return 0;
+  const overlap = Math.min(aEnd, bEnd) - Math.max(aStart, bStart);
+  if (overlap <= 0) return 0;
+  const shorter = Math.min(aEnd - aStart, bEnd - bStart);
+  return overlap / shorter;
 }
 
 function buildTrend(snapshots, periods) {
@@ -133,6 +159,7 @@ function buildPeriodPayload(snapshots, period, allSnapshots = [], periods = []) 
   const pageRows = normalizeRows(pageSnapshot);
   const queryRows = normalizeRows(querySnapshot);
   const pageQueryRows = normalizeRows(pageQuerySnapshot);
+  const dailyTrend = buildDailyTrend(byDimension.get('date'));
 
   if (!pageRows.length && !queryRows.length && !pageQueryRows.length) {
     return {
@@ -150,6 +177,7 @@ function buildPeriodPayload(snapshots, period, allSnapshots = [], periods = []) 
       cannibalization: [],
       topPages: [],
       topQueries: [],
+      dailyTrend,
     };
   }
 
@@ -200,7 +228,22 @@ function buildPeriodPayload(snapshots, period, allSnapshots = [], periods = []) 
     cannibalization,
     topPages,
     topQueries,
+    dailyTrend,
   };
+}
+
+function buildDailyTrend(dateSnapshot) {
+  const rows = normalizeRows(dateSnapshot);
+  return rows
+    .map((row) => ({
+      date: Array.isArray(row.keys) ? String(row.keys[0] || '') : '',
+      clicks: Math.round(Number(row.clicks || 0)),
+      impressions: Math.round(Number(row.impressions || 0)),
+      ctr: Number(row.ctr || 0),
+      position: Number(row.position || 0),
+    }))
+    .filter((row) => row.date)
+    .sort((a, b) => a.date.localeCompare(b.date));
 }
 
 function buildContentDecay(allSnapshots, periods, selectedPeriod) {

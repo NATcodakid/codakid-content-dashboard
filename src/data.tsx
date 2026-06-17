@@ -1,5 +1,6 @@
 import React from 'react';
 import { apiFetch, normalizeUrl } from './lib';
+import { toast } from './toast';
 import type {
   ActionInput,
   ActionItem,
@@ -78,7 +79,7 @@ const DashboardContext = React.createContext<DashboardContextValue | null>(null)
 
 const DEFAULT_HOME_LAYOUT: HomeLayout = {
   cards: ['ai-analyst', 'alerts', 'content-ideas', 'ai-visibility', 'refresh-queue', 'keyword-gap', 'boss-report'],
-  hidden: [],
+  hidden: ['content-ideas', 'ai-visibility', 'refresh-queue', 'keyword-gap'],
 };
 
 export function useDashboard() {
@@ -377,7 +378,7 @@ export function DashboardProvider({
           body: JSON.stringify({ url: post.url, title: post.title, cluster: post.cluster }),
         });
         if (!response.ok) throw new Error('Could not save pillar.');
-        void refresh({ forceCrawl: true });
+        void refresh();
       } catch (caught) {
         setMarkedPillars((current) =>
           current.filter((pillar) => normalizeUrl(pillar.raw_url || pillar.url) !== optimistic.url),
@@ -401,7 +402,7 @@ export function DashboardProvider({
         body: JSON.stringify({ url }),
       });
       if (!response.ok) throw new Error('Could not remove pillar.');
-      void refresh({ forceCrawl: true });
+      void refresh();
     } catch (caught) {
       setMarkedPillars(previous);
       setError(caught instanceof Error ? caught.message : 'Could not remove pillar.');
@@ -418,9 +419,12 @@ export function DashboardProvider({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not save action item.');
       setActionItems((current) => upsertActionItem(current, data.actionItem));
+      toast.success('Added to your action queue');
       return data.actionItem as ActionItem;
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not save action item.');
+      const message = caught instanceof Error ? caught.message : 'Could not save action item.';
+      setError(message);
+      toast.error(message);
       return null;
     }
   }, []);
@@ -494,9 +498,12 @@ export function DashboardProvider({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not save keyword.');
       await refreshTrackedKeywords();
+      toast.success(`Now tracking “${data.keyword?.keyword || item.keyword}”`);
       return data.keyword as TrackedKeyword;
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not save keyword.');
+      const message = caught instanceof Error ? caught.message : 'Could not save keyword.';
+      setError(message);
+      toast.error(message);
       return null;
     }
   }, [refreshTrackedKeywords]);
@@ -568,8 +575,11 @@ export function DashboardProvider({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not save competitor.');
       await refreshCompetitors();
+      toast.success('Competitor added to your watchlist');
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not save competitor.');
+      const message = caught instanceof Error ? caught.message : 'Could not save competitor.';
+      setError(message);
+      toast.error(message);
     }
   }, [refreshCompetitors]);
 

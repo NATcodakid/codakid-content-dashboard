@@ -1,6 +1,6 @@
 import React from 'react';
 import { KeyRound, RefreshCw, Search, UserPlus } from 'lucide-react';
-import { MetricPill } from './components';
+import { BrandLogo, MetricPill } from './components';
 import { apiFetch } from './lib';
 import type { AuthUser, GoogleStatus } from './types';
 
@@ -8,7 +8,7 @@ export function AuthLoadingState() {
   return (
     <div className="auth-page">
       <div className="auth-card compact">
-        <span className="brand-mark">CK</span>
+        <BrandLogo variant="loading" />
         <RefreshCw className="spin" size={22} />
         <h1>Checking secure access</h1>
         <p>One moment while the dashboard verifies your session.</p>
@@ -48,11 +48,7 @@ export function LoginScreen({ onAuthenticated }: { onAuthenticated: (user: AuthU
     <div className="auth-page">
       <form className="auth-card" onSubmit={submit}>
         <div className="auth-brand">
-          <span className="brand-mark">CK</span>
-          <span>
-            <strong>CodaKid Content OS</strong>
-            <small>Private dashboard</small>
-          </span>
+          <BrandLogo variant="auth" subtitle="Content Intelligence" />
         </div>
         <div>
           <h1>Sign in to continue</h1>
@@ -119,11 +115,7 @@ export function AcceptInviteScreen({
     <div className="auth-page">
       <form className="auth-card" onSubmit={submit}>
         <div className="auth-brand">
-          <span className="brand-mark">CK</span>
-          <span>
-            <strong>CodaKid Content OS</strong>
-            <small>Invite setup</small>
-          </span>
+          <BrandLogo variant="auth" subtitle="Invite setup" />
         </div>
         <div>
           <h1>Create your dashboard login</h1>

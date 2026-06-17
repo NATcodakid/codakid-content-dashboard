@@ -63,6 +63,7 @@ const starterPillarSlugs = new Set([
 ]);
 
 const SNAPSHOT_CACHE_HOURS = 6;
+let inFlightCrawl = null;
 
 export async function handler(event) {
   try {
@@ -86,15 +87,22 @@ export async function loadContentSnapshot({ forceRefresh = false } = {}) {
   if (!forceRefresh) {
     const cached = await fetchRecentWordPressSnapshot();
     if (cached?.data?.kpis) {
-      return {
-        ...cached.data,
-        generatedAt: cached.created_at || cached.data.generatedAt,
-        source: 'cached-wordpress-snapshot',
-        sourceDetail: `Serving cached crawl from the last ${SNAPSHOT_CACHE_HOURS} hours.`,
-      };
+      return formatCachedSnapshot(cached, `Serving cached crawl from the last ${SNAPSHOT_CACHE_HOURS} hours.`);
     }
   }
 
+  if (inFlightCrawl) {
+    return inFlightCrawl;
+  }
+
+  inFlightCrawl = runLiveCrawl(markedPillarUrls, forceRefresh).finally(() => {
+    inFlightCrawl = null;
+  });
+
+  return inFlightCrawl;
+}
+
+async function runLiveCrawl(markedPillarUrls, forceRefresh) {
   try {
     const snapshot = await buildSnapshot(markedPillarUrls);
     await saveWordPressSnapshot(snapshot);
@@ -106,12 +114,10 @@ export async function loadContentSnapshot({ forceRefresh = false } = {}) {
   } catch (error) {
     const cached = await fetchLatestWordPressSnapshot();
     if (cached?.data?.kpis) {
-      return {
-        ...cached.data,
-        generatedAt: cached.created_at || cached.data.generatedAt,
-        source: 'cached-wordpress-snapshot',
-        sourceDetail: `Live WordPress crawl failed: ${error instanceof Error ? error.message : String(error)}`,
-      };
+      return formatCachedSnapshot(
+        cached,
+        `Live WordPress crawl failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
     if (!fallbackSnapshot?.kpis) throw error;
     return {
@@ -120,6 +126,15 @@ export async function loadContentSnapshot({ forceRefresh = false } = {}) {
       sourceDetail: error instanceof Error ? error.message : String(error),
     };
   }
+}
+
+function formatCachedSnapshot(row, sourceDetail) {
+  return {
+    ...row.data,
+    generatedAt: row.created_at || row.data.generatedAt,
+    source: 'cached-wordpress-snapshot',
+    sourceDetail,
+  };
 }
 
 async function saveWordPressSnapshot(snapshot) {
@@ -394,14 +409,32 @@ async function fetchTotalPages() {
 }
 
 async function fetchPosts(totalPages) {
+  const metadataFields = 'id,link,slug,title,date,modified,categories,excerpt';
+  const metadataPages = await fetchWpPages(totalPages, metadataFields);
+  const posts = metadataPages.flat();
+
+  const contentById = new Map();
+  const contentPages = await fetchWpPages(totalPages, 'id,content');
+  for (const page of contentPages) {
+    for (const post of page) {
+      contentById.set(post.id, post.content?.rendered || '');
+    }
+  }
+
+  return posts.map((post) => ({
+    ...post,
+    content: { rendered: contentById.get(post.id) || '' },
+  }));
+}
+
+async function fetchWpPages(totalPages, fields) {
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
   const requests = pages.map(async (page) => {
-    const fields = 'id,link,slug,title,date,modified,categories,content,excerpt';
     const response = await wpFetch(`${WP_API}/posts?per_page=100&page=${page}&_fields=${fields}`);
     if (!response.ok) throw new Error(`Posts page ${page} failed: ${response.status}`);
     return response.json();
   });
-  return (await Promise.all(requests)).flat();
+  return Promise.all(requests);
 }
 
 async function wpFetch(url) {

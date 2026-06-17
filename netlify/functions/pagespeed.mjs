@@ -23,18 +23,7 @@ export async function handler(event) {
       if (!url) throw new HttpError(400, 'A valid page URL is required.');
       const strategy = body.strategy === 'desktop' ? 'desktop' : 'mobile';
       const result = await runPageSpeed(url, strategy);
-      await sql`
-        insert into pagespeed_snapshots (
-          id, url, strategy, performance, seo, accessibility, best_practices,
-          lcp_ms, cls_x1000, fcp_ms, ttfb_ms,
-          field_lcp_ms, field_cls_x1000, field_inp_ms, overall_category, data
-        ) values (
-          ${randomUUID()}, ${result.url}, ${strategy}, ${result.performance}, ${result.seo}, ${result.accessibility}, ${result.bestPractices},
-          ${result.lcpMs}, ${result.clsX1000}, ${result.fcpMs}, ${result.ttfbMs},
-          ${result.fieldLcpMs}, ${result.fieldClsX1000}, ${result.fieldInpMs}, ${result.overallCategory}, ${JSON.stringify(result.extra || {})}
-        )
-      `;
-      await sql`delete from pagespeed_snapshots where created_at < now() - interval '180 days'`;
+      await storePageSpeedResult(sql, result, strategy);
       await audit(event, user, 'pagespeed.run', result.url, { strategy, performance: result.performance });
       return json(200, { configured: true, result: { ...result, strategy } }, { 'cache-control': 'private, no-store' });
     }
@@ -49,6 +38,18 @@ export async function handler(event) {
       from pagespeed_snapshots
       order by url, strategy, created_at desc
     `;
+    // Daily history (mobile), averaged across pages, for the Core Web Vitals trend.
+    const historyRows = await sql`
+      select to_char(date_trunc('day', created_at), 'YYYY-MM-DD') as day,
+             round(avg(performance))::int as performance,
+             round(avg(lcp_ms))::int as lcp_ms,
+             round(avg(cls_x1000))::int as cls_x1000
+      from pagespeed_snapshots
+      where strategy = 'mobile' and performance is not null
+      group by day
+      order by day asc
+      limit 60
+    `;
     return json(
       200,
       {
@@ -56,6 +57,12 @@ export async function handler(event) {
         generatedAt: new Date().toISOString(),
         candidates,
         results: cached.map(publicResult),
+        history: historyRows.map((row) => ({
+          date: row.day,
+          performance: row.performance,
+          lcpMs: row.lcp_ms,
+          clsX1000: row.cls_x1000,
+        })),
       },
       { 'cache-control': 'private, no-store' },
     );
@@ -64,7 +71,22 @@ export async function handler(event) {
   }
 }
 
-async function buildCandidates() {
+export async function storePageSpeedResult(sql, result, strategy) {
+  await sql`
+    insert into pagespeed_snapshots (
+      id, url, strategy, performance, seo, accessibility, best_practices,
+      lcp_ms, cls_x1000, fcp_ms, ttfb_ms,
+      field_lcp_ms, field_cls_x1000, field_inp_ms, overall_category, data
+    ) values (
+      ${randomUUID()}, ${result.url}, ${strategy}, ${result.performance}, ${result.seo}, ${result.accessibility}, ${result.bestPractices},
+      ${result.lcpMs}, ${result.clsX1000}, ${result.fcpMs}, ${result.ttfbMs},
+      ${result.fieldLcpMs}, ${result.fieldClsX1000}, ${result.fieldInpMs}, ${result.overallCategory}, ${JSON.stringify(result.extra || {})}
+    )
+  `;
+  await sql`delete from pagespeed_snapshots where created_at < now() - interval '180 days'`;
+}
+
+export async function buildCandidates() {
   const candidates = [{ url: `${WP_BASE}/`, title: 'Homepage' }];
   try {
     const snapshot = await loadContentSnapshot({ forceRefresh: false });
@@ -85,7 +107,7 @@ async function buildCandidates() {
   }).slice(0, MAX_CANDIDATES);
 }
 
-async function runPageSpeed(url, strategy) {
+export async function runPageSpeed(url, strategy) {
   const params = new URLSearchParams({ url, strategy, key: process.env.PAGESPEED_API_KEY });
   for (const category of ['performance', 'seo', 'accessibility', 'best-practices']) {
     params.append('category', category);

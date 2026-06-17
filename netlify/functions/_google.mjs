@@ -146,6 +146,7 @@ export async function syncSearchAnalytics() {
     ['page'],
     ['query'],
     ['page', 'query'],
+    ['date'],
   ];
   const snapshots = [];
 

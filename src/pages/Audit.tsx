@@ -1,10 +1,12 @@
 import React from 'react';
-import { AlertTriangle, ArrowRight, FileWarning, Gauge, Link2Off, ListChecks, Search, Smartphone, Monitor, Zap, RefreshCw } from 'lucide-react';
+import { AlertTriangle, ArrowRight, ArrowUp, ArrowDown, ChevronsUpDown, FileWarning, Gauge, Link2Off, ListChecks, Search, Smartphone, Monitor, Zap, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDashboard } from '../data';
 import { KpiCard, LoadingState, PageHeading, PanelHeader } from '../components';
+import type { KpiDelta } from '../components';
+import { AuditIssuesDonut, CoreWebVitalsTrend } from '../charts';
 import { formatter, shortUrl } from '../lib';
-import type { TechnicalAuditIssue, PageSpeedResult } from '../types';
+import type { TechnicalAudit, TechnicalAuditIssue, PageSpeedResult } from '../types';
 
 const ISSUE_LABELS: Record<string, string> = {
   'thin-content': 'Thin content',
@@ -26,12 +28,23 @@ export function AuditPage() {
   const { technicalAudit, snapshot, isLoading, saveActionItem, pageSpeed, runPageSpeed } = useDashboard();
   const [type, setType] = React.useState('all');
   const [query, setQuery] = React.useState('');
+  const [sort, setSort] = React.useState<{ key: 'title' | 'pageTitle' | 'cluster' | 'priorityScore'; dir: 'asc' | 'desc' }>({ key: 'priorityScore', dir: 'desc' });
 
   if (isLoading && !snapshot) return <LoadingState label="Running technical audit" />;
   const issues = technicalAudit?.issues || [];
   const filtered = issues
     .filter((issue) => type === 'all' || issue.type === type)
-    .filter((issue) => !query || `${issue.title} ${issue.pageTitle} ${issue.detail}`.toLowerCase().includes(query.toLowerCase()));
+    .filter((issue) => !query || `${issue.title} ${issue.pageTitle} ${issue.detail}`.toLowerCase().includes(query.toLowerCase()))
+    .sort((a, b) => {
+      const av = a[sort.key];
+      const bv = b[sort.key];
+      const cmp = typeof av === 'number' && typeof bv === 'number' ? av - bv : String(av).localeCompare(String(bv));
+      return sort.dir === 'asc' ? cmp : -cmp;
+    });
+
+  function toggleSort(key: typeof sort.key) {
+    setSort((prev) => (prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: key === 'priorityScore' ? 'desc' : 'asc' }));
+  }
   const topActions = issues.slice(0, 3);
   const issueTypes = Object.keys(technicalAudit?.summary.byType || {});
 
@@ -44,7 +57,7 @@ export function AuditPage() {
 
       <div className="dash-stack">
         <section className="kpi-grid kpi-grid-3">
-          <KpiCard icon={<Gauge />} label="Audit Health" value={technicalAudit?.healthScore ?? '—'} note={technicalAudit?.trend?.length ? `${technicalAudit.trend.length} saved snapshots` : 'saved to Neon'} tone={(technicalAudit?.healthScore || 0) >= 75 ? 'success' : 'warning'} />
+          <KpiCard icon={<Gauge />} label="Audit Health" value={technicalAudit?.healthScore ?? '—'} note={technicalAudit?.trend?.length ? `${technicalAudit.trend.length} saved snapshots` : 'saved to Neon'} tone={(technicalAudit?.healthScore || 0) >= 75 ? 'success' : 'warning'} delta={healthDelta(technicalAudit?.trend)} />
           <KpiCard icon={<FileWarning />} label="Issues" value={technicalAudit?.summary.total || 0} note="from latest crawl" tone="warning" />
           <KpiCard icon={<AlertTriangle />} label="High Priority" value={technicalAudit?.summary.high || 0} note="fix first" tone="danger" />
           <KpiCard icon={<Link2Off />} label="Broken + Gaps" value={(technicalAudit?.summary.byType?.['broken-internal-link'] || 0) + (technicalAudit?.summary.byType?.['link-gap'] || 0)} note="internal links to repair" />
@@ -57,7 +70,21 @@ export function AuditPage() {
           </section>
         ) : null}
 
+        {Object.keys(technicalAudit?.summary.byType || {}).length ? (
+          <section className="panel">
+            <PanelHeader icon={<FileWarning />} title="Issues by type" action="current crawl" />
+            <AuditIssuesDonut byType={technicalAudit?.summary.byType || {}} labels={ISSUE_LABELS} />
+          </section>
+        ) : null}
+
         <PageSpeedPanel pageSpeed={pageSpeed} runPageSpeed={runPageSpeed} />
+
+        {(pageSpeed?.history?.length || 0) >= 2 ? (
+          <section className="panel">
+            <PanelHeader icon={<Zap />} title="Core Web Vitals over time" action="weekly check" />
+            <CoreWebVitalsTrend history={pageSpeed?.history || []} />
+          </section>
+        ) : null}
 
         {topActions.length ? (
           <section className="next-action-grid">
@@ -108,10 +135,10 @@ export function AuditPage() {
             <table className="dash-table">
               <thead>
                 <tr>
-                  <th>Issue</th>
-                  <th>Page</th>
-                  <th>Cluster</th>
-                  <th className="num">Priority</th>
+                  <th><SortTh label="Issue" col="title" sort={sort} onSort={toggleSort} /></th>
+                  <th><SortTh label="Page" col="pageTitle" sort={sort} onSort={toggleSort} /></th>
+                  <th><SortTh label="Cluster" col="cluster" sort={sort} onSort={toggleSort} /></th>
+                  <th className="num"><SortTh label="Priority" col="priorityScore" sort={sort} onSort={toggleSort} /></th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -288,6 +315,23 @@ function stripUrl(url: string) {
   } catch {
     return url.toLowerCase().replace(/\/$/, '');
   }
+}
+
+function SortTh<T extends string>({ label, col, sort, onSort }: { label: string; col: T; sort: { key: T; dir: 'asc' | 'desc' }; onSort: (col: T) => void }) {
+  const active = sort.key === col;
+  return (
+    <button type="button" className={`sort-th${active ? ' active' : ''}`} onClick={() => onSort(col)}>
+      {label}
+      {active ? (sort.dir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />) : <ChevronsUpDown size={12} />}
+    </button>
+  );
+}
+
+function healthDelta(trend?: TechnicalAudit['trend']): KpiDelta | undefined {
+  if (!trend || trend.length < 2) return undefined;
+  const change = (trend[trend.length - 1].healthScore || 0) - (trend[trend.length - 2].healthScore || 0);
+  if (!change) return undefined;
+  return { display: `${change > 0 ? '+' : ''}${change}`, good: change > 0 };
 }
 
 function actionFromIssue(issue: TechnicalAuditIssue) {

@@ -7,6 +7,7 @@ import {
   Clock,
   Download,
   GitBranch,
+  KeyRound,
   Lightbulb,
   Link2,
   ListChecks,
@@ -18,12 +19,142 @@ import {
   RefreshCw,
   Search,
   Trash2,
+  TrendingUp,
 } from 'lucide-react';
 import { useDashboard } from '../data';
-import { KpiCard, LoadingState, MetricPill, PageHeading, PanelHeader } from '../components';
-import { SearchClicksChart } from '../charts';
+import { ConnectCard, LoadingState } from '../components';
+import type { KpiDelta } from '../components';
+import { SearchClicksChart, CtrPositionScatter, RankTrendChart, RankSparkline, PositionBucketTrend } from '../charts';
 import { formatDate, formatDateRange, formatPercent, formatPosition, formatter, shortUrl } from '../lib';
-import type { CannibalizationOpportunity, ContentDecayOpportunity, Ga4Report, KeywordIdeas, PostSummary, SearchOpportunity, TrackedKeyword } from '../types';
+import type { CannibalizationOpportunity, ContentDecayOpportunity, Ga4Report, KeywordIdeas, PostSummary, SearchOpportunity, SearchTrendPoint, TrackedKeyword } from '../types';
+
+type KeywordTab = 'opportunities' | 'tracking' | 'research' | 'traffic';
+
+const KEYWORD_TABS: Array<{ id: KeywordTab; label: string }> = [
+  { id: 'opportunities', label: 'Opportunities' },
+  { id: 'tracking', label: 'Tracking' },
+  { id: 'research', label: 'Research' },
+  { id: 'traffic', label: 'Traffic' },
+];
+
+function KeywordsHero({
+  periodLabel,
+  gscLive,
+  clicks,
+  impressions,
+  avgPosition,
+  avgCtr,
+  clicksDelta,
+  impressionsDelta,
+  positionDelta,
+  ctrDeltaValue,
+  trackedCount,
+}: {
+  periodLabel: string;
+  gscLive: boolean;
+  clicks?: number;
+  impressions?: number;
+  avgPosition?: number;
+  avgCtr?: number;
+  clicksDelta?: KpiDelta;
+  impressionsDelta?: KpiDelta;
+  positionDelta?: KpiDelta;
+  ctrDeltaValue?: KpiDelta;
+  trackedCount: number;
+}) {
+  return (
+    <header className="keywords-hero">
+      <div className="keywords-hero-glow" aria-hidden />
+      <div className="keywords-hero-inner">
+        <div className="keywords-hero-copy">
+          <span className="keywords-eyebrow">
+            <KeyRound size={14} />
+            Keywords
+          </span>
+          <h1>Search intelligence</h1>
+          <p>Opportunities from Search Console, rank tracking, keyword research, and GA4 blog traffic.</p>
+        </div>
+        <div className="keywords-hero-aside">
+          <span className={`keywords-status${gscLive ? ' live' : ''}`}>
+            <i aria-hidden />
+            {gscLive ? 'Search Console live' : 'GSC pending'}
+          </span>
+          <p className="keywords-period">{periodLabel}</p>
+          <dl className="keywords-stats">
+            {gscLive ? (
+              <>
+                <div>
+                  <dt>Clicks</dt>
+                  <dd>{formatter.format(clicks || 0)}</dd>
+                  {clicksDelta ? <small className={deltaClass(clicksDelta)}>{clicksDelta.display}</small> : null}
+                </div>
+                <div>
+                  <dt>Impressions</dt>
+                  <dd>{formatter.format(impressions || 0)}</dd>
+                  {impressionsDelta ? <small className={deltaClass(impressionsDelta)}>{impressionsDelta.display}</small> : null}
+                </div>
+                <div>
+                  <dt>Avg position</dt>
+                  <dd>{Math.round(avgPosition || 0)}</dd>
+                  {positionDelta ? <small className={deltaClass(positionDelta)}>{positionDelta.display}</small> : null}
+                </div>
+                <div>
+                  <dt>CTR</dt>
+                  <dd>{Math.round((avgCtr || 0) * 100)}%</dd>
+                  {ctrDeltaValue ? <small className={deltaClass(ctrDeltaValue)}>{ctrDeltaValue.display}</small> : null}
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <dt>Tracked</dt>
+                  <dd>{trackedCount}</dd>
+                </div>
+                <div>
+                  <dt>GSC</dt>
+                  <dd>—</dd>
+                </div>
+                <div>
+                  <dt>Period</dt>
+                  <dd>—</dd>
+                </div>
+                <div>
+                  <dt>CTR</dt>
+                  <dd>—</dd>
+                </div>
+              </>
+            )}
+          </dl>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function KeywordsTabs({ tab, onChange }: { tab: KeywordTab; onChange: (tab: KeywordTab) => void }) {
+  return (
+    <nav className="keywords-tabs" role="tablist" aria-label="Keywords sections">
+      {KEYWORD_TABS.map((item) => (
+        <button
+          key={item.id}
+          type="button"
+          role="tab"
+          aria-selected={tab === item.id}
+          className={tab === item.id ? 'active' : ''}
+          onClick={() => onChange(item.id)}
+        >
+          {item.label}
+        </button>
+      ))}
+    </nav>
+  );
+}
+
+function deltaClass(delta: KpiDelta) {
+  if (delta.good === true) return 'up';
+  if (delta.good === false) return 'down';
+  return '';
+}
 
 export function KeywordsPage() {
   const {
@@ -46,44 +177,51 @@ export function KeywordsPage() {
   const [bucket, setBucket] = React.useState('all');
   const [minImpressions, setMinImpressions] = React.useState(0);
   const [serpKeyword, setSerpKeyword] = React.useState('');
+  const [tab, setTab] = React.useState<KeywordTab>('opportunities');
 
   if (isLoading && !snapshot) return <LoadingState label="Loading search opportunities" />;
 
   if (!searchOpportunities?.available) {
     return (
-      <>
-        <PageHeading
-          title="Keywords"
-          description="Tracked keywords, SERP movement, GA4 traffic, and Search Console opportunities."
+      <div className="keywords-page">
+        <KeywordsHero
+          periodLabel="Waiting on Search Console import"
+          gscLive={false}
+          trackedCount={trackedKeywords.filter((item) => item.status === 'active').length}
         />
-        <div className="dash-stack">
-        <KeywordTrackingPanel
-          keywords={trackedKeywords}
-          posts={snapshot?.allPosts || []}
-          serpConfigured={Boolean(serpTracker?.configured)}
-          onSave={saveTrackedKeyword}
-          onUpdate={updateTrackedKeyword}
-          onArchive={archiveTrackedKeyword}
-          onTrack={(keyword) => void trackSerpKeywords([keyword])}
-          onWeeklySync={() => void syncTrackedKeywords()}
-        />
-        <KeywordIdeasPanel
-          fetchKeywordIdeas={fetchKeywordIdeas}
-          onTrack={(keyword) => void saveTrackedKeyword({ keyword, source: 'keyword-ideas' })}
-        />
-        <Ga4Panel report={ga4} onSync={() => void syncGa4()} />
-        <section className="panel">
-          <div className="empty-compact">
-            <PanelTop size={22} />
-            <strong>Waiting on Search Console data</strong>
-            <p>
-              {searchOpportunities?.message ||
-                'Once the daily import runs, this page will show low-CTR pages and keywords close to page one.'}
-            </p>
-          </div>
-        </section>
+        <KeywordsTabs tab={tab} onChange={setTab} />
+        <div className="keywords-tab-panel">
+          {tab === 'tracking' && (
+            <KeywordTrackingPanel
+              keywords={trackedKeywords}
+              posts={snapshot?.allPosts || []}
+              serpConfigured={Boolean(serpTracker?.configured)}
+              onSave={saveTrackedKeyword}
+              onUpdate={updateTrackedKeyword}
+              onArchive={archiveTrackedKeyword}
+              onTrack={(keyword) => void trackSerpKeywords([keyword])}
+              onWeeklySync={() => void syncTrackedKeywords()}
+            />
+          )}
+          {tab === 'research' && (
+            <KeywordIdeasPanel
+              fetchKeywordIdeas={fetchKeywordIdeas}
+              onTrack={(keyword) => void saveTrackedKeyword({ keyword, source: 'keyword-ideas' })}
+            />
+          )}
+          {tab === 'traffic' && <Ga4Panel report={ga4} onSync={() => void syncGa4()} />}
+          {tab === 'opportunities' && (
+            <section className="keywords-empty-gsc">
+              <PanelTop size={26} strokeWidth={1.5} />
+              <strong>Waiting on Search Console data</strong>
+              <p>
+                {searchOpportunities?.message ||
+                  'Once the daily import runs, this tab will show low-CTR pages and keywords close to page one.'}
+              </p>
+            </section>
+          )}
         </div>
-      </>
+      </div>
     );
   }
 
@@ -100,221 +238,277 @@ export function KeywordsPage() {
     .sort((a, b) => b.priorityScore - a.priorityScore || b.impressions - a.impressions);
 
   return (
-    <>
-      <PageHeading
-        title="Keywords"
-        description={`Search opportunities · ${formatDateRange(opportunities.startDate, opportunities.endDate)}`}
-        badges={<span className="dash-badge live">Search Console</span>}
+    <div className="keywords-page">
+      <KeywordsHero
+        periodLabel={formatDateRange(opportunities.startDate, opportunities.endDate)}
+        gscLive
+        clicks={opportunities.summary?.totalClicks}
+        impressions={opportunities.summary?.totalImpressions}
+        avgPosition={opportunities.summary?.averagePosition}
+        avgCtr={opportunities.summary?.averageCtr}
+        clicksDelta={pctDelta(opportunities.trend, 'totalClicks', true)}
+        impressionsDelta={pctDelta(opportunities.trend, 'totalImpressions', true)}
+        positionDelta={positionDelta(opportunities.trend)}
+        ctrDeltaValue={ctrDelta(opportunities.trend)}
+        trackedCount={trackedKeywords.filter((item) => item.status === 'active').length}
       />
 
-      <div className="dash-stack">
-      <KeywordTrackingPanel
-        keywords={trackedKeywords}
-        posts={snapshot?.allPosts || []}
-        serpConfigured={Boolean(serpTracker?.configured)}
-        onSave={saveTrackedKeyword}
-        onUpdate={updateTrackedKeyword}
-        onArchive={archiveTrackedKeyword}
-        onTrack={(keyword) => void trackSerpKeywords([keyword])}
-        onWeeklySync={() => void syncTrackedKeywords()}
-      />
-      <KeywordIdeasPanel
-        fetchKeywordIdeas={fetchKeywordIdeas}
-        onTrack={(keyword) => void saveTrackedKeyword({ keyword, source: 'keyword-ideas' })}
-      />
-      <Ga4Panel report={ga4} onSync={() => void syncGa4()} />
+      <KeywordsTabs tab={tab} onChange={setTab} />
 
-      <section className="kpi-grid" aria-label="Search KPIs">
-        <KpiCard icon={<MousePointerClick />} label="Clicks" value={opportunities.summary?.totalClicks || 0} note="total in range" />
-        <KpiCard icon={<BarChart3 />} label="Impressions" value={opportunities.summary?.totalImpressions || 0} note="total in range" />
-        <KpiCard icon={<ArrowUpRight />} label="Avg Position" value={Math.round(opportunities.summary?.averagePosition || 0)} note="weighted by impressions" />
-        <KpiCard icon={<ListChecks />} label="Avg CTR" value={`${Math.round((opportunities.summary?.averageCtr || 0) * 100)}%`} note="clicks ÷ impressions" />
-      </section>
-
-      <section className="panel">
-        <PanelHeader icon={<Search />} title="Keyword Explorer" action={`${filteredRows.length} matches`} />
-        <div className="filter-bar keyword-filter-bar">
-          <div className="search-field">
-            <Search size={15} />
-            <input
-              type="search"
-              placeholder="Filter keyword or page…"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-          </div>
-          <select value={bucket} onChange={(event) => setBucket(event.target.value)}>
-            <option value="all">All positions</option>
-            <option value="top3">Top 3</option>
-            <option value="page1">Page 1</option>
-            <option value="page2">Page 2</option>
-            <option value="page3">21+</option>
-          </select>
-          <select value={minImpressions} onChange={(event) => setMinImpressions(Number(event.target.value))}>
-            <option value={0}>Any impressions</option>
-            <option value={100}>100+ impressions</option>
-            <option value={500}>500+ impressions</option>
-            <option value={1000}>1,000+ impressions</option>
-          </select>
-          <button className="secondary-button" onClick={() => downloadKeywordCsv(filteredRows)}>
-            <Download size={15} />
-            Export CSV
-          </button>
-        </div>
-        <KeywordExplorerTable
-          rows={filteredRows.slice(0, 80)}
-          onSave={(row) =>
-            void saveActionItem({
-              fingerprint: `keyword:${row.page || ''}:${row.query || row.label}`,
-              type: 'keyword',
-              source: 'search-console',
-              title: row.query || row.label,
-              detail: row.recommendation,
-              pageUrl: row.page || '',
-              keyword: row.query || row.label,
-              priorityScore: row.priorityScore,
-            })
-          }
-        />
-      </section>
-
-      <section className="panel">
-        <PanelHeader
-          icon={<BarChart3 />}
-          title="SERP Tracker"
-          action={serpTracker?.configured ? 'Serper cached in Neon' : 'SERPER_API_KEY needed'}
-        />
-        <p className="panel-note">
-          Use sparingly. Each uncached keyword check can use one Serper search; cached results are reused for about 7 days.
-        </p>
-        <div className="filter-bar keyword-filter-bar">
-          <div className="search-field">
-            <Search size={15} />
-            <input
-              value={serpKeyword}
-              placeholder="coding for kids"
-              onChange={(event) => setSerpKeyword(event.target.value)}
-            />
-          </div>
-          <button
-            className="secondary-button"
-            disabled={!serpKeyword.trim() || !serpTracker?.configured}
-            onClick={() => void trackSerpKeywords([serpKeyword])}
-          >
-            Track cached SERP
-          </button>
-        </div>
-        <div className="serp-list">
-          {(serpTracker?.snapshots || []).slice(0, 5).map((snapshot) => (
-            <article key={snapshot.id} className="serp-item">
+      <div className="keywords-tab-panel">
+      {tab === 'opportunities' && (
+        <>
+          <section className="keywords-panel chart-panel">
+            <div className="keywords-section-head">
+              <MousePointerClick size={18} />
               <div>
-                <strong>{snapshot.keyword}</strong>
-                <span>{snapshot.cached ? 'cached' : 'fresh'} · {snapshot.codakidPosition ? `CodaKid #${snapshot.codakidPosition}` : 'CodaKid not top 10'}</span>
+                <h2>Click-through vs. ranking</h2>
+                <p>Low-left dots rank well but under-click — title/meta fixes. Bubble size = impressions.</p>
               </div>
-              <ol>
-                {snapshot.organic.slice(0, 5).map((result) => (
-                  <li key={`${snapshot.id}-${result.position}-${result.link}`}>
-                    <span>{result.position}</span>
-                    <a href={result.link} target="_blank" rel="noreferrer">{result.domain}</a>
-                    <small>{result.title}</small>
-                  </li>
-                ))}
-              </ol>
-            </article>
-          ))}
-        </div>
-      </section>
+            </div>
+            <CtrPositionScatter rows={[...opportunities.topQueries, ...opportunities.queryOpportunities]} />
+          </section>
 
-      <section className="dashboard-grid lower-grid">
-        <div className="panel">
-          <ContentDecayList
-            rows={opportunities.contentDecay || []}
-            onSave={(row) =>
-              void saveActionItem({
-                fingerprint: `decay:${row.page}`,
-                type: 'content-decay',
-                source: 'search-console',
-                title: shortUrl(row.page),
-                detail: row.recommendation,
-                pageUrl: row.page,
-                priorityScore: row.priorityScore,
-              })
-            }
-          />
-        </div>
-        <div className="panel">
-          <CannibalizationList
-            rows={opportunities.cannibalization || []}
-            onSave={(row) =>
-              void saveActionItem({
-                fingerprint: `cannibalization:${row.query}`,
-                type: 'cannibalization',
-                source: 'search-console',
-                title: row.query,
-                detail: row.recommendation,
-                keyword: row.query,
-                pageUrl: row.pages[0]?.page || '',
-                priorityScore: row.totalImpressions,
-              })
-            }
-          />
-        </div>
-      </section>
+          <section className="keywords-opp-grid">
+            <OpportunityList
+              title="Almost on page 1"
+              icon={<ArrowUpRight />}
+              hint="Positions 6–20. A refresh or internal links can push these onto page one."
+              emptyText="No keywords are sitting in positions 6-20 yet."
+              opportunities={opportunities.queryOpportunities.slice(0, 6)}
+              onSave={(row) => void saveActionItem(actionFromOpportunity(row, 'striking-distance'))}
+            />
+            <OpportunityList
+              title="High impressions, low clicks"
+              icon={<MousePointerClick />}
+              hint="Seen often but not clicked — rewrite title and meta."
+              emptyText="No low-CTR pages crossed the current threshold."
+              opportunities={opportunities.pageOpportunities.slice(0, 6)}
+              onSave={(row) => void saveActionItem(actionFromOpportunity(row, 'low-ctr-page'))}
+            />
+            <OpportunityList
+              title="Page + keyword fixes"
+              icon={<ListChecks />}
+              hint="Specific pages underperforming for specific queries."
+              emptyText="No page-query fixes are available yet."
+              opportunities={opportunities.pageQueryOpportunities.slice(0, 6)}
+              showPage
+              onSave={(row) => void saveActionItem(actionFromOpportunity(row, 'page-query'))}
+            />
+            <ContentDecayList
+              rows={opportunities.contentDecay || []}
+              onSave={(row) =>
+                void saveActionItem({
+                  fingerprint: `decay:${row.page}`,
+                  type: 'content-decay',
+                  source: 'search-console',
+                  title: shortUrl(row.page),
+                  detail: row.recommendation,
+                  pageUrl: row.page,
+                  priorityScore: row.priorityScore,
+                })
+              }
+            />
+            <CannibalizationList
+              rows={opportunities.cannibalization || []}
+              onSave={(row) =>
+                void saveActionItem({
+                  fingerprint: `cannibalization:${row.query}`,
+                  type: 'cannibalization',
+                  source: 'search-console',
+                  title: row.query,
+                  detail: row.recommendation,
+                  keyword: row.query,
+                  pageUrl: row.pages[0]?.page || '',
+                  priorityScore: row.totalImpressions,
+                })
+              }
+            />
+            <OpportunityList
+              title="Top queries by visibility"
+              icon={<BarChart3 />}
+              hint="Most-seen queries — protect and expand these."
+              emptyText="No query-level data yet."
+              opportunities={opportunities.topQueries.slice(0, 6)}
+            />
+          </section>
 
-      <section className="panel">
-        <PanelHeader icon={<BarChart3 />} title="Top Pages by Clicks" action="Search Console" />
-        {opportunities.topPages?.length ? (
-          <SearchClicksChart pages={opportunities.topPages} />
-        ) : (
-          <p className="panel-note">No page-level click data in this snapshot yet.</p>
-        )}
-      </section>
+          <section className="keywords-panel">
+            <div className="keywords-section-head">
+              <BarChart3 size={18} />
+              <div>
+                <h2>Top pages by clicks</h2>
+                <p>Search Console page performance in this period</p>
+              </div>
+            </div>
+            {opportunities.topPages?.length ? (
+              <SearchClicksChart pages={opportunities.topPages} />
+            ) : (
+              <p className="keywords-panel-note">No page-level click data in this snapshot yet.</p>
+            )}
+          </section>
+        </>
+      )}
 
-      <section className="dashboard-grid lower-grid">
-        <div className="panel">
-          <OpportunityList
-            title="Low CTR Pages"
-            icon={<MousePointerClick />}
-            emptyText="No low-CTR pages crossed the current threshold."
-            opportunities={opportunities.pageOpportunities.slice(0, 6)}
-            onSave={(row) => void saveActionItem(actionFromOpportunity(row, 'low-ctr-page'))}
+      {tab === 'tracking' && (
+        <>
+          <section className="keywords-charts-grid">
+            <div className="keywords-panel">
+              <div className="keywords-section-head">
+                <TrendingUp size={18} />
+                <div>
+                  <h2>Average rank over time</h2>
+                  <p>Tracked keywords</p>
+                </div>
+              </div>
+              <RankTrendChart keywords={trackedKeywords} />
+            </div>
+            <div className="keywords-panel">
+              <div className="keywords-section-head">
+                <BarChart3 size={18} />
+                <div>
+                  <h2>Position buckets</h2>
+                  <p>How rankings shift week to week</p>
+                </div>
+              </div>
+              <PositionBucketTrend keywords={trackedKeywords} />
+            </div>
+          </section>
+
+          <KeywordTrackingPanel
+            keywords={trackedKeywords}
+            posts={snapshot?.allPosts || []}
+            serpConfigured={Boolean(serpTracker?.configured)}
+            onSave={saveTrackedKeyword}
+            onUpdate={updateTrackedKeyword}
+            onArchive={archiveTrackedKeyword}
+            onTrack={(keyword) => void trackSerpKeywords([keyword])}
+            onWeeklySync={() => void syncTrackedKeywords()}
           />
-        </div>
-        <div className="panel">
-          <OpportunityList
-            title="Striking Distance Queries"
-            icon={<ArrowUpRight />}
-            emptyText="No keywords are sitting in positions 6-20 yet."
-            opportunities={opportunities.queryOpportunities.slice(0, 6)}
-            onSave={(row) => void saveActionItem(actionFromOpportunity(row, 'striking-distance'))}
+
+          <section className="keywords-panel keywords-serp-panel">
+            <div className="keywords-section-head">
+              <Search size={18} />
+              <div>
+                <h2>SERP checker</h2>
+                <p>
+                  Live top 10 · {serpTracker?.configured ? 'Serper cached in Neon' : 'SERPER_API_KEY needed'}
+                </p>
+              </div>
+            </div>
+            <div className="keywords-serp-bar">
+              <Search size={16} />
+              <input
+                value={serpKeyword}
+                placeholder="coding for kids"
+                onChange={(event) => setSerpKeyword(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && serpKeyword.trim() && serpTracker?.configured) {
+                    void trackSerpKeywords([serpKeyword]);
+                  }
+                }}
+              />
+              <button
+                type="button"
+                className="keywords-run-btn"
+                disabled={!serpKeyword.trim() || !serpTracker?.configured}
+                onClick={() => void trackSerpKeywords([serpKeyword])}
+              >
+                Check SERP
+              </button>
+            </div>
+            <div className="keywords-serp-feed">
+              {(serpTracker?.snapshots || []).slice(0, 5).map((snapshot) => (
+                <article key={snapshot.id} className="keywords-serp-card">
+                  <header>
+                    <strong>{snapshot.keyword}</strong>
+                    <span>{snapshot.cached ? 'cached' : 'fresh'}</span>
+                    <em>{snapshot.codakidPosition ? `CodaKid #${snapshot.codakidPosition}` : 'Not in top 10'}</em>
+                  </header>
+                  <ol>
+                    {snapshot.organic.slice(0, 5).map((result) => (
+                      <li key={`${snapshot.id}-${result.position}-${result.link}`}>
+                        <span>{result.position}</span>
+                        <a href={result.link} target="_blank" rel="noreferrer">{result.domain}</a>
+                        <small>{result.title}</small>
+                      </li>
+                    ))}
+                  </ol>
+                </article>
+              ))}
+              {!(serpTracker?.snapshots || []).length ? (
+                <p className="keywords-panel-note">No SERP checks yet — search a keyword above.</p>
+              ) : null}
+            </div>
+          </section>
+        </>
+      )}
+
+      {tab === 'research' && (
+        <>
+          <KeywordIdeasPanel
+            fetchKeywordIdeas={fetchKeywordIdeas}
+            onTrack={(keyword) => void saveTrackedKeyword({ keyword, source: 'keyword-ideas' })}
           />
-        </div>
-        <div className="panel">
-          <OpportunityList
-            title="Page + Query Work"
-            icon={<ListChecks />}
-            emptyText="No page-query fixes are available yet."
-            opportunities={opportunities.pageQueryOpportunities.slice(0, 6)}
-            showPage
-            onSave={(row) => void saveActionItem(actionFromOpportunity(row, 'page-query'))}
-          />
-        </div>
-        <div className="panel">
-          <PanelHeader icon={<ArrowUpRight />} title="Top Queries" action="driving impressions" />
-          <div className="keyword-metrics">
-            <MetricPill label="Clicks" value={opportunities.summary?.totalClicks || 0} />
-            <MetricPill label="Impressions" value={opportunities.summary?.totalImpressions || 0} />
-          </div>
-          <OpportunityList
-            title="Highest Visibility"
-            icon={<BarChart3 />}
-            emptyText="No query-level data yet."
-            opportunities={opportunities.topQueries.slice(0, 5)}
-          />
-        </div>
-      </section>
+
+          <section className="keywords-panel keywords-explorer-panel">
+            <div className="keywords-section-head">
+              <Search size={18} />
+              <div>
+                <h2>Keyword explorer</h2>
+                <p>{filteredRows.length} matches · search, filter, export</p>
+              </div>
+            </div>
+            <div className="keywords-explorer-filters">
+              <div className="keywords-search">
+                <Search size={16} />
+                <input
+                  type="search"
+                  placeholder="Filter keyword or page…"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                />
+              </div>
+              <select value={bucket} onChange={(event) => setBucket(event.target.value)}>
+                <option value="all">All positions</option>
+                <option value="top3">Top 3</option>
+                <option value="page1">Page 1</option>
+                <option value="page2">Page 2</option>
+                <option value="page3">21+</option>
+              </select>
+              <select value={minImpressions} onChange={(event) => setMinImpressions(Number(event.target.value))}>
+                <option value={0}>Any impressions</option>
+                <option value={100}>100+ impressions</option>
+                <option value={500}>500+ impressions</option>
+                <option value={1000}>1,000+ impressions</option>
+              </select>
+              <button type="button" className="keywords-text-btn" onClick={() => downloadKeywordCsv(filteredRows)}>
+                <Download size={14} />
+                Export CSV
+              </button>
+            </div>
+            <KeywordExplorerTable
+              rows={filteredRows.slice(0, 80)}
+              onSave={(row) =>
+                void saveActionItem({
+                  fingerprint: `keyword:${row.page || ''}:${row.query || row.label}`,
+                  type: 'keyword',
+                  source: 'search-console',
+                  title: row.query || row.label,
+                  detail: row.recommendation,
+                  pageUrl: row.page || '',
+                  keyword: row.query || row.label,
+                  priorityScore: row.priorityScore,
+                })
+              }
+            />
+          </section>
+        </>
+      )}
+
+      {tab === 'traffic' && <Ga4Panel report={ga4} onSync={() => void syncGa4()} />}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -373,24 +567,35 @@ function KeywordTrackingPanel({
   }
 
   return (
-    <section className="panel">
-      <PanelHeader
-        icon={<Clock />}
-        title="Tracked Keywords"
-        action={`${active.length} active · ${tracked.length} with SERP history`}
-      />
-      <div className="keyword-tracker-top">
-        <MetricPill label="Active" value={active.length} />
-        <MetricPill label="Avg Rank" value={averagePosition ? formatPosition(averagePosition) : '-'} />
-        <MetricPill label="Weekly Cap" value="30" />
-        <button className="secondary-button" disabled={!serpConfigured} onClick={onWeeklySync}>
-          <RefreshCw size={15} />
+    <section className="keywords-panel keywords-tracking-panel">
+      <div className="keywords-section-head">
+        <Clock size={18} />
+        <div>
+          <h2>Tracked keywords</h2>
+          <p>{active.length} active · {tracked.length} with SERP history</p>
+        </div>
+      </div>
+      <div className="keywords-tracker-bar">
+        <div className="keywords-mini-stat">
+          <span>Active</span>
+          <strong>{active.length}</strong>
+        </div>
+        <div className="keywords-mini-stat">
+          <span>Avg rank</span>
+          <strong>{averagePosition ? formatPosition(averagePosition) : '—'}</strong>
+        </div>
+        <div className="keywords-mini-stat">
+          <span>Weekly cap</span>
+          <strong>30</strong>
+        </div>
+        <button type="button" className="keywords-text-btn" disabled={!serpConfigured} onClick={onWeeklySync}>
+          <RefreshCw size={14} />
           Run due keywords
         </button>
       </div>
-      <form className="keyword-add-form" onSubmit={submit}>
-        <div className="search-field">
-          <Search size={15} />
+      <form className="keywords-add-form" onSubmit={submit}>
+        <div className="keywords-search">
+          <Search size={16} />
           <input
             value={keyword}
             placeholder="Add keyword, e.g. best coding classes for kids"
@@ -419,19 +624,20 @@ function KeywordTrackingPanel({
             <option key={post.url} value={post.url}>{post.title}</option>
           ))}
         </datalist>
-        <button className="primary-button">
-          <Plus size={15} />
+        <button type="submit" className="keywords-run-btn">
+          <Plus size={14} />
           Add
         </button>
       </form>
-      <div className="dash-table-wrap">
-        <table className="dash-table tracked-keyword-table">
+      <div className="keywords-table-wrap">
+        <table className="keywords-table tracked-keyword-table">
           <thead>
             <tr>
               <th>Keyword</th>
               <th>Target</th>
               <th className="num">Rank</th>
               <th>Movement</th>
+              <th>Trend</th>
               <th>Competitors</th>
               <th>Controls</th>
             </tr>
@@ -507,6 +713,9 @@ function TrackedKeywordRow({
         {item.latestSerp?.fetchedAt && <small className="table-subtle"> {formatDate(item.latestSerp.fetchedAt)}</small>}
       </td>
       <td>
+        <RankSparkline trend={item.trend} />
+      </td>
+      <td>
         <div className="competitor-chip-row">
           {(item.latestSerp?.competitors || []).slice(0, 3).map((competitor) => (
             <span key={`${item.id}-${competitor.domain}-${competitor.position}`}>
@@ -572,25 +781,31 @@ function KeywordIdeasPanel({
   ];
 
   return (
-    <section className="panel">
-      <PanelHeader icon={<Lightbulb />} title="Keyword Ideas" action="Google Autocomplete · free" />
-      <form className="filter-bar" onSubmit={run}>
-        <div className="search-field" style={{ flex: 1 }}>
-          <Search size={15} />
+    <section className="keywords-panel keywords-ideas-panel">
+      <div className="keywords-section-head">
+        <Lightbulb size={18} />
+        <div>
+          <h2>Keyword ideas</h2>
+          <p>Google Autocomplete · free</p>
+        </div>
+      </div>
+      <form className="keywords-ideas-form" onSubmit={run}>
+        <div className="keywords-search grow">
+          <Search size={16} />
           <input
             value={seed}
             placeholder="Enter a seed topic, e.g. coding for kids"
             onChange={(event) => setSeed(event.target.value)}
           />
         </div>
-        <button type="submit" className="primary-button" disabled={isLoading || !seed.trim()}>
-          {isLoading ? <RefreshCw size={15} className="spin" /> : <Lightbulb size={15} />}
+        <button type="submit" className="keywords-run-btn" disabled={isLoading || !seed.trim()}>
+          {isLoading ? <RefreshCw size={14} className="spin" /> : <Lightbulb size={14} />}
           {isLoading ? 'Finding ideas…' : 'Get ideas'}
         </button>
       </form>
 
       {!ideas && !isLoading ? (
-        <p className="panel-note">
+        <p className="keywords-panel-note">
           Expand any topic into real Google searches — questions, comparisons, and long-tail variants — then track the
           ones worth ranking for. No API key or credits required.
         </p>
@@ -598,25 +813,25 @@ function KeywordIdeasPanel({
 
       {ideas ? (
         <>
-          <p className="panel-note">
+          <p className="keywords-panel-note">
             {ideas.total} ideas for <strong>“{ideas.seed}”</strong>. Click a phrase to add it to tracked keywords.
           </p>
-          <div className="idea-groups">
+          <div className="keywords-idea-groups">
             {groups.map(({ key, label, hint }) => {
               const items = ideas.groups[key] || [];
               if (!items.length) return null;
               return (
-                <div key={key} className="idea-group">
+                <div key={key} className="keywords-idea-group">
                   <header>
                     <strong>{label}</strong>
                     <small>{items.length} · {hint}</small>
                   </header>
-                  <div className="idea-chips">
+                  <div className="keywords-idea-chips">
                     {items.map((keyword) => (
                       <button
                         key={keyword}
                         type="button"
-                        className={`idea-chip${added.has(keyword) ? ' added' : ''}`}
+                        className={`keywords-idea-chip${added.has(keyword) ? ' added' : ''}`}
                         title={added.has(keyword) ? 'Added to tracked keywords' : 'Add to tracked keywords'}
                         onClick={() => track(keyword)}
                       >
@@ -638,29 +853,57 @@ function KeywordIdeasPanel({
 function Ga4Panel({ report, onSync }: { report: Ga4Report | null; onSync: () => void }) {
   const latest = report?.latest;
   return (
-    <section className="panel">
-      <PanelHeader
-        icon={<BarChart3 />}
-        title="GA4 Blog Traffic"
-        action={report?.configured ? report.analyticsScopeReady ? 'ready' : 'reconnect Google' : 'property id needed'}
-      />
+    <section className="keywords-panel keywords-ga4-panel">
+      <div className="keywords-section-head">
+        <BarChart3 size={18} />
+        <div>
+          <h2>GA4 blog traffic</h2>
+          <p>{report?.configured ? report.analyticsScopeReady ? 'ready' : 'reconnect Google' : 'property id needed'}</p>
+        </div>
+      </div>
       {!report?.configured ? (
-        <p className="panel-note">GA4_PROPERTY_ID is not configured yet.</p>
+        <ConnectCard
+          icon={<BarChart3 />}
+          title="Connect Google Analytics 4"
+          body="See sessions, users, and top blog pages alongside your search data."
+          steps={[
+            'Add GA4_PROPERTY_ID in Netlify → Site configuration → Environment variables',
+            'Redeploy, then reconnect Google so the dashboard can read Analytics',
+          ]}
+          hint="Free with your existing Google account."
+        />
       ) : !report.analyticsScopeReady ? (
-        <p className="panel-note">Google needs to be reconnected once after deploy so the dashboard can read Analytics data.</p>
+        <ConnectCard
+          icon={<RefreshCw />}
+          title="Reconnect Google for Analytics"
+          body="Google needs to be reconnected once after deploy so the dashboard can read GA4 data."
+          hint="Settings → connect Google, then run a sync."
+        />
       ) : latest ? (
         <>
-          <div className="keyword-tracker-top">
-            <MetricPill label="Sessions" value={formatter.format(latest.summary.sessions)} />
-            <MetricPill label="Users" value={formatter.format(latest.summary.totalUsers)} />
-            <MetricPill label="Views" value={formatter.format(latest.summary.screenPageViews)} />
-            <MetricPill label="Engagement" value={formatPercent(latest.summary.engagementRate)} />
-            <button className="secondary-button" onClick={onSync}>
-              <RefreshCw size={15} />
+          <div className="keywords-tracker-bar">
+            <div className="keywords-mini-stat">
+              <span>Sessions</span>
+              <strong>{formatter.format(latest.summary.sessions)}</strong>
+            </div>
+            <div className="keywords-mini-stat">
+              <span>Users</span>
+              <strong>{formatter.format(latest.summary.totalUsers)}</strong>
+            </div>
+            <div className="keywords-mini-stat">
+              <span>Views</span>
+              <strong>{formatter.format(latest.summary.screenPageViews)}</strong>
+            </div>
+            <div className="keywords-mini-stat">
+              <span>Engagement</span>
+              <strong>{formatPercent(latest.summary.engagementRate)}</strong>
+            </div>
+            <button type="button" className="keywords-text-btn" onClick={onSync}>
+              <RefreshCw size={14} />
               Sync GA4
             </button>
           </div>
-          <div className="ga4-page-list">
+          <div className="keywords-ga4-list">
             {latest.topPages.slice(0, 5).map((page) => (
               <article key={page.path}>
                 <div>
@@ -674,9 +917,9 @@ function Ga4Panel({ report, onSync }: { report: Ga4Report | null; onSync: () => 
         </>
       ) : (
         <>
-          <p className="panel-note">GA4 is configured. Run a sync to save the first Analytics snapshot into Neon.</p>
-          <button className="secondary-button" onClick={onSync}>
-            <RefreshCw size={15} />
+          <p className="keywords-panel-note">GA4 is configured. Run a sync to save the first Analytics snapshot into Neon.</p>
+          <button type="button" className="keywords-text-btn" onClick={onSync}>
+            <RefreshCw size={14} />
             Sync GA4
           </button>
         </>
@@ -686,9 +929,9 @@ function Ga4Panel({ report, onSync }: { report: Ga4Report | null; onSync: () => 
 }
 
 function movementClass(value?: number | null) {
-  if (!value) return 'movement-chip';
-  if (value > 0) return 'movement-chip up';
-  return 'movement-chip down';
+  if (!value) return 'keywords-movement flat';
+  if (value > 0) return 'keywords-movement up';
+  return 'keywords-movement down';
 }
 
 function ContentDecayList({
@@ -699,31 +942,36 @@ function ContentDecayList({
   onSave: (row: ContentDecayOpportunity) => void;
 }) {
   return (
-    <div className="opportunity-block">
-      <div className="opportunity-title">
-        <AlertTriangle />
-        <strong>Content Decay</strong>
-      </div>
+    <section className="keywords-opp-card">
+      <header className="keywords-opp-head">
+        <AlertTriangle size={16} />
+        <div>
+          <h3>Content decay</h3>
+          <p>Pages losing clicks between periods</p>
+        </div>
+      </header>
       {rows.length ? (
-        rows.slice(0, 6).map((row) => (
-          <article className="opportunity-item" key={row.page}>
-            <div>
-              <strong>{shortUrl(row.page)}</strong>
-              <small>
-                {formatter.format(Math.max(0, row.lostClicks))} clicks down · {formatPercent(row.clickChange)}
-              </small>
-            </div>
-            <p>{row.recommendation}</p>
-            <button className="secondary-button mini-button" onClick={() => onSave(row)}>
-              <ListChecks size={14} />
-              Add action
-            </button>
-          </article>
-        ))
+        <ul className="keywords-opp-list">
+          {rows.slice(0, 6).map((row) => (
+            <li key={row.page}>
+              <div className="keywords-opp-row-top">
+                <strong>{shortUrl(row.page)}</strong>
+                <span className="keywords-opp-metrics">
+                  {formatter.format(Math.max(0, row.lostClicks))} clicks down · {formatPercent(row.clickChange)}
+                </span>
+              </div>
+              <p>{row.recommendation}</p>
+              <button type="button" className="keywords-action-btn" onClick={() => onSave(row)}>
+                <ListChecks size={13} />
+                Add action
+              </button>
+            </li>
+          ))}
+        </ul>
       ) : (
-        <p className="panel-note">No meaningful page decay detected between the latest two imported periods.</p>
+        <p className="keywords-opp-empty">No meaningful page decay detected between the latest two imported periods.</p>
       )}
-    </div>
+    </section>
   );
 }
 
@@ -735,38 +983,43 @@ function CannibalizationList({
   onSave: (row: CannibalizationOpportunity) => void;
 }) {
   return (
-    <div className="opportunity-block">
-      <div className="opportunity-title">
-        <GitBranch />
-        <strong>Query Cannibalization</strong>
-      </div>
+    <section className="keywords-opp-card">
+      <header className="keywords-opp-head">
+        <GitBranch size={16} />
+        <div>
+          <h3>Query cannibalization</h3>
+          <p>Multiple pages competing for the same query</p>
+        </div>
+      </header>
       {rows.length ? (
-        rows.slice(0, 6).map((row) => (
-          <article className="opportunity-item" key={row.query}>
-            <div>
-              <strong>{row.query}</strong>
-              <small>
-                {row.pageCount} pages · {formatter.format(row.totalImpressions)} impressions
-              </small>
-            </div>
-            <div className="cannibal-pages">
-              {row.pages.slice(0, 3).map((page) => (
-                <span key={page.page}>
-                  {shortUrl(page.page)} <b>#{formatPosition(page.position)}</b>
+        <ul className="keywords-opp-list">
+          {rows.slice(0, 6).map((row) => (
+            <li key={row.query}>
+              <div className="keywords-opp-row-top">
+                <strong>{row.query}</strong>
+                <span className="keywords-opp-metrics">
+                  {row.pageCount} pages · {formatter.format(row.totalImpressions)} impressions
                 </span>
-              ))}
-            </div>
-            <p>{row.recommendation}</p>
-            <button className="secondary-button mini-button" onClick={() => onSave(row)}>
-              <ListChecks size={14} />
-              Add action
-            </button>
-          </article>
-        ))
+              </div>
+              <div className="keywords-cannibal-pages">
+                {row.pages.slice(0, 3).map((page) => (
+                  <span key={page.page}>
+                    {shortUrl(page.page)} <b>#{formatPosition(page.position)}</b>
+                  </span>
+                ))}
+              </div>
+              <p>{row.recommendation}</p>
+              <button type="button" className="keywords-action-btn" onClick={() => onSave(row)}>
+                <ListChecks size={13} />
+                Add action
+              </button>
+            </li>
+          ))}
+        </ul>
       ) : (
-        <p className="panel-note">No overlapping page/query conflicts crossed the current threshold.</p>
+        <p className="keywords-opp-empty">No overlapping page/query conflicts crossed the current threshold.</p>
       )}
-    </div>
+    </section>
   );
 }
 
@@ -775,6 +1028,7 @@ function OpportunityList({
   icon,
   opportunities,
   emptyText,
+  hint,
   showPage = false,
   onSave,
 }: {
@@ -782,48 +1036,54 @@ function OpportunityList({
   icon: ReactNode;
   opportunities: SearchOpportunity[];
   emptyText: string;
+  hint?: string;
   showPage?: boolean;
   onSave?: (opportunity: SearchOpportunity) => void;
 }) {
   return (
-    <div className="opportunity-block">
-      <div className="opportunity-title">
+    <section className="keywords-opp-card">
+      <header className="keywords-opp-head">
         {icon}
-        <strong>{title}</strong>
-      </div>
+        <div>
+          <h3>{title}</h3>
+          {hint ? <p>{hint}</p> : null}
+        </div>
+      </header>
       {opportunities.length ? (
-        opportunities.map((opportunity) => (
-          <article className="opportunity-item" key={`${title}-${opportunity.label}-${opportunity.page || ''}`}>
-            <div>
-              <strong>{opportunity.label}</strong>
-              {showPage && opportunity.page && <small>{shortUrl(opportunity.page)}</small>}
-            </div>
-            <div className="opportunity-stats">
-              <span>{formatter.format(opportunity.impressions)} imp.</span>
-              <span>{formatPercent(opportunity.ctr)} CTR</span>
-              <span>#{formatPosition(opportunity.position)}</span>
-            </div>
-            <p>{opportunity.recommendation}</p>
-            {onSave && (
-              <button className="secondary-button mini-button" onClick={() => onSave(opportunity)}>
-                <ListChecks size={14} />
-                Add action
-              </button>
-            )}
-          </article>
-        ))
+        <ul className="keywords-opp-list">
+          {opportunities.map((opportunity) => (
+            <li key={`${title}-${opportunity.label}-${opportunity.page || ''}`}>
+              <div className="keywords-opp-row-top">
+                <div>
+                  <strong>{opportunity.label}</strong>
+                  {showPage && opportunity.page ? <small>{shortUrl(opportunity.page)}</small> : null}
+                </div>
+                <span className="keywords-opp-metrics">
+                  {formatter.format(opportunity.impressions)} imp. · {formatPercent(opportunity.ctr)} CTR · #{formatPosition(opportunity.position)}
+                </span>
+              </div>
+              <p>{opportunity.recommendation}</p>
+              {onSave ? (
+                <button type="button" className="keywords-action-btn" onClick={() => onSave(opportunity)}>
+                  <ListChecks size={13} />
+                  Add action
+                </button>
+              ) : null}
+            </li>
+          ))}
+        </ul>
       ) : (
-        <p className="panel-note">{emptyText}</p>
+        <p className="keywords-opp-empty">{emptyText}</p>
       )}
-    </div>
+    </section>
   );
 }
 
 function KeywordExplorerTable({ rows, onSave }: { rows: SearchOpportunity[]; onSave: (row: SearchOpportunity) => void }) {
-  if (!rows.length) return <p className="panel-note">No keyword rows match these filters.</p>;
+  if (!rows.length) return <p className="keywords-panel-note">No keyword rows match these filters.</p>;
   return (
-    <div className="dash-table-wrap">
-      <table className="dash-table">
+    <div className="keywords-table-wrap">
+      <table className="keywords-table">
         <thead>
           <tr>
             <th>Keyword</th>
@@ -845,7 +1105,7 @@ function KeywordExplorerTable({ rows, onSave }: { rows: SearchOpportunity[]; onS
               <td className="num">{formatPercent(row.ctr)}</td>
               <td className="num">{formatPosition(row.position)}</td>
               <td>
-                <button className="chip-button" onClick={() => onSave(row)}>
+                <button type="button" className="keywords-action-btn compact" onClick={() => onSave(row)}>
                   <ListChecks size={13} />
                   Add
                 </button>
@@ -856,6 +1116,38 @@ function KeywordExplorerTable({ rows, onSave }: { rows: SearchOpportunity[]; onS
       </table>
     </div>
   );
+}
+
+function lastTwo(trend?: SearchTrendPoint[]) {
+  if (!trend || trend.length < 2) return null;
+  return { current: trend[trend.length - 1], previous: trend[trend.length - 2] };
+}
+
+function pctDelta(trend: SearchTrendPoint[] | undefined, key: 'totalClicks' | 'totalImpressions', goodWhenUp: boolean): KpiDelta | undefined {
+  const pair = lastTwo(trend);
+  if (!pair) return undefined;
+  const curr = pair.current[key] || 0;
+  const prev = pair.previous[key] || 0;
+  if (!prev) return undefined;
+  const change = Math.round(((curr - prev) / prev) * 100);
+  return { display: `${change > 0 ? '+' : ''}${change}%`, good: change === 0 ? undefined : goodWhenUp ? change > 0 : change < 0 };
+}
+
+function ctrDelta(trend?: SearchTrendPoint[]): KpiDelta | undefined {
+  const pair = lastTwo(trend);
+  if (!pair) return undefined;
+  const change = Math.round(((pair.current.averageCtr || 0) - (pair.previous.averageCtr || 0)) * 1000) / 10;
+  if (!change) return undefined;
+  return { display: `${change > 0 ? '+' : ''}${change}pt`, good: change > 0 };
+}
+
+function positionDelta(trend?: SearchTrendPoint[]): KpiDelta | undefined {
+  const pair = lastTwo(trend);
+  if (!pair) return undefined;
+  const change = Math.round(((pair.current.averagePosition || 0) - (pair.previous.averagePosition || 0)) * 10) / 10;
+  if (!change) return undefined;
+  // Lower position is better, so a decrease (negative change) is good.
+  return { display: `${change > 0 ? '+' : ''}${change}`, good: change < 0, direction: change < 0 ? 'up' : 'down' };
 }
 
 function dedupeOpportunities(rows: SearchOpportunity[]) {

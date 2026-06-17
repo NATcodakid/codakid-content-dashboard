@@ -44,6 +44,11 @@ export async function handler(event) {
 export async function scheduled() {
   await ensureAuthSchema();
   if (!ga4Configured()) return;
+  const connection = await googleConnectionStatus();
+  if (!connection.connected || !(await googleConnectionHasAnalyticsScope())) {
+    console.info('GA4 scheduled sync skipped: Google Analytics access is not connected.');
+    return;
+  }
   await syncGa4();
 }
 

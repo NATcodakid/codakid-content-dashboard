@@ -3,6 +3,14 @@
   publish = "dist"
   functions = "netlify/functions"
 
+[dev]
+  command = "npm run dev"
+  port = 8888
+  targetPort = 5173
+  framework = "vite"
+  autoLaunch = false
+  functionsTimeout = 90
+
 [functions]
   node_bundler = "esbuild"
   included_files = [
@@ -10,11 +18,20 @@
     "netlify/functions/seo-gameplan.json"
   ]
 
-[functions."keyword-weekly-sync"]
+[functions."keyword-weekly-sync-scheduled"]
   schedule = "@weekly"
 
-[functions."ga4"]
+[functions."content-snapshot"]
+  timeout = 26
+
+[functions."technical-audit"]
+  timeout = 26
+
+[functions."ga4-scheduled"]
   schedule = "@daily"
+
+[functions."pagespeed-scheduled"]
+  schedule = "@weekly"
 
 [[redirects]]
   from = "/api/content-snapshot"

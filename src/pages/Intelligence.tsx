@@ -1,9 +1,9 @@
 import React from 'react';
-import { ArrowRight, Bot, Download, Lightbulb, ListChecks, Plus, RefreshCw, Search, Sparkles } from 'lucide-react';
+import { ArrowRight, Bot, Download, Lightbulb, ListChecks, Plus, RefreshCw, Search, Sparkles, Wand2 } from 'lucide-react';
 import { useDashboard } from '../data';
-import { KpiCard, LoadingState, PageHeading, PanelHeader } from '../components';
+import { LoadingState } from '../components';
 import { analystBriefMarkdown, contentIdeasMarkdown, downloadMarkdown } from '../export';
-import { formatDate, formatter, shortUrl } from '../lib';
+import { formatDate, shortUrl } from '../lib';
 import type { AiAnalystBrief, AiContentIdea, AiVisibilityRun } from '../types';
 
 export function IntelligencePage() {
@@ -44,120 +44,211 @@ export function IntelligencePage() {
 
   const latestRuns = aiWorkbench?.latestVisibilityRuns || [];
   const ideas = aiWorkbench?.contentIdeas || [];
-  const promptCount = aiWorkbench?.prompts?.length || 0;
+  const watchlist = aiWorkbench?.prompts || [];
+  const promptCount = watchlist.length;
   const visibilityMentions = latestRuns.filter((run) => run.codakidMentioned).length;
+  const periodLabel = searchOpportunities?.startDate
+    ? `${searchOpportunities.startDate} – ${searchOpportunities.endDate}`
+    : 'latest crawl + GSC';
 
   return (
-    <>
-      <PageHeading
-        title="AI Lab"
-        description="OpenAI-powered SEO analysis, AI visibility checks, content ideas, and page-level planning."
-        badges={<span className={aiWorkbench?.configured ? 'dash-badge live' : 'dash-badge'}>{aiWorkbench?.configured ? 'OpenAI connected' : 'OpenAI fallback mode'}</span>}
-      />
-
-      <div className="dash-stack">
-        <section className="kpi-grid kpi-grid-3">
-          <KpiCard icon={<Bot />} label="Visibility Prompts" value={promptCount} note="tracked AI-search questions" />
-          <KpiCard icon={<Sparkles />} label="CodaKid Mentions" value={`${visibilityMentions}/${latestRuns.length || 0}`} note="latest AI visibility runs" tone={visibilityMentions ? 'success' : 'warning'} />
-          <KpiCard icon={<ListChecks />} label="Audit Issues" value={technicalAudit?.summary.total || 0} note={`${technicalAudit?.summary.high || 0} high priority`} tone={technicalAudit?.summary.high ? 'danger' : 'success'} />
-        </section>
-
-        <section className="intelligence-grid">
-          <div className="panel ai-command-panel">
-            <PanelHeader icon={<Sparkles />} title="AI SEO Analyst" action={searchOpportunities?.startDate ? `${searchOpportunities.startDate} to ${searchOpportunities.endDate}` : 'latest data'} />
-            <p className="panel-note">
-              Generates a plain-English readout with metric source and time-period labels so numbers do not float without context.
+    <div className="ai-lab">
+      <header className="ai-lab-hero">
+        <div className="ai-lab-hero-glow" aria-hidden />
+        <div className="ai-lab-hero-inner">
+          <div className="ai-lab-hero-copy">
+            <span className="ai-lab-eyebrow">
+              <Sparkles size={14} />
+              AI Lab
+            </span>
+            <h1>SEO intelligence workspace</h1>
+            <p>
+              Analyst briefs, AI-search visibility, and content ideas — grounded in your crawl, Search Console, and competitor data.
             </p>
-            <button className="primary-button" onClick={() => void runAnalyst()} disabled={busy === 'analyst'}>
-              <RefreshCw size={15} className={busy === 'analyst' ? 'spin' : ''} />
-              Generate analyst brief
-            </button>
-            {brief && (
-              <div className="ai-brief-box">
-                <div className="ai-brief-actions">
-                  <span>Ready to share</span>
-                  <button
-                    type="button"
-                    className="chip-button"
-                    onClick={() => downloadMarkdown('codakid-ai-analyst-brief.md', analystBriefMarkdown(brief))}
-                  >
-                    <Download size={13} />
-                    Export
-                  </button>
-                </div>
-                <strong>{brief.headline}</strong>
-                <p>{brief.summary}</p>
-                <div className="ai-insight-list">
-                  {brief.insights?.map((insight) => (
-                    <article key={`${insight.title}-${insight.source}`}>
-                      <span className={`severity-chip ${insight.severity}`}>{insight.source || 'AI'}</span>
-                      <div>
-                        <strong>{insight.title}</strong>
-                        <p>{insight.detail}</p>
-                        <small>{insight.period}</small>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
-
-          <div className="panel">
-            <PanelHeader icon={<Search />} title="AI Visibility Tracker" action={`${latestRuns.length} latest runs`} />
-            <p className="panel-note">
-              Tracks how CodaKid might appear in AI-style answers for parent research prompts. Results are saved in Neon for trend history.
-            </p>
-            <div className="filter-bar">
-              <div className="search-field">
-                <Search size={15} />
-                <input
-                  value={promptText}
-                  placeholder="Best Python coding class for kids"
-                  onChange={(event) => setPromptText(event.target.value)}
-                />
+          <div className="ai-lab-hero-aside">
+            <span className={`ai-lab-status${aiWorkbench?.configured ? ' live' : ''}`}>
+              <i aria-hidden />
+              {aiWorkbench?.configured ? 'OpenAI connected' : 'Fallback mode'}
+            </span>
+            <dl className="ai-lab-stats">
+              <div>
+                <dt>Prompts</dt>
+                <dd>{promptCount}</dd>
               </div>
-              <button
-                className="secondary-button"
-                disabled={busy === 'visibility'}
-                onClick={() => void runVisibility(promptText.trim() ? [promptText.trim()] : undefined)}
-              >
-                <Bot size={15} />
-                {promptText.trim() ? 'Run prompt' : 'Run watchlist'}
-              </button>
+              <div>
+                <dt>Mentions</dt>
+                <dd>
+                  {visibilityMentions}/{latestRuns.length || 0}
+                </dd>
+              </div>
+              <div>
+                <dt>Audit issues</dt>
+                <dd>{technicalAudit?.summary.total || 0}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </header>
+
+      <section className="ai-lab-workspace">
+        <article className="ai-lab-station analyst">
+          <div className="ai-lab-station-head">
+            <div>
+              <Wand2 size={18} />
+              <div>
+                <h2>SEO Analyst</h2>
+                <p>Plain-English readout with labeled sources · {periodLabel}</p>
+              </div>
             </div>
-            <VisibilityRuns runs={latestRuns} />
+            <button className="ai-lab-run-btn" onClick={() => void runAnalyst()} disabled={busy === 'analyst'}>
+              <RefreshCw size={15} className={busy === 'analyst' ? 'spin' : ''} />
+              {brief ? 'Refresh brief' : 'Generate brief'}
+            </button>
           </div>
-        </section>
 
-        <section className="panel">
-          <PanelHeader
-            icon={<Lightbulb />}
-            title="Content Idea Generator"
-            action={
-              <span className="panel-actions">
-                {ideas.length ? (
-                  <button
-                    type="button"
-                    className="chip-button"
-                    onClick={() => downloadMarkdown('codakid-content-ideas.md', contentIdeasMarkdown(ideas))}
-                  >
-                    <Download size={13} />
-                    Export
-                  </button>
-                ) : null}
-                <button type="button" className="chip-button" onClick={() => void generateIdeas()} disabled={busy === 'ideas'}>
-                  <Plus size={13} />
-                  Generate ideas
+          {brief ? (
+            <div className="ai-lab-brief">
+              <div className="ai-lab-brief-toolbar">
+                <span>Analyst brief</span>
+                <button
+                  type="button"
+                  className="ai-lab-text-btn"
+                  onClick={() => downloadMarkdown('codakid-ai-analyst-brief.md', analystBriefMarkdown(brief))}
+                >
+                  <Download size={14} />
+                  Export
                 </button>
-              </span>
-            }
-          />
-          <div className="content-idea-grid">
-            {ideas.length ? ideas.slice(0, 12).map((idea) => (
+              </div>
+              <h3>{brief.headline}</h3>
+              <p className="ai-lab-brief-summary">{brief.summary}</p>
+              {brief.insights?.length ? (
+                <ol className="ai-lab-insights">
+                  {brief.insights.map((insight) => (
+                    <li key={`${insight.title}-${insight.source}`} data-severity={insight.severity || 'default'}>
+                      <div className="ai-lab-insight-top">
+                        <strong>{insight.title}</strong>
+                        <span>{insight.source || 'AI'}</span>
+                      </div>
+                      <p>{insight.detail}</p>
+                      {insight.period ? <small>{insight.period}</small> : null}
+                    </li>
+                  ))}
+                </ol>
+              ) : null}
+              {brief.recommendedActions?.length ? (
+                <div className="ai-lab-actions-block">
+                  <h4>Recommended next</h4>
+                  <ul>
+                    {brief.recommendedActions.slice(0, 4).map((action) => (
+                      <li key={action.title}>
+                        <strong>{action.title}</strong>
+                        <span>{action.detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <div className="ai-lab-empty">
+              <div className="ai-lab-empty-orb" aria-hidden />
+              <strong>Run your first analyst brief</strong>
+              <p>Summarizes what moved in search, what needs links, and what to fix — with the date range on every metric.</p>
+            </div>
+          )}
+        </article>
+
+        <article className="ai-lab-station visibility">
+          <div className="ai-lab-station-head">
+            <div>
+              <Search size={18} />
+              <div>
+                <h2>AI Visibility</h2>
+                <p>How CodaKid shows up in AI-style parent research answers</p>
+              </div>
+            </div>
+            <span className="ai-lab-station-meta">{latestRuns.length} runs saved</span>
+          </div>
+
+          <div className="ai-lab-prompt-bar">
+            <Search size={18} />
+            <input
+              value={promptText}
+              placeholder="Ask a parent research question…"
+              onChange={(event) => setPromptText(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !busy) {
+                  void runVisibility(promptText.trim() ? [promptText.trim()] : undefined);
+                }
+              }}
+            />
+            <button
+              type="button"
+              className="ai-lab-run-btn compact"
+              disabled={busy === 'visibility'}
+              onClick={() => void runVisibility(promptText.trim() ? [promptText.trim()] : undefined)}
+            >
+              <Bot size={15} />
+              {promptText.trim() ? 'Run' : 'Watchlist'}
+            </button>
+          </div>
+
+          {watchlist.length ? (
+            <div className="ai-lab-prompt-chips">
+              {watchlist.slice(0, 6).map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className="ai-lab-prompt-chip"
+                  disabled={busy === 'visibility'}
+                  onClick={() => void runVisibility([item.prompt])}
+                >
+                  {item.prompt}
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          <VisibilityFeed runs={latestRuns} />
+        </article>
+      </section>
+
+      <section className="ai-lab-ideas">
+        <div className="ai-lab-ideas-head">
+          <div>
+            <Lightbulb size={18} />
+            <div>
+              <h2>Content ideas</h2>
+              <p>Backlog from crawl, competitors, keywords, and GA4</p>
+            </div>
+          </div>
+          <div className="ai-lab-ideas-actions">
+            {ideas.length ? (
+              <button
+                type="button"
+                className="ai-lab-text-btn"
+                onClick={() => downloadMarkdown('codakid-content-ideas.md', contentIdeasMarkdown(ideas))}
+              >
+                <Download size={14} />
+                Export
+              </button>
+            ) : null}
+            <button type="button" className="ai-lab-run-btn" onClick={() => void generateIdeas()} disabled={busy === 'ideas'}>
+              <Plus size={15} />
+              Generate ideas
+            </button>
+          </div>
+        </div>
+
+        {ideas.length ? (
+          <div className="ai-lab-ideas-grid">
+            {ideas.slice(0, 12).map((idea, index) => (
               <ContentIdeaCard
                 key={idea.id}
                 idea={idea}
+                featured={index === 0}
+                rank={index + 1}
                 onSave={() =>
                   saveActionItem({
                     fingerprint: `content-idea:${idea.id}`,
@@ -172,61 +263,94 @@ export function IntelligencePage() {
                   })
                 }
               />
-            )) : (
-              <p className="panel-note">Generate ideas to create a reusable content backlog from crawl, competitor, keyword, and GA4 data.</p>
-            )}
+            ))}
           </div>
-        </section>
-      </div>
-    </>
+        ) : (
+          <div className="ai-lab-empty ideas">
+            <ListChecks size={28} strokeWidth={1.5} />
+            <strong>No ideas yet</strong>
+            <p>Generate a batch to fill your content queue with keyword targets and outlines.</p>
+          </div>
+        )}
+      </section>
+    </div>
   );
 }
 
-function VisibilityRuns({ runs }: { runs: AiVisibilityRun[] }) {
-  if (!runs.length) return <p className="panel-note">Run the watchlist to see AI visibility results.</p>;
+function VisibilityFeed({ runs }: { runs: AiVisibilityRun[] }) {
+  if (!runs.length) {
+    return (
+      <div className="ai-lab-feed-empty">
+        <Bot size={22} strokeWidth={1.5} />
+        <p>Run the watchlist or type a question above to see visibility results.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="visibility-run-list">
+    <div className="ai-lab-feed">
       {runs.slice(0, 8).map((run) => (
-        <article key={run.id}>
-          <div>
-            <strong>{run.prompt}</strong>
-            <span className={`movement-chip ${run.codakidMentioned ? 'up' : 'down'}`}>
-              {run.codakidMentioned ? 'mentioned' : 'not mentioned'}
-            </span>
+        <article key={run.id} className={run.codakidMentioned ? 'mentioned' : ''}>
+          <div className="ai-lab-feed-marker" aria-hidden />
+          <div className="ai-lab-feed-body">
+            <header>
+              <strong>{run.prompt}</strong>
+              <span className={run.codakidMentioned ? 'hit' : 'miss'}>
+                {run.codakidMentioned ? 'Mentioned' : 'Not mentioned'}
+              </span>
+            </header>
+            <p>{run.answer}</p>
+            <footer>
+              {formatDate(run.createdAt)}
+              {run.codakidSentiment ? ` · ${run.codakidSentiment}` : ''}
+              {run.competitors?.length
+                ? ` · ${run.competitors.map((competitor) => competitor.domain).join(', ')}`
+                : ''}
+            </footer>
           </div>
-          <p>{run.answer}</p>
-          <small>
-            {formatDate(run.createdAt)} · {run.codakidSentiment} · competitors:{' '}
-            {run.competitors?.map((competitor) => competitor.domain).join(', ') || 'none listed'}
-          </small>
         </article>
       ))}
     </div>
   );
 }
 
-function ContentIdeaCard({ idea, onSave }: { idea: AiContentIdea; onSave: () => Promise<unknown> }) {
-  const outline = Array.isArray(idea.brief?.outline) ? idea.brief.outline.slice(0, 4) : [];
+function ContentIdeaCard({
+  idea,
+  featured,
+  rank,
+  onSave,
+}: {
+  idea: AiContentIdea;
+  featured?: boolean;
+  rank: number;
+  onSave: () => Promise<unknown>;
+}) {
+  const outline = Array.isArray(idea.brief?.outline) ? idea.brief.outline.slice(0, 3) : [];
+  const tier = idea.priorityScore >= 80 ? 'high' : idea.priorityScore >= 60 ? 'mid' : 'low';
+
   return (
-    <article className="content-idea-card">
-      <div className="content-idea-head">
-        <span>{formatter.format(idea.priorityScore)}</span>
-        <small>{idea.intent || 'idea'}</small>
+    <article className={`ai-lab-idea-card${featured ? ' featured' : ''}`}>
+      <div className="ai-lab-idea-top">
+        <span className="ai-lab-idea-rank">#{rank}</span>
+        <span className={`ai-lab-idea-tier ${tier}`}>{tier === 'high' ? 'High priority' : tier === 'mid' ? 'Medium' : 'Explore'}</span>
       </div>
-      <strong>{idea.title}</strong>
+      <h3>{idea.title}</h3>
       <p>{idea.brief?.angle || 'AI-generated content opportunity.'}</p>
-      <div className="topic-tags">
-        {idea.targetKeyword && <span>{idea.targetKeyword}</span>}
-        {idea.cluster && <span>{idea.cluster}</span>}
-        {idea.pillarUrl && <span>{shortUrl(idea.pillarUrl)}</span>}
+      <div className="ai-lab-idea-tags">
+        {idea.targetKeyword ? <span>{idea.targetKeyword}</span> : null}
+        {idea.cluster ? <span>{idea.cluster}</span> : null}
+        {idea.pillarUrl ? <span>{shortUrl(idea.pillarUrl)}</span> : null}
       </div>
       {outline.length ? (
-        <ul className="mini-outline">
-          {outline.map((item) => <li key={item}>{item}</li>)}
+        <ul className="ai-lab-idea-outline">
+          {outline.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
         </ul>
       ) : null}
-      <button className="next-action-link idea-action" onClick={() => void onSave()}>
-        Add to work queue <ArrowRight size={18} />
+      <button type="button" className="ai-lab-idea-action" onClick={() => void onSave()}>
+        Add to work queue
+        <ArrowRight size={15} />
       </button>
     </article>
   );

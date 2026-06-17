@@ -489,9 +489,18 @@ export type SearchTrendPoint = {
   keywordCount: number;
 };
 
+export type SearchDailyPoint = {
+  date: string;
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+};
+
 export type SearchOpportunities = {
   available: boolean;
   message?: string;
+  dailyTrend?: SearchDailyPoint[];
   siteUrl?: string;
   startDate?: string;
   endDate?: string;
@@ -696,9 +705,17 @@ export type KeywordIdeas = {
 
 export type PageSpeedCandidate = { url: string; title: string };
 
+export type PageSpeedHistoryPoint = {
+  date: string;
+  performance: number | null;
+  lcpMs: number | null;
+  clsX1000: number | null;
+};
+
 export type PageSpeedReport = {
   configured: boolean;
   generatedAt: string;
   candidates: PageSpeedCandidate[];
   results: PageSpeedResult[];
+  history?: PageSpeedHistoryPoint[];
 };

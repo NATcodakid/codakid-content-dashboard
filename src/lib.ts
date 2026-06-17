@@ -1,4 +1,4 @@
-import type { FocusAction, GameplanRow, Pillar, SearchOpportunities, Snapshot } from './types';
+import type { FocusAction, GameplanRow, LinkGap, Pillar, PostSummary, SearchOpportunities, Snapshot } from './types';
 
 const CSRF_COOKIE = 'ck_content_csrf';
 
@@ -212,6 +212,29 @@ export function formatCompact(value: number) {
   return Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(value);
 }
 
+export function formatContentAge(modified?: string, date?: string) {
+  const raw = modified || date;
+  if (!raw) return 'Date unknown';
+  const days = Math.floor((Date.now() - new Date(raw).getTime()) / 86400000);
+  if (!Number.isFinite(days) || days < 0) return 'Updated recently';
+  if (days < 45) return 'Updated recently';
+  if (days < 180) return `Updated ${Math.max(1, Math.round(days / 30))} mo ago`;
+  if (days < 365) return 'Updated this year';
+  return 'Stale — consider refresh';
+}
+
+export function pillarSupportLevel(inboundCount: number) {
+  if (inboundCount >= 12) return { label: 'Well linked', tone: 'success' as const };
+  if (inboundCount >= 5) return { label: 'Growing', tone: 'warning' as const };
+  return { label: 'Needs links', tone: 'danger' as const };
+}
+
+export function inboundBarColor(inboundCount: number) {
+  if (inboundCount >= 12) return '#3f5733';
+  if (inboundCount >= 5) return '#9a6b12';
+  return '#a94436';
+}
+
 export function shortUrl(url: string) {
   if (!url) return 'Not set';
   try {
@@ -236,6 +259,55 @@ export function normalizeUrl(url: string) {
   } catch {
     return String(url).replace(/\/$/, '').toLowerCase();
   }
+}
+
+export type PillarClusterMapData = {
+  inbound: PostSummary[];
+  outbound: PostSummary[];
+  gaps: LinkGap[];
+  siblings: PostSummary[];
+};
+
+export function buildPillarClusterMap(
+  pillarUrl: string,
+  posts: PostSummary[],
+  linkGaps: LinkGap[],
+): PillarClusterMapData {
+  const normalized = normalizeUrl(pillarUrl);
+  const pillar = posts.find((post) => normalizeUrl(post.url) === normalized);
+
+  const inbound = posts
+    .filter(
+      (post) =>
+        normalizeUrl(post.url) !== normalized &&
+        (post.internalLinks || []).some((link) => normalizeUrl(link) === normalized),
+    )
+    .sort((a, b) => b.inboundCount - a.inboundCount);
+
+  const outboundUrls = new Set((pillar?.internalLinks || []).map((link) => normalizeUrl(link)));
+  const outbound = posts
+    .filter((post) => outboundUrls.has(normalizeUrl(post.url)))
+    .sort((a, b) => b.health - a.health);
+
+  const gaps = linkGaps.filter((gap) => normalizeUrl(gap.pillarUrl) === normalized);
+
+  const linkedUrls = new Set<string>([
+    normalized,
+    ...inbound.map((post) => normalizeUrl(post.url)),
+    ...outbound.map((post) => normalizeUrl(post.url)),
+    ...gaps.map((gap) => normalizeUrl(gap.sourceUrl)),
+  ]);
+
+  const siblings = posts
+    .filter(
+      (post) =>
+        pillar &&
+        post.cluster === pillar.cluster &&
+        !linkedUrls.has(normalizeUrl(post.url)),
+    )
+    .sort((a, b) => b.inboundCount - a.inboundCount);
+
+  return { inbound, outbound, gaps, siblings };
 }
 
 export function nextMoveForPillar(pillar: Pillar, role: string) {
