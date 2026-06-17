@@ -439,12 +439,14 @@ export function ConnectCard({
   body,
   hint,
   steps,
+  action,
 }: {
   icon: React.ReactNode;
   title: string;
   body: string;
   hint?: string;
   steps?: string[];
+  action?: React.ReactNode;
 }) {
   return (
     <div className="connect-card">
@@ -460,6 +462,7 @@ export function ConnectCard({
           </ol>
         ) : null}
         {hint ? <span className="connect-card-hint">{hint}</span> : null}
+        {action ? <div className="connect-card-action">{action}</div> : null}
       </div>
     </div>
   );

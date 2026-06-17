@@ -9801,6 +9801,14 @@ button.pillar-map-siblings-toggle:hover {
   color: var(--tertiary);
 }
 
+.connect-card-action {
+  margin-top: 12px;
+}
+
+.connect-card-action .secondary-button {
+  width: fit-content;
+}
+
 /* Tabbed sub-navigation (Keywords, etc.) */
 .dash-tabs {
   display: inline-flex;

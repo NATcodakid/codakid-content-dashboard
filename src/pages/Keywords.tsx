@@ -877,7 +877,12 @@ function Ga4Panel({ report, onSync }: { report: Ga4Report | null; onSync: () => 
           icon={<RefreshCw />}
           title="Reconnect Google for Analytics"
           body="Google needs to be reconnected once after deploy so the dashboard can read GA4 data."
-          hint="Settings → connect Google, then run a sync."
+          hint="Uses read-only Analytics access."
+          action={(
+            <a className="secondary-button" href="/api/google/oauth/start">
+              Connect Google Analytics
+            </a>
+          )}
         />
       ) : latest ? (
         <>

@@ -115,7 +115,17 @@ export async function runPageSpeed(url, strategy) {
   const response = await fetch(`${PSI_ENDPOINT}?${params.toString()}`);
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new HttpError(502, payload?.error?.message || `PageSpeed request failed (${response.status}).`);
+    const upstreamMessage = payload?.error?.message || '';
+    if (/api key not valid/i.test(upstreamMessage)) {
+      throw new HttpError(
+        502,
+        'PageSpeed API key is invalid. Replace PAGESPEED_API_KEY with a Google Cloud API key that has the PageSpeed Insights API enabled.',
+      );
+    }
+    if (response.status === 429) {
+      throw new HttpError(429, 'PageSpeed quota is temporarily exhausted. Try again later or review the API key quota in Google Cloud.');
+    }
+    throw new HttpError(502, upstreamMessage || `PageSpeed request failed (${response.status}).`);
   }
   const lh = payload.lighthouseResult || {};
   const cats = lh.categories || {};

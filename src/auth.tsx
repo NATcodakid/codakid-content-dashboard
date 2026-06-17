@@ -265,10 +265,10 @@ export function GoogleSearchConsolePanel({
         </div>
       )}
 
-      {status?.configured && !hasSearchConsoleData && (
+      {status?.configured && !status.connected && (
         <a className="secondary-button full-width" href="/api/google/oauth/start">
           <Search size={16} />
-          Connect Google Search Console
+          {hasSearchConsoleData ? 'Connect Google for Analytics' : 'Connect Google Search Console'}
         </a>
       )}
 
