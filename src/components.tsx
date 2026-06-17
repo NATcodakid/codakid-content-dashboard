@@ -14,7 +14,7 @@ export function KpiCard({
   label: string;
   value: number | string;
   note: string;
-  tone?: 'default' | 'warning' | 'success';
+  tone?: 'default' | 'warning' | 'success' | 'danger';
 }) {
   return (
     <article className={`kpi-card ${tone}`}>
@@ -43,7 +43,11 @@ export function PanelHeader({
         {icon}
         <h2>{title}</h2>
       </div>
-      {action !== undefined && <span>{action}</span>}
+      {action !== undefined && (
+        typeof action === 'string' || typeof action === 'number'
+          ? <span>{action}</span>
+          : <div className="panel-header-action">{action}</div>
+      )}
     </div>
   );
 }

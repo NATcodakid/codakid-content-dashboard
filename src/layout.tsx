@@ -3,15 +3,18 @@ import { NavLink, Outlet, useLocation, useSearchParams } from 'react-router-dom'
 import {
   BarChart3,
   ClipboardList,
+  FileWarning,
   FileText,
   GitBranch,
   Globe2,
+  Sparkles,
   LogOut,
   RefreshCw,
   Settings,
   ShieldCheck,
   TrendingUp,
   ListChecks,
+  ScrollText,
 } from 'lucide-react';
 import { useDashboard } from './data';
 
@@ -20,6 +23,9 @@ const NAV_ITEMS = [
   { to: '/pillars', label: 'Pillars', icon: <FileText /> },
   { to: '/keywords', label: 'Keywords', icon: <TrendingUp /> },
   { to: '/actions', label: 'Actions', icon: <ListChecks /> },
+  { to: '/audit', label: 'Audit', icon: <FileWarning /> },
+  { to: '/intelligence', label: 'AI Lab', icon: <Sparkles /> },
+  { to: '/reports', label: 'Reports', icon: <ScrollText /> },
   { to: '/gameplan', label: 'Gameplan', icon: <ClipboardList /> },
   { to: '/links', label: 'Links', icon: <GitBranch /> },
   { to: '/competitors', label: 'Competitors', icon: <Globe2 /> },
@@ -86,7 +92,7 @@ export function DashboardLayout() {
                 <small>{user.role}</small>
               </span>
             )}
-            <button className="primary-button" onClick={() => void refresh()} disabled={isLoading}>
+            <button className="primary-button" onClick={() => void refresh({ forceCrawl: true })} disabled={isLoading}>
               <RefreshCw size={16} className={isLoading ? 'spin' : ''} />
               Refresh crawl
             </button>

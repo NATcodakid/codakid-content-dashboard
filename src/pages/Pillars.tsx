@@ -161,11 +161,12 @@ export function PillarsPage() {
                 return (
                   <tr key={post.url}>
                     <td>
-                      <a className="table-link" href={post.url} target="_blank" rel="noreferrer">
+                      <Link className="table-link" to={`/pages/${encodeURIComponent(post.slug || slugFromUrl(post.url))}`}>
                         {post.title}
-                        <ExternalLink size={13} />
-                      </a>
-                      <small>Score {post.pillarScore}</small>
+                      </Link>
+                      <small>
+                        Score {post.pillarScore} · <a href={post.url} target="_blank" rel="noreferrer">Open live <ExternalLink size={11} /></a>
+                      </small>
                     </td>
                     <td>{post.cluster}</td>
                     <td>{post.inboundCount}</td>

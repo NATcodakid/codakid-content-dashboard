@@ -161,6 +161,19 @@ export async function ensureAuthSchema() {
   `;
 
   await sql`
+    create table if not exists dashboard_competitors (
+      domain text primary key,
+      label text not null default '',
+      category text not null default 'coding education',
+      status text not null default 'active',
+      notes text not null default '',
+      created_by text,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
     create table if not exists dashboard_action_items (
       id text primary key,
       fingerprint text not null unique,
@@ -179,6 +192,73 @@ export async function ensureAuthSchema() {
       created_by text,
       created_at timestamptz not null default now(),
       updated_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists dashboard_preferences (
+      user_id text not null references dashboard_users(id) on delete cascade,
+      key text not null,
+      value jsonb not null default '{}'::jsonb,
+      updated_at timestamptz not null default now(),
+      primary key (user_id, key)
+    )
+  `;
+
+  await sql`
+    create table if not exists ai_visibility_prompts (
+      id text primary key,
+      prompt text not null unique,
+      cluster text not null default '',
+      status text not null default 'active',
+      created_by text,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists ai_visibility_runs (
+      id text primary key,
+      prompt_id text,
+      prompt text not null default '',
+      model text not null default '',
+      answer text not null default '',
+      codakid_mentioned boolean not null default false,
+      codakid_sentiment text not null default 'unknown',
+      competitors jsonb not null default '[]'::jsonb,
+      recommendations jsonb not null default '[]'::jsonb,
+      created_by text,
+      created_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists ai_content_ideas (
+      id text primary key,
+      title text not null default '',
+      target_keyword text not null default '',
+      intent text not null default '',
+      cluster text not null default '',
+      pillar_url text not null default '',
+      priority_score integer not null default 0,
+      brief jsonb not null default '{}'::jsonb,
+      status text not null default 'idea',
+      source text not null default 'openai',
+      created_by text,
+      created_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists technical_audit_snapshots (
+      id text primary key,
+      health_score integer not null default 0,
+      summary jsonb not null default '{}'::jsonb,
+      issue_count integer not null default 0,
+      high_count integer not null default 0,
+      medium_count integer not null default 0,
+      created_at timestamptz not null default now()
     )
   `;
 
@@ -270,8 +350,13 @@ export async function ensureAuthSchema() {
   await sql`create index if not exists dashboard_sessions_expires_at_idx on dashboard_sessions(expires_at)`;
   await sql`create index if not exists google_oauth_states_expires_at_idx on google_oauth_states(expires_at)`;
   await sql`create index if not exists gsc_snapshots_site_dates_idx on google_search_console_snapshots(site_url, start_date, end_date)`;
+  await sql`create index if not exists dashboard_competitors_status_idx on dashboard_competitors(status, domain)`;
   await sql`create index if not exists dashboard_action_items_status_idx on dashboard_action_items(status, priority_score desc)`;
   await sql`create index if not exists dashboard_action_items_type_idx on dashboard_action_items(type, source)`;
+  await sql`create index if not exists ai_visibility_prompts_status_idx on ai_visibility_prompts(status, cluster)`;
+  await sql`create index if not exists ai_visibility_runs_prompt_created_idx on ai_visibility_runs(prompt_id, created_at desc)`;
+  await sql`create index if not exists ai_content_ideas_status_priority_idx on ai_content_ideas(status, priority_score desc, created_at desc)`;
+  await sql`create index if not exists technical_audit_snapshots_created_idx on technical_audit_snapshots(created_at desc)`;
   await sql`create index if not exists serp_snapshots_keyword_fetched_idx on serp_snapshots(keyword, fetched_at desc)`;
   await sql`create index if not exists tracked_keywords_status_priority_idx on tracked_keywords(status, priority desc)`;
   await sql`create index if not exists tracked_keywords_last_tracked_idx on tracked_keywords(last_tracked_at asc nulls first)`;
@@ -279,6 +364,8 @@ export async function ensureAuthSchema() {
   await sql`create index if not exists ga4_snapshots_property_dates_idx on ga4_snapshots(property_id, start_date, end_date, created_at desc)`;
   await sql`create index if not exists dashboard_audit_log_created_idx on dashboard_audit_log(created_at desc)`;
   await sql`create index if not exists dashboard_rate_limits_reset_idx on dashboard_rate_limits(reset_at)`;
+  await seedCompetitors(sql);
+  await seedAiVisibilityPrompts(sql);
   await seedTrackedKeywords(sql);
   await syncEnvAdmin(sql);
   schemaReady = true;
@@ -521,6 +608,54 @@ export function publicUser(user) {
     role: user.role,
     status: user.status,
   };
+}
+
+async function seedCompetitors(sql) {
+  const rows = await sql`select count(*)::int as count from dashboard_competitors`;
+  if (Number(rows[0]?.count || 0) > 0) return;
+
+  const competitors = [
+    ['tynker.com', 'Tynker', 'self-paced coding platform', 'Game-based coding and Minecraft/Python content.'],
+    ['code.org', 'Code.org', 'free coding curriculum', 'High-authority curriculum and Hour of Code content.'],
+    ['codewizardshq.com', 'CodeWizardsHQ', 'live coding classes', 'Strong parent-guide and coding class comparison content.'],
+    ['codemonkey.com', 'CodeMonkey', 'game-based coding platform', 'Game-based coding classes and coding website guides.'],
+    ['codecombat.com', 'CodeCombat', 'game-based coding platform', 'Game-led Python and JavaScript learning.'],
+    ['junilearning.com', 'Juni Learning', 'online tutoring', 'Private online coding and STEM tutoring.'],
+    ['idtech.com', 'iD Tech', 'camp and classes', 'Summer camp and coding class landing pages.'],
+    ['scratch.mit.edu', 'Scratch', 'free beginner coding', 'High-authority beginner/block coding destination.'],
+    ['khanacademy.org', 'Khan Academy', 'free learning platform', 'Free programming and CS learning content.'],
+    ['kodable.com', 'Kodable', 'elementary coding platform', 'Younger-kid coding and school curriculum content.'],
+  ];
+
+  for (const [domain, label, category, notes] of competitors) {
+    await sql`
+      insert into dashboard_competitors (domain, label, category, notes, created_by)
+      values (${domain}, ${label}, ${category}, ${notes}, 'seed')
+      on conflict (domain) do nothing
+    `;
+  }
+}
+
+async function seedAiVisibilityPrompts(sql) {
+  const rows = await sql`select count(*)::int as count from ai_visibility_prompts`;
+  if (Number(rows[0]?.count || 0) > 0) return;
+
+  const prompts = [
+    ['What are the best online coding classes for kids?', 'Coding for Kids'],
+    ['What is the best way for a child to learn Python?', 'Python'],
+    ['Best Minecraft coding course for kids', 'Minecraft'],
+    ['Best Roblox coding classes for beginners', 'Roblox'],
+    ['Coding classes for homeschool kids', 'Homeschool'],
+    ['Safe AI and coding classes for kids', 'AI'],
+  ];
+
+  for (const [prompt, cluster] of prompts) {
+    await sql`
+      insert into ai_visibility_prompts (id, prompt, cluster, created_by)
+      values (${randomUUID()}, ${prompt}, ${cluster}, 'seed')
+      on conflict (prompt) do nothing
+    `;
+  }
 }
 
 async function seedTrackedKeywords(sql) {

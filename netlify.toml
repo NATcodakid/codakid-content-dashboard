@@ -32,6 +32,21 @@
   status = 200
 
 [[redirects]]
+  from = "/api/ai-workbench"
+  to = "/.netlify/functions/ai-workbench"
+  status = 200
+
+[[redirects]]
+  from = "/api/dashboard-layout"
+  to = "/.netlify/functions/dashboard-layout"
+  status = 200
+
+[[redirects]]
+  from = "/api/dashboard-history"
+  to = "/.netlify/functions/dashboard-history"
+  status = 200
+
+[[redirects]]
   from = "/api/auth/me"
   to = "/.netlify/functions/auth-me"
   status = 200
@@ -99,6 +114,11 @@
 [[redirects]]
   from = "/api/search-opportunities"
   to = "/.netlify/functions/search-opportunities"
+  status = 200
+
+[[redirects]]
+  from = "/api/technical-audit"
+  to = "/.netlify/functions/technical-audit"
   status = 200
 
 [[redirects]]

@@ -1,27 +1,139 @@
-import { Globe2 } from 'lucide-react';
+import React from 'react';
+import { Archive, ExternalLink, Globe2, Plus, RefreshCw, Search } from 'lucide-react';
 import { useDashboard } from '../data';
 import { LoadingState, PageHeading, PanelHeader } from '../components';
-import type { Cluster, CompetitorSnapshot } from '../types';
+import type { Cluster, CompetitorInput, CompetitorSnapshot } from '../types';
 
 export function CompetitorsPage() {
-  const { competitors, isLoading, snapshot } = useDashboard();
+  const { competitors, isLoading, snapshot, saveCompetitor, archiveCompetitor, refresh } = useDashboard();
+  const [form, setForm] = React.useState<CompetitorInput>({ domain: '', label: '', category: '', notes: '' });
+  const [query, setQuery] = React.useState('');
+  const [isSaving, setIsSaving] = React.useState(false);
 
   if (isLoading && !snapshot) return <LoadingState label="Sampling competitor sitemaps" />;
+
+  const filteredCompetitors = (competitors?.competitors || []).filter((competitor) => {
+    const haystack = `${competitor.domain} ${competitor.label || ''} ${competitor.category || ''}`.toLowerCase();
+    return !query || haystack.includes(query.toLowerCase());
+  });
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!form.domain?.trim()) return;
+    setIsSaving(true);
+    await saveCompetitor(form);
+    setForm({ domain: '', label: '', category: '', notes: '' });
+    setIsSaving(false);
+  }
 
   return (
     <>
       <PageHeading
         title="Competitors"
-        description="Public sitemap samples — topics competitors publish and where you can differentiate."
+        description="Public sitemap samples, competitor categories, and content gaps you can review without burning Serper credits."
+        badges={
+          <button type="button" className="secondary-button" onClick={() => void refresh()}>
+            <RefreshCw size={15} />
+            Resample
+          </button>
+        }
       />
 
       <div className="dash-stack">
-      {competitors && snapshot && (
-        <section className="panel">
-          <PanelHeader icon={<Globe2 />} title="Content Gap Matrix" action="public sitemap/title sample" />
-          <CompetitorGapMatrix competitors={competitors} clusters={snapshot.clusters} />
+        <section className="competitor-command-grid">
+          <form className="panel competitor-form" onSubmit={handleSubmit}>
+            <PanelHeader icon={<Plus />} title="Add Competitor" action="saved to Neon" />
+            <div className="form-grid">
+              <label>
+                Domain
+                <input
+                  required
+                  value={form.domain || ''}
+                  placeholder="example.com"
+                  onChange={(event) => setForm((current) => ({ ...current, domain: event.target.value }))}
+                />
+              </label>
+              <label>
+                Name
+                <input
+                  value={form.label || ''}
+                  placeholder="Competitor name"
+                  onChange={(event) => setForm((current) => ({ ...current, label: event.target.value }))}
+                />
+              </label>
+              <label>
+                Category
+                <input
+                  value={form.category || ''}
+                  placeholder="live classes, games, camps..."
+                  onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}
+                />
+              </label>
+              <label>
+                Notes
+                <input
+                  value={form.notes || ''}
+                  placeholder="Why they matter"
+                  onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))}
+                />
+              </label>
+            </div>
+            <button type="submit" className="primary-button" disabled={isSaving}>
+              <Plus size={15} />
+              {isSaving ? 'Saving...' : 'Add competitor'}
+            </button>
+          </form>
+
+          <section className="panel">
+            <PanelHeader icon={<Search />} title="Watchlist Controls" action={`${competitors?.watchlist?.length || 0} active`} />
+            <div className="filter-bar">
+              <div className="search-field">
+                <Search size={15} />
+                <input value={query} placeholder="Filter competitors..." onChange={(event) => setQuery(event.target.value)} />
+              </div>
+            </div>
+            <div className="watchlist-table-wrap">
+              <table className="watchlist-table">
+                <thead>
+                  <tr>
+                    <th>Competitor</th>
+                    <th>Category</th>
+                    <th>Sample</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredCompetitors.map((competitor) => (
+                    <tr key={competitor.domain}>
+                      <td>
+                        <strong>{competitor.label || competitor.domain}</strong>
+                        <small>
+                          <a href={`https://${competitor.domain}`} target="_blank" rel="noreferrer">
+                            {competitor.domain} <ExternalLink size={11} />
+                          </a>
+                        </small>
+                      </td>
+                      <td>{competitor.category || 'Competitor'}</td>
+                      <td>{competitor.blogUrls} blog URLs</td>
+                      <td>
+                        <button className="icon-button small-icon-button" title="Archive competitor" onClick={() => void archiveCompetitor(competitor.domain)}>
+                          <Archive size={15} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
-      )}
+
+        {competitors && snapshot && (
+          <section className="panel">
+            <PanelHeader icon={<Globe2 />} title="Content Gap Matrix" action="public sitemap/title sample" />
+            <CompetitorGapMatrix competitors={{ ...competitors, competitors: filteredCompetitors }} clusters={snapshot.clusters} />
+          </section>
+        )}
 
       <section className="panel">
         <PanelHeader icon={<Globe2 />} title="Competitor Watchlist" action={competitors?.mode || 'loading'} />
@@ -29,10 +141,13 @@ export function CompetitorsPage() {
           <p className="panel-note">Loading public sitemap samples.</p>
         ) : (
           <div className="competitor-grid">
-            {competitors.competitors.map((competitor) => (
+            {filteredCompetitors.map((competitor) => (
               <article key={competitor.domain} className="competitor-card">
-                <div>
-                  <strong>{competitor.domain}</strong>
+                <div className="competitor-card-head">
+                  <div>
+                    <strong>{competitor.label || competitor.domain}</strong>
+                    <small>{competitor.category || competitor.domain}</small>
+                  </div>
                   <span>{competitor.status}</span>
                 </div>
                 <small>

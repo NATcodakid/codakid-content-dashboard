@@ -25,6 +25,15 @@ export type PostSummary = {
   modified: string;
   inboundCount: number;
   outboundCount: number;
+  wordCount?: number;
+  titleLength?: number;
+  excerptLength?: number;
+  h2Count?: number;
+  h3Count?: number;
+  imageCount?: number;
+  imagesMissingAlt?: number;
+  schemaHintCount?: number;
+  internalLinks?: string[];
   relatedPostCount: number;
   pillarScore: number;
   health: number;
@@ -104,8 +113,12 @@ export type Snapshot = {
 export type CompetitorSnapshot = {
   generatedAt: string;
   mode: string;
+  watchlist?: CompetitorWatchlistItem[];
   competitors: Array<{
     domain: string;
+    label?: string;
+    category?: string;
+    notes?: string;
     source: string;
     urlsSampled: number;
     blogUrls: number;
@@ -117,10 +130,162 @@ export type CompetitorSnapshot = {
   }>;
 };
 
+export type CompetitorWatchlistItem = {
+  domain: string;
+  label: string;
+  category: string;
+  status: string;
+  notes: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type CompetitorInput = {
+  domain: string;
+  label?: string;
+  category?: string;
+  notes?: string;
+  status?: string;
+};
+
 export type AiResponse = {
   mode: string;
   message?: string;
   insights: string[];
+};
+
+export type HomeLayout = {
+  cards: string[];
+  hidden: string[];
+};
+
+export type DashboardHistory = {
+  generatedAt: string;
+  wordpress: Array<{
+    createdAt: string;
+    posts: number;
+    internalLinks: number;
+    linkGaps: number;
+    orphanPosts: number;
+  }>;
+  audit: Array<{
+    createdAt: string;
+    healthScore: number;
+    total: number;
+    high: number;
+    medium: number;
+    byType: Record<string, number>;
+  }>;
+  ga4: Array<{
+    createdAt: string;
+    startDate: string;
+    endDate: string;
+    sessions: number;
+    users: number;
+    views: number;
+    engagementRate: number;
+  }>;
+  searchConsole: Array<{
+    createdAt: string;
+    startDate: string;
+    endDate: string;
+    dimensions: string;
+    clicks: number;
+    impressions: number;
+    ctr: number;
+    position: number;
+  }>;
+  serp: Array<{
+    keyword: string;
+    position?: number | null;
+    url?: string | null;
+    createdAt: string;
+  }>;
+  aiVisibility: Array<{
+    prompt: string;
+    codakidMentioned: boolean;
+    codakidSentiment: string;
+    createdAt: string;
+  }>;
+};
+
+export type AiAnalystInsight = {
+  title: string;
+  detail: string;
+  source: string;
+  period: string;
+  severity: 'info' | 'warning' | 'danger' | 'success' | string;
+};
+
+export type AiAnalystBrief = {
+  headline: string;
+  summary: string;
+  insights: AiAnalystInsight[];
+  recommendedActions: Array<{
+    title: string;
+    detail: string;
+    priorityScore: number;
+    source: string;
+  }>;
+};
+
+export type AiVisibilityPrompt = {
+  id: string;
+  prompt: string;
+  cluster: string;
+  status: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type AiVisibilityRun = {
+  id: string;
+  promptId?: string;
+  prompt: string;
+  model: string;
+  answer: string;
+  codakidMentioned: boolean;
+  codakidSentiment: string;
+  competitors: Array<{ domain: string; reason?: string }>;
+  recommendations: string[];
+  createdAt: string;
+};
+
+export type AiContentIdea = {
+  id: string;
+  title: string;
+  targetKeyword: string;
+  intent: string;
+  cluster: string;
+  pillarUrl: string;
+  priorityScore: number;
+  brief: {
+    angle?: string;
+    outline?: string[];
+    whyNow?: string;
+    internalLinks?: string[];
+    competitorGap?: string;
+    [key: string]: unknown;
+  };
+  status: string;
+  source: string;
+  createdAt: string;
+};
+
+export type AiWorkbench = {
+  configured: boolean;
+  prompts: AiVisibilityPrompt[];
+  latestVisibilityRuns: AiVisibilityRun[];
+  contentIdeas: AiContentIdea[];
+};
+
+export type PageBrief = {
+  titleIdeas: string[];
+  metaDescriptions: string[];
+  faqQuestions: string[];
+  missingSections: string[];
+  internalLinkAnchors: string[];
+  rewriteNotes: string[];
 };
 
 export type GoogleStatus = {
@@ -229,6 +394,40 @@ export type Ga4Report = {
       engagementRate: number;
     }>;
   } | null;
+};
+
+export type TechnicalAuditIssue = {
+  id: string;
+  type: string;
+  severity: 'High' | 'Medium' | 'Low' | string;
+  title: string;
+  detail: string;
+  pageUrl: string;
+  pageTitle: string;
+  targetUrl?: string;
+  targetTitle?: string;
+  cluster: string;
+  priorityScore: number;
+};
+
+export type TechnicalAudit = {
+  generatedAt: string;
+  healthScore?: number;
+  summary: {
+    total: number;
+    high: number;
+    medium: number;
+    byType: Record<string, number>;
+  };
+  issues: TechnicalAuditIssue[];
+  trend?: Array<{
+    createdAt: string;
+    healthScore: number;
+    total: number;
+    high: number;
+    medium: number;
+    byType: Record<string, number>;
+  }>;
 };
 
 export type SearchOpportunity = {

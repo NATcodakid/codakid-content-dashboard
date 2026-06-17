@@ -1,12 +1,13 @@
-import { requireUser } from './_auth.mjs';
-
-const DEFAULT_COMPETITORS = [
-  'codewizardshq.com',
-  'idtech.com',
-  'createandlearn.us',
-  'tynker.com',
-  'codecombat.com',
-];
+import {
+  audit,
+  errorResponse,
+  getSql,
+  json,
+  parseJsonBody,
+  requireCsrf,
+  requireUser,
+  HttpError,
+} from './_auth.mjs';
 
 const topicTerms = [
   'coding',
@@ -23,32 +24,93 @@ const topicTerms = [
 
 export async function handler(event) {
   try {
-    await requireUser(event);
-  } catch (error) {
-    return json(error?.statusCode || 500, {
-      error: error?.statusCode ? error.message : 'Server error',
-      detail: error instanceof Error ? error.message : String(error),
-    });
-  }
+    const user = await requireUser(event);
+    const sql = getSql();
 
-  const domains = event.queryStringParameters?.domains
-    ? event.queryStringParameters.domains.split(',').map((domain) => domain.trim()).filter(Boolean)
-    : DEFAULT_COMPETITORS;
+    if (event.httpMethod === 'POST') {
+      requireCsrf(event);
+      const body = parseJsonBody(event);
+      const domain = normalizeDomain(body.domain);
+      if (!domain) throw new HttpError(400, 'Competitor domain is required.');
+      const label = String(body.label || domain).trim();
+      const category = String(body.category || 'coding education').trim();
+      const notes = String(body.notes || '').trim();
+      const rows = await sql`
+        insert into dashboard_competitors (domain, label, category, notes, created_by, updated_at)
+        values (${domain}, ${label}, ${category}, ${notes}, ${user.email}, now())
+        on conflict (domain) do update set
+          label = excluded.label,
+          category = excluded.category,
+          notes = excluded.notes,
+          status = 'active',
+          updated_at = now()
+        returning *
+      `;
+      await audit(event, user, 'competitor.upsert', domain, { label, category });
+      return json(200, { competitor: publicCompetitor(rows[0]) }, { 'cache-control': 'private, no-store' });
+    }
 
-  try {
-    const competitors = await Promise.all(domains.slice(0, 8).map(sampleCompetitor));
+    if (event.httpMethod === 'PATCH') {
+      requireCsrf(event);
+      const body = parseJsonBody(event);
+      const domain = normalizeDomain(body.domain);
+      if (!domain) throw new HttpError(400, 'Competitor domain is required.');
+      const status = String(body.status || 'active').trim();
+      const rows = await sql`
+        update dashboard_competitors
+        set status = ${status}, updated_at = now()
+        where domain = ${domain}
+        returning *
+      `;
+      if (!rows[0]) throw new HttpError(404, 'Competitor not found.');
+      await audit(event, user, 'competitor.update', domain, { status });
+      return json(200, { competitor: publicCompetitor(rows[0]) }, { 'cache-control': 'private, no-store' });
+    }
+
+    if (event.httpMethod === 'DELETE') {
+      requireCsrf(event);
+      const body = parseJsonBody(event);
+      const domain = normalizeDomain(body.domain);
+      if (!domain) throw new HttpError(400, 'Competitor domain is required.');
+      await sql`update dashboard_competitors set status = 'archived', updated_at = now() where domain = ${domain}`;
+      await audit(event, user, 'competitor.archive', domain);
+      return json(200, { ok: true }, { 'cache-control': 'private, no-store' });
+    }
+
+    if (event.httpMethod !== 'GET') return json(405, { error: 'Method not allowed.' });
+
+    const dbCompetitors = await sql`
+      select *
+      from dashboard_competitors
+      where status = 'active'
+      order by domain asc
+    `;
+
+    const domains = event.queryStringParameters?.domains
+      ? event.queryStringParameters.domains.split(',').map((domain) => normalizeDomain(domain)).filter(Boolean)
+      : dbCompetitors.map((row) => row.domain);
+
+    const competitors = await Promise.all(domains.slice(0, 12).map(async (domain) => {
+      const sample = await sampleCompetitor(domain);
+      const meta = dbCompetitors.find((row) => row.domain === sample.domain);
+      return {
+        ...sample,
+        label: meta?.label || sample.domain,
+        category: meta?.category || 'coding education',
+        notes: meta?.notes || '',
+      };
+    }));
+
     return json(200, {
       generatedAt: new Date().toISOString(),
       mode: 'public-sitemap-sampling',
+      watchlist: dbCompetitors.map(publicCompetitor),
       competitors,
     }, {
       'cache-control': 'private, no-store',
     });
   } catch (error) {
-    return json(500, {
-      error: 'Failed to sample competitors',
-      detail: error instanceof Error ? error.message : String(error),
-    });
+    return errorResponse(error);
   }
 }
 
@@ -173,13 +235,24 @@ function cleanHtml(value) {
     .trim();
 }
 
-function json(statusCode, body, headers = {}) {
+function normalizeDomain(value) {
+  try {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    return new URL(raw.startsWith('http') ? raw : `https://${raw}`).hostname.replace(/^www\./, '').toLowerCase();
+  } catch {
+    return String(value || '').trim().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0].toLowerCase();
+  }
+}
+
+function publicCompetitor(row) {
   return {
-    statusCode,
-    headers: {
-      'content-type': 'application/json',
-      ...headers,
-    },
-    body: JSON.stringify(body),
+    domain: row.domain,
+    label: row.label,
+    category: row.category,
+    status: row.status,
+    notes: row.notes,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }

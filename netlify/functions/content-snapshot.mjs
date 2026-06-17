@@ -62,10 +62,13 @@ const starterPillarSlugs = new Set([
   'best-online-coding-camps-for-kids-ultimate-guide',
 ]);
 
+const SNAPSHOT_CACHE_HOURS = 6;
+
 export async function handler(event) {
   try {
     await requireUser(event);
-    const snapshot = await getSnapshot();
+    const forceRefresh = event.queryStringParameters?.refresh === '1';
+    const snapshot = await loadContentSnapshot({ forceRefresh });
     return json(200, snapshot, {
       'cache-control': 'private, no-store',
     });
@@ -77,12 +80,29 @@ export async function handler(event) {
   }
 }
 
-async function getSnapshot() {
+export async function loadContentSnapshot({ forceRefresh = false } = {}) {
   const markedPillarUrls = await fetchMarkedPillarUrls();
+
+  if (!forceRefresh) {
+    const cached = await fetchRecentWordPressSnapshot();
+    if (cached?.data?.kpis) {
+      return {
+        ...cached.data,
+        generatedAt: cached.created_at || cached.data.generatedAt,
+        source: 'cached-wordpress-snapshot',
+        sourceDetail: `Serving cached crawl from the last ${SNAPSHOT_CACHE_HOURS} hours.`,
+      };
+    }
+  }
+
   try {
     const snapshot = await buildSnapshot(markedPillarUrls);
     await saveWordPressSnapshot(snapshot);
-    return snapshot;
+    return {
+      ...snapshot,
+      source: 'wordpress-rest',
+      sourceDetail: forceRefresh ? 'Live WordPress crawl requested.' : 'Live WordPress crawl completed.',
+    };
   } catch (error) {
     const cached = await fetchLatestWordPressSnapshot();
     if (cached?.data?.kpis) {
@@ -129,6 +149,23 @@ async function saveWordPressSnapshot(snapshot) {
     await sql`delete from wordpress_snapshots where created_at < now() - interval '180 days'`;
   } catch {
     // The live dashboard should still work if history persistence has a problem.
+  }
+}
+
+async function fetchRecentWordPressSnapshot() {
+  try {
+    const sql = getSql();
+    const rows = await sql`
+      select data, created_at
+      from wordpress_snapshots
+      where ok = true
+        and created_at >= now() - interval '6 hours'
+      order by created_at desc
+      limit 1
+    `;
+    return rows[0] || null;
+  } catch {
+    return null;
   }
 }
 
@@ -281,6 +318,15 @@ export async function buildSnapshot(markedPillarUrls = new Set()) {
         modified: post.modified,
         inboundCount: post.inboundCount,
         outboundCount: post.outboundCount,
+        wordCount: post.wordCount,
+        titleLength: post.titleLength,
+        excerptLength: post.excerptLength,
+        h2Count: post.h2Count,
+        h3Count: post.h3Count,
+        imageCount: post.imageCount,
+        imagesMissingAlt: post.imagesMissingAlt,
+        schemaHintCount: post.schemaHintCount,
+        internalLinks: post.internalLinks,
         relatedPostCount: post.relatedPostCount,
         pillarScore: post.pillarScore,
         health: post.health,
@@ -374,6 +420,7 @@ function normalizePost(post, categoryMap) {
   const internalLinks = extractInternalLinks(content, url);
   const text = cleanHtml(content);
   const cluster = inferCluster(title, categoryNames, url);
+  const imageStats = extractImageStats(content);
 
   return {
     id: post.id,
@@ -387,6 +434,13 @@ function normalizePost(post, categoryMap) {
     cluster,
     excerpt,
     content,
+    titleLength: title.length,
+    excerptLength: excerpt.length,
+    h2Count: countTags(content, 'h2'),
+    h3Count: countTags(content, 'h3'),
+    imageCount: imageStats.total,
+    imagesMissingAlt: imageStats.missingAlt,
+    schemaHintCount: countSchemaHints(content),
     wordCount: text.split(/\s+/).filter(Boolean).length,
     internalLinks,
     outboundCount: internalLinks.length,
@@ -408,6 +462,29 @@ function extractInternalLinks(html, sourceUrl) {
     .filter((href) => href && href !== source && !href.includes('/wp-content/'));
 
   return [...new Set(matches)];
+}
+
+function extractImageStats(html) {
+  const images = [...String(html || '').matchAll(/<img\b[^>]*>/gi)].map((match) => match[0]);
+  return {
+    total: images.length,
+    missingAlt: images.filter((tag) => {
+      const alt = tag.match(/\balt=["']([^"']*)["']/i)?.[1];
+      return alt === undefined || !cleanHtml(alt).trim();
+    }).length,
+  };
+}
+
+function countTags(html, tagName) {
+  return (String(html || '').match(new RegExp(`<${tagName}\\b`, 'gi')) || []).length;
+}
+
+function countSchemaHints(html) {
+  const value = String(html || '');
+  return (
+    (value.match(/application\/ld\+json/gi) || []).length +
+    (value.match(/itemscope|itemtype=|schema\.org/gi) || []).length
+  );
 }
 
 function inferCluster(title, categories, url) {
@@ -525,7 +602,7 @@ function suggestAnchor(pillar) {
 }
 
 function stripContent(post) {
-  const { content, internalLinks, ...rest } = post;
+  const { content, ...rest } = post;
   return rest;
 }
 

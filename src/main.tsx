@@ -14,6 +14,10 @@ const PillarsPage = React.lazy(() => import('./pages/Pillars').then((module) => 
 const PillarDetailPage = React.lazy(() => import('./pages/Pillars').then((module) => ({ default: module.PillarDetailPage })));
 const KeywordsPage = React.lazy(() => import('./pages/Keywords').then((module) => ({ default: module.KeywordsPage })));
 const ActionsPage = React.lazy(() => import('./pages/Actions').then((module) => ({ default: module.ActionsPage })));
+const AuditPage = React.lazy(() => import('./pages/Audit').then((module) => ({ default: module.AuditPage })));
+const ReportsPage = React.lazy(() => import('./pages/Reports').then((module) => ({ default: module.ReportsPage })));
+const PageWorkspacePage = React.lazy(() => import('./pages/PageWorkspace').then((module) => ({ default: module.PageWorkspacePage })));
+const IntelligencePage = React.lazy(() => import('./pages/Intelligence').then((module) => ({ default: module.IntelligencePage })));
 const GameplanPage = React.lazy(() => import('./pages/Gameplan').then((module) => ({ default: module.GameplanPage })));
 const LinksPage = React.lazy(() => import('./pages/Links').then((module) => ({ default: module.LinksPage })));
 const CompetitorsPage = React.lazy(() => import('./pages/Competitors').then((module) => ({ default: module.CompetitorsPage })));
@@ -79,6 +83,10 @@ function App() {
           <Route path="pillars/:slug" element={<RouteFallback><PillarDetailPage /></RouteFallback>} />
           <Route path="keywords" element={<RouteFallback><KeywordsPage /></RouteFallback>} />
           <Route path="actions" element={<RouteFallback><ActionsPage /></RouteFallback>} />
+          <Route path="audit" element={<RouteFallback><AuditPage /></RouteFallback>} />
+          <Route path="reports" element={<RouteFallback><ReportsPage /></RouteFallback>} />
+          <Route path="intelligence" element={<RouteFallback><IntelligencePage /></RouteFallback>} />
+          <Route path="pages/:slug" element={<RouteFallback><PageWorkspacePage /></RouteFallback>} />
           <Route path="gameplan" element={<RouteFallback><GameplanPage /></RouteFallback>} />
           <Route path="links" element={<RouteFallback><LinksPage /></RouteFallback>} />
           <Route path="competitors" element={<RouteFallback><CompetitorsPage /></RouteFallback>} />
