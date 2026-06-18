@@ -12,7 +12,7 @@ import {
 } from './_auth.mjs';
 
 const SERPER_ENDPOINT = 'https://google.serper.dev/search';
-const MENTION_QUERY = '"CodaKid" coding kids -site:codakid.com';
+const MENTION_QUERY = 'CodaKid coding for kids';
 
 export async function handler(event) {
   try {
