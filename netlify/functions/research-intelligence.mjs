@@ -122,6 +122,11 @@ async function buildResearchPayload() {
   ]);
 
   const share = buildShareOfVoice(serpRows);
+  const codakidVisibility = share.find((item) => item.domain === 'codakid.com') || null;
+  const shareLeaders = share.slice(0, 10);
+  const displayedShare = codakidVisibility && !shareLeaders.some((item) => item.domain === 'codakid.com')
+    ? [...share.slice(0, 9), codakidVisibility].sort((a, b) => b.score - a.score)
+    : shareLeaders;
   const serpFeatures = serpRows.reduce((totals, row) => {
     if ((row.people_also_ask || []).length) totals.peopleAlsoAsk += 1;
     if ((row.related_searches || []).length) totals.relatedSearches += 1;
@@ -132,8 +137,8 @@ async function buildResearchPayload() {
     configured: Boolean(process.env.SERPER_API_KEY || process.env.SERPER_DEV_API_KEY),
     market: {
       trackedSerps: serpRows.length,
-      shareOfVoice: share,
-      codakidShare: share.find((item) => item.domain === 'codakid.com')?.share || 0,
+      shareOfVoice: displayedShare,
+      codakidShare: codakidVisibility?.share || 0,
       serpFeatures,
       latestAt: serpRows.reduce((latest, row) => !latest || new Date(row.fetched_at) > new Date(latest) ? row.fetched_at : latest, null),
     },
@@ -169,8 +174,7 @@ function buildShareOfVoice(rows) {
   }
   return [...scores.entries()]
     .map(([domain, score]) => ({ domain, score, share: total ? score / total : 0 }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 10);
+    .sort((a, b) => b.score - a.score);
 }
 
 function clean(value, max) { return String(value || '').trim().slice(0, max); }
