@@ -159,7 +159,7 @@ function buildShareOfVoice(rows) {
   let total = 0;
   for (const row of rows) {
     for (const result of row.organic || []) {
-      const domain = result.domain || domainFor(result.link);
+      const domain = domainFor(result.link) || String(result.domain || '').replace(/^www\./, '').toLowerCase();
       const position = Number(result.position || 0);
       if (!domain || position < 1 || position > 10) continue;
       const points = 11 - position;
