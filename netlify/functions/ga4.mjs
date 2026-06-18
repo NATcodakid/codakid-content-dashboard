@@ -68,27 +68,32 @@ async function ga4StatusPayload() {
   };
 }
 
-async function syncGa4() {
+export async function syncGa4() {
   const propertyId = ga4PropertyId();
   const current = dateRange(31, 3);
   const previous = dateRange(62, 32);
-  const [summary, previousSummary, pages] = await Promise.all([
+  const historyRange = dateRange(93, 3);
+  const [summary, previousSummary, pages, daily, pageDaily] = await Promise.all([
     runSummary(current),
     runSummary(previous),
     runPages(current),
+    runDaily(historyRange),
+    runPageDaily(historyRange),
   ]);
 
   const sql = getSql();
   await saveGa4Snapshot(sql, propertyId, current, 'summary', summary);
   await saveGa4Snapshot(sql, propertyId, previous, 'summary', previousSummary);
   await saveGa4Snapshot(sql, propertyId, current, 'pagePath,pageTitle', pages);
+  await saveGa4Snapshot(sql, propertyId, historyRange, 'date', daily);
+  await saveGa4Snapshot(sql, propertyId, historyRange, 'pagePath,date', pageDaily);
 
   return {
     configured: true,
     propertyId,
     connected: true,
     analyticsScopeReady: true,
-    latest: buildPayload(propertyId, current, summary, previousSummary, pages),
+    latest: buildPayload(propertyId, current, summary, previousSummary, pages, undefined, daily, pageDaily),
     summary,
     topPages: normalizePageRows(pages),
   };
@@ -102,11 +107,13 @@ async function latestGa4Payload(propertyId) {
     from ga4_snapshots
     where property_id = ${propertyId}
     order by created_at desc
-    limit 8
+    limit 16
   `;
   if (!rows.length) return null;
   const latestSummary = rows.find((row) => row.dimensions === 'summary');
   const latestPages = rows.find((row) => row.dimensions === 'pagePath,pageTitle');
+  const latestDaily = rows.find((row) => row.dimensions === 'date');
+  const latestPageDaily = rows.find((row) => row.dimensions === 'pagePath,date');
   const previousSummary = rows.find(
     (row) =>
       row.dimensions === 'summary' &&
@@ -121,44 +128,93 @@ async function latestGa4Payload(propertyId) {
     previousSummary?.data || null,
     latestPages?.data || null,
     latestSummary.created_at,
+    latestDaily?.data || null,
+    latestPageDaily?.data || null,
   );
 }
 
 async function runSummary(range) {
-  return (await ga4RunReport({
-    dateRanges: [range],
-    metrics: [
+  const baseMetrics = [
       { name: 'sessions' },
       { name: 'totalUsers' },
       { name: 'screenPageViews' },
       { name: 'engagementRate' },
       { name: 'averageSessionDuration' },
-    ],
-  })).data;
+  ];
+  return runWithMetricFallback({ dateRanges: [range] }, baseMetrics);
 }
 
 async function runPages(range) {
-  return (await ga4RunReport({
+  const base = {
     dateRanges: [range],
     dimensions: [{ name: 'pagePath' }, { name: 'pageTitle' }],
-    metrics: [
-      { name: 'screenPageViews' },
-      { name: 'sessions' },
-      { name: 'totalUsers' },
-      { name: 'engagementRate' },
-    ],
     dimensionFilter: {
       filter: {
         fieldName: 'pagePath',
-        stringFilter: {
-          matchType: 'CONTAINS',
-          value: '/',
-        },
+        stringFilter: { matchType: 'CONTAINS', value: '/' },
       },
     },
     limit: 50,
     orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
-  })).data;
+  };
+  const baseMetrics = [
+      { name: 'screenPageViews' },
+      { name: 'sessions' },
+      { name: 'totalUsers' },
+      { name: 'engagementRate' },
+  ];
+  return runWithMetricFallback(base, baseMetrics);
+}
+
+async function runDaily(range) {
+  const base = {
+    dateRanges: [range],
+    dimensions: [{ name: 'date' }],
+    limit: 120,
+    orderBys: [{ dimension: { dimensionName: 'date' } }],
+  };
+  const baseMetrics = [
+      { name: 'sessions' },
+      { name: 'totalUsers' },
+      { name: 'screenPageViews' },
+  ];
+  return runWithMetricFallback(base, baseMetrics, true);
+}
+
+async function runPageDaily(range) {
+  const base = {
+    dateRanges: [range],
+    dimensions: [{ name: 'pagePath' }, { name: 'date' }],
+    dimensionFilter: {
+      filter: {
+        fieldName: 'pagePath',
+        stringFilter: { matchType: 'CONTAINS', value: '/' },
+      },
+    },
+    limit: 10000,
+    orderBys: [{ dimension: { dimensionName: 'date' } }],
+  };
+  const baseMetrics = [
+      { name: 'sessions' },
+      { name: 'totalUsers' },
+      { name: 'screenPageViews' },
+  ];
+  return runWithMetricFallback(base, baseMetrics, true);
+}
+
+async function runWithMetricFallback(base, baseMetrics, optional = false) {
+  try {
+    return (await ga4RunReport({ ...base, metrics: [...baseMetrics, { name: 'keyEvents' }, { name: 'totalRevenue' }] })).data;
+  } catch (error) {
+    console.warn('GA4 enriched report failed; retrying core metrics.', error instanceof Error ? error.message : error);
+    try {
+      return (await ga4RunReport({ ...base, metrics: baseMetrics })).data;
+    } catch (fallbackError) {
+      if (!optional) throw fallbackError;
+      console.warn('Optional GA4 history report skipped.', fallbackError instanceof Error ? fallbackError.message : fallbackError);
+      return { dimensionHeaders: base.dimensions || [], metricHeaders: baseMetrics, rows: [] };
+    }
+  }
 }
 
 async function saveGa4Snapshot(sql, propertyId, range, dimensions, data) {
@@ -178,7 +234,7 @@ async function saveGa4Snapshot(sql, propertyId, range, dimensions, data) {
   await sql`delete from ga4_snapshots where created_at < now() - interval '180 days'`;
 }
 
-function buildPayload(propertyId, range, summary, previousSummary, pages, updatedAt = new Date().toISOString()) {
+function buildPayload(propertyId, range, summary, previousSummary, pages, updatedAt = new Date().toISOString(), daily = null, pageDaily = null) {
   const currentMetrics = normalizeSummary(summary);
   const previousMetrics = normalizeSummary(previousSummary);
   return {
@@ -193,9 +249,13 @@ function buildPayload(propertyId, range, summary, previousSummary, pages, update
         totalUsers: delta(currentMetrics.totalUsers, previousMetrics.totalUsers),
         screenPageViews: delta(currentMetrics.screenPageViews, previousMetrics.screenPageViews),
         engagementRate: delta(currentMetrics.engagementRate, previousMetrics.engagementRate),
+        keyEvents: delta(currentMetrics.keyEvents, previousMetrics.keyEvents),
+        totalRevenue: delta(currentMetrics.totalRevenue, previousMetrics.totalRevenue),
       },
     },
     topPages: normalizePageRows(pages),
+    dailyTrend: normalizeDailyRows(daily),
+    pageDaily: normalizePageDailyRows(pageDaily),
   };
 }
 
@@ -212,6 +272,8 @@ function normalizeSummary(data) {
     screenPageViews: Math.round(values.screenPageViews || 0),
     engagementRate: Number(values.engagementRate || 0),
     averageSessionDuration: Number(values.averageSessionDuration || 0),
+    keyEvents: Number(values.keyEvents || 0),
+    totalRevenue: Number(values.totalRevenue || 0),
   };
 }
 
@@ -230,10 +292,56 @@ function normalizePageRows(data) {
         sessions: Math.round(Number(metrics[1]?.value || 0)),
         users: Math.round(Number(metrics[2]?.value || 0)),
         engagementRate: Number(metrics[3]?.value || 0),
+        keyEvents: Number(metrics[4]?.value || 0),
+        totalRevenue: Number(metrics[5]?.value || 0),
       };
     })
     .filter((row) => row.path.startsWith('/'))
     .slice(0, 24);
+}
+
+function metricMap(data, row) {
+  const values = {};
+  (data?.metricHeaders || []).forEach((header, index) => {
+    values[header.name] = Number(row?.metricValues?.[index]?.value || 0);
+  });
+  return values;
+}
+
+function normalizeDailyRows(data) {
+  return (data?.rows || []).map((row) => {
+    const values = metricMap(data, row);
+    return {
+      date: gaDate(row.dimensionValues?.[0]?.value),
+      sessions: Math.round(values.sessions || 0),
+      users: Math.round(values.totalUsers || 0),
+      views: Math.round(values.screenPageViews || 0),
+      keyEvents: values.keyEvents || 0,
+      totalRevenue: values.totalRevenue || 0,
+    };
+  }).filter((row) => row.date);
+}
+
+function normalizePageDailyRows(data) {
+  return (data?.rows || []).map((row) => {
+    const values = metricMap(data, row);
+    const path = row.dimensionValues?.[0]?.value || '';
+    return {
+      path,
+      url: `https://codakid.com${path}`,
+      date: gaDate(row.dimensionValues?.[1]?.value),
+      sessions: Math.round(values.sessions || 0),
+      users: Math.round(values.totalUsers || 0),
+      views: Math.round(values.screenPageViews || 0),
+      keyEvents: values.keyEvents || 0,
+      totalRevenue: values.totalRevenue || 0,
+    };
+  }).filter((row) => row.path.startsWith('/') && row.date);
+}
+
+function gaDate(value) {
+  const text = String(value || '');
+  return /^\d{8}$/.test(text) ? `${text.slice(0, 4)}-${text.slice(4, 6)}-${text.slice(6, 8)}` : text;
 }
 
 function delta(current, previous) {

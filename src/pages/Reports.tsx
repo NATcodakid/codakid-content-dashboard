@@ -1,10 +1,11 @@
-import { AlertTriangle, ArrowRight, BarChart3, CheckCircle2, Download, FileText, ListChecks, MousePointerClick, Target, TrendingUp } from 'lucide-react';
+import { AlertTriangle, ArrowRight, BarChart3, CheckCircle2, Download, FileText, ListChecks, MousePointerClick, Target, TrendingUp, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDashboard } from '../data';
 import { KpiCard, LoadingState, PageHeading, PanelHeader } from '../components';
 import type { KpiDelta } from '../components';
 import { buildFocusActions, formatCompact, formatDate, formatDateRange, formatPercent, formatPosition, formatter, shortUrl } from '../lib';
-import type { SearchTrendPoint } from '../types';
+import type { Ga4Report, SearchTrendPoint } from '../types';
+import { TrafficHistoryChart } from '../charts';
 
 export function ReportsPage() {
   const {
@@ -27,6 +28,7 @@ export function ReportsPage() {
   const topActions = buildFocusActions(snapshot, searchOpportunities).slice(0, 3);
   const traffic = ga4?.latest?.summary;
   const strongestCompetitors = competitors?.competitors?.slice(0, 4) || [];
+  const attributionPages = aggregateGa4Pages(ga4?.latest?.topPages || []);
 
   const trend = searchOpportunities?.trend || [];
   const clicksDelta = pctDelta(trend, 'totalClicks');
@@ -66,7 +68,30 @@ export function ReportsPage() {
           <KpiCard icon={<BarChart3 />} label="Impressions" value={searchOpportunities?.summary?.totalImpressions ?? '—'} note={periodLabel} delta={imprDelta} />
           <KpiCard icon={<TrendingUp />} label="Avg Position" value={searchOpportunities?.summary ? formatPosition(searchOpportunities.summary.averagePosition) : '—'} note="lower is better" delta={positionDelta} />
           <KpiCard icon={<Target />} label="Audit Health" value={technicalAudit?.healthScore ?? '—'} note={`${technicalAudit?.summary.high || 0} high-priority issues`} tone={(technicalAudit?.healthScore || 0) >= 75 ? 'success' : 'warning'} delta={healthDelta} />
+          <KpiCard icon={<CheckCircle2 />} label="Key events" value={traffic ? formatter.format(Math.round(traffic.keyEvents || 0)) : '—'} note={periodLabel} delta={traffic?.deltas.keyEvents == null ? undefined : { display: `${traffic.deltas.keyEvents > 0 ? '+' : ''}${Math.round(traffic.deltas.keyEvents * 100)}%`, good: traffic.deltas.keyEvents >= 0 }} tone="success" />
           <KpiCard icon={<MousePointerClick />} label="Est. traffic value" value={searchOpportunities?.summary ? `$${formatCompact(Math.round((searchOpportunities.summary.totalClicks || 0) * 1.5))}` : '—'} note="organic clicks × ~$1.50 est." tone="success" />
+        </section>
+
+        <section className="panel report-history-panel">
+          <PanelHeader icon={<TrendingUp />} title="Daily Traffic History" action={ga4?.latest ? formatDateRange(ga4.latest.dailyTrend[0]?.date, ga4.latest.dailyTrend[ga4.latest.dailyTrend.length - 1]?.date) : 'GA4'} />
+          <TrafficHistoryChart daily={ga4?.latest?.dailyTrend || []} />
+        </section>
+
+        <section className="panel conversion-attribution">
+          <PanelHeader icon={<Trophy />} title="Content Attribution" action="GA4 page contribution" />
+          <p className="panel-note">Key events and revenue are attributed to the page path reported by GA4. Use this to prioritize pages that contribute to business outcomes, not only traffic.</p>
+          <div className="attribution-table" role="table" aria-label="Top pages by key events">
+            <div className="attribution-head" role="row"><span>Page</span><span>Views</span><span>Key events</span><span>Revenue</span></div>
+            {attributionPages.map((page) => (
+              <div className="attribution-row" role="row" key={page.path}>
+                <div><strong>{page.title || page.path}</strong><small>{page.path}</small></div>
+                <span>{formatter.format(page.views)}</span>
+                <span>{formatter.format(Math.round(page.keyEvents || 0))}</span>
+                <span>{page.totalRevenue ? `$${formatter.format(Math.round(page.totalRevenue))}` : '—'}</span>
+              </div>
+            ))}
+            {!ga4?.latest?.topPages.length ? <p className="panel-note">Run a GA4 sync to populate page attribution.</p> : null}
+          </div>
         </section>
 
         <section className="report-triptych">
@@ -113,7 +138,7 @@ export function ReportsPage() {
                   <p>{formatter.format(traffic?.screenPageViews || 0)} page views · {formatPercent(traffic?.engagementRate || 0)} engagement</p>
                   <small>{ga4.latest.startDate} to {ga4.latest.endDate}</small>
                 </article>
-                {ga4.latest.topPages.slice(0, 3).map((page) => (
+                {attributionPages.slice(0, 3).map((page) => (
                   <article key={page.path}>
                     <strong>{page.title || page.path}</strong>
                     <p>{formatter.format(page.views)} views</p>
@@ -249,4 +274,21 @@ function auditHealthDelta(trend?: NonNullable<ReturnType<typeof useDashboard>['t
 
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function aggregateGa4Pages(pages: NonNullable<Ga4Report['latest']>['topPages']) {
+  const byPath = new Map<string, (typeof pages)[number]>();
+  for (const page of pages) {
+    const current = byPath.get(page.path);
+    if (!current) {
+      byPath.set(page.path, { ...page });
+      continue;
+    }
+    current.views += page.views;
+    current.sessions += page.sessions;
+    current.users += page.users;
+    current.keyEvents += page.keyEvents;
+    current.totalRevenue += page.totalRevenue;
+  }
+  return [...byPath.values()].sort((a, b) => b.keyEvents - a.keyEvents || b.views - a.views).slice(0, 8);
 }

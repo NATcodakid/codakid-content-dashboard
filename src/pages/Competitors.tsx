@@ -1,18 +1,22 @@
 import React from 'react';
-import { Archive, ExternalLink, Globe2, Plus, RefreshCw, Search, Award, Swords, Target } from 'lucide-react';
+import { Archive, BarChart3, ExternalLink, FileUp, Globe2, Link2, Plus, Radio, RefreshCw, Search, Award, Target } from 'lucide-react';
 import { useDashboard } from '../data';
 import { LoadingState } from '../components';
-import { formatDate } from '../lib';
 import type { Cluster, CompetitorInput, CompetitorSnapshot, DomainAuthorityReport } from '../types';
+import { ShareOfVoiceChart } from '../charts';
+import { formatDate, formatPercent, formatter, shortUrl } from '../lib';
 
 type CompetitorEntry = CompetitorSnapshot['competitors'][number];
 
 export function CompetitorsPage() {
-  const { competitors, isLoading, snapshot, saveCompetitor, archiveCompetitor, refresh, domainAuthority, refreshAuthority } = useDashboard();
+  const { competitors, research, isLoading, snapshot, saveCompetitor, archiveCompetitor, refresh, domainAuthority, refreshAuthority, refreshMentions, importBacklinks } = useDashboard();
   const [form, setForm] = React.useState<CompetitorInput>({ domain: '', label: '', category: '', notes: '' });
   const [query, setQuery] = React.useState('');
   const [isSaving, setIsSaving] = React.useState(false);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const [view, setView] = React.useState<'landscape' | 'visibility' | 'mentions' | 'backlinks'>('landscape');
+  const [researchBusy, setResearchBusy] = React.useState(false);
+  const [showAllCompetitors, setShowAllCompetitors] = React.useState(false);
 
   if (isLoading && !snapshot) return <LoadingState label="Sampling competitor sitemaps" />;
 
@@ -21,6 +25,7 @@ export function CompetitorsPage() {
     const haystack = `${competitor.domain} ${competitor.label || ''} ${competitor.category || ''}`.toLowerCase();
     return !query || haystack.includes(query.toLowerCase());
   });
+  const visibleCompetitors = query || showAllCompetitors ? filteredCompetitors : filteredCompetitors.slice(0, 5);
 
   const totalBlogUrls = allCompetitors.reduce((sum, item) => sum + item.blogUrls, 0);
   const totalSampled = allCompetitors.reduce((sum, item) => sum + item.urlsSampled, 0);
@@ -45,47 +50,24 @@ export function CompetitorsPage() {
 
   return (
     <div className="competitors-page">
-      <header className="competitors-hero">
-        <div className="competitors-hero-glow" aria-hidden />
-        <div className="competitors-hero-inner">
-          <div className="competitors-hero-copy">
-            <span className="competitors-eyebrow">
-              <Swords size={14} />
-              Competitor intel
-            </span>
-            <h1>Who you&apos;re up against</h1>
-            <p>
-              Public sitemap samples, topic overlap, and content gaps — reviewed without burning Serper credits.
-            </p>
-          </div>
-          <div className="competitors-hero-aside">
-            <button type="button" className="competitors-resample-btn" disabled={isRefreshing} onClick={() => void handleResample()}>
-              <RefreshCw size={15} className={isRefreshing ? 'spin' : ''} />
-              Resample sitemaps
-            </button>
-            <dl className="competitors-stats">
-              <div>
-                <dt>Tracked</dt>
-                <dd>{allCompetitors.length}</dd>
-              </div>
-              <div>
-                <dt>Blog URLs</dt>
-                <dd>{totalBlogUrls}</dd>
-              </div>
-              <div>
-                <dt>Sampled</dt>
-                <dd>{totalSampled}</dd>
-              </div>
-            </dl>
-            {competitors?.generatedAt ? (
-              <p className="competitors-meta">
-                {competitors.mode} · updated {formatDate(competitors.generatedAt)}
-              </p>
-            ) : null}
-          </div>
-        </div>
+      <header className="research-header">
+        <div><h1>Competitive research</h1><p>Search visibility, public content, mentions, and your imported Search Console link sample.</p></div>
+        <dl>
+          <div><dt>Competitors</dt><dd>{allCompetitors.length}</dd></div>
+          <div><dt>CodaKid share</dt><dd>{formatPercent(research?.market.codakidShare || 0)}</dd></div>
+          <div><dt>Mentions</dt><dd>{research?.mentions.total || 0}</dd></div>
+          <div><dt>Referring domains</dt><dd>{research?.backlinks.domains || 0}</dd></div>
+        </dl>
       </header>
 
+      <nav className="research-view-tabs" aria-label="Research views">
+        <button type="button" className={view === 'landscape' ? 'active' : ''} onClick={() => setView('landscape')}><Globe2 size={14} /> Landscape</button>
+        <button type="button" className={view === 'visibility' ? 'active' : ''} onClick={() => setView('visibility')}><BarChart3 size={14} /> Search visibility</button>
+        <button type="button" className={view === 'mentions' ? 'active' : ''} onClick={() => setView('mentions')}><Radio size={14} /> Mentions</button>
+        <button type="button" className={view === 'backlinks' ? 'active' : ''} onClick={() => setView('backlinks')}><Link2 size={14} /> Backlinks</button>
+      </nav>
+
+      {view === 'landscape' ? <>
       <DomainAuthorityPanel domainAuthority={domainAuthority} refreshAuthority={refreshAuthority} />
 
       <section className="competitors-workspace">
@@ -100,13 +82,13 @@ export function CompetitorsPage() {
               />
             </div>
             <span className="competitors-toolbar-meta">
-              {filteredCompetitors.length} of {allCompetitors.length} shown
+              {visibleCompetitors.length} of {allCompetitors.length} shown
             </span>
           </div>
 
           {filteredCompetitors.length ? (
             <div className="competitors-list">
-              {filteredCompetitors.map((competitor) => (
+              {visibleCompetitors.map((competitor) => (
                 <CompetitorRow key={competitor.domain} competitor={competitor} onArchive={() => void archiveCompetitor(competitor.domain)} />
               ))}
             </div>
@@ -117,6 +99,11 @@ export function CompetitorsPage() {
               <p>{query ? 'Try a different search term.' : 'Add a competitor on the right to start sampling their sitemap.'}</p>
             </div>
           )}
+          {!query && filteredCompetitors.length > 5 ? (
+            <button type="button" className="competitors-show-more" onClick={() => setShowAllCompetitors((current) => !current)}>
+              {showAllCompetitors ? 'Show fewer competitors' : `Show all ${filteredCompetitors.length} competitors`}
+            </button>
+          ) : null}
         </div>
 
         <aside className="competitors-sidebar">
@@ -170,27 +157,113 @@ export function CompetitorsPage() {
       </section>
 
       {competitors && snapshot && filteredCompetitors.length ? (
-        <section className="competitors-matrix-section">
-          <div className="competitors-matrix-head">
+        <details className="competitors-matrix-section competitors-matrix-disclosure">
+          <summary className="competitors-matrix-head">
             <div>
               <Target size={18} />
               <div>
                 <h2>Cluster overlap matrix</h2>
-                <p>Where competitors publish vs. your pillar depth</p>
+                <p>Open the detailed competitor-by-cluster comparison</p>
               </div>
             </div>
+          </summary>
+          <div className="competitors-matrix-body">
             <div className="competitors-matrix-legend">
               <span><i className="covered" /> You&apos;re strong</span>
               <span><i className="review" /> Worth reviewing</span>
               <span><i className="gap" /> Open gap</span>
               <span><i className="none" /> No overlap</span>
             </div>
+            <CompetitorGapMatrix competitors={{ ...competitors, competitors: filteredCompetitors }} clusters={snapshot.clusters} />
           </div>
-          <CompetitorGapMatrix competitors={{ ...competitors, competitors: filteredCompetitors }} clusters={snapshot.clusters} />
+        </details>
+      ) : null}
+      </> : null}
+
+      {view === 'visibility' ? (
+        <section className="research-mode-panel">
+          <div className="research-mode-head"><div><h2>Search share of voice</h2><p>Weighted presence across the latest top ten results for tracked keywords.</p></div><span>{research?.market.trackedSerps || 0} SERPs</span></div>
+          <ShareOfVoiceChart rows={research?.market.shareOfVoice || []} />
+          <div className="research-signal-strip">
+            <div><span>People Also Ask</span><strong>{research?.market.serpFeatures.peopleAlsoAsk || 0}</strong><small>tracked SERPs with questions</small></div>
+            <div><span>Related searches</span><strong>{research?.market.serpFeatures.relatedSearches || 0}</strong><small>tracked SERPs with topic expansions</small></div>
+            <div><span>Serper usage</span><strong>{research?.credits.usedThisMonth || 0}</strong><small>of {research?.credits.monthlyBudget || 2000} dashboard budget</small></div>
+          </div>
         </section>
       ) : null}
+
+      {view === 'mentions' ? (
+        <section className="research-mode-panel">
+          <div className="research-mode-head">
+            <div><h2>External mentions</h2><p>Weekly web results that mention CodaKid outside codakid.com. This is mention monitoring, not a complete backlink index.</p></div>
+            <button type="button" className="secondary-button" disabled={researchBusy || !research?.configured} onClick={async () => { setResearchBusy(true); await refreshMentions(); setResearchBusy(false); }}><RefreshCw size={14} className={researchBusy ? 'spin' : ''} /> Refresh</button>
+          </div>
+          <div className="research-result-list">
+            {(research?.mentions.rows || []).map((mention) => (
+              <article key={mention.id}><div><strong>{mention.title || mention.domain}</strong><a href={mention.url} target="_blank" rel="noreferrer">{mention.domain}<ExternalLink size={11} /></a><p>{mention.snippet}</p></div><time>{formatDate(mention.lastSeenAt)}</time></article>
+            ))}
+            {!research?.mentions.rows.length ? <div className="research-empty"><Radio size={24} /><strong>No external mentions saved yet</strong><p>Run the weekly check to create the first sample.</p></div> : null}
+          </div>
+        </section>
+      ) : null}
+
+      {view === 'backlinks' ? <BacklinkPanel research={research} onImport={importBacklinks} /> : null}
     </div>
   );
+}
+
+function BacklinkPanel({ research, onImport }: { research: ReturnType<typeof useDashboard>['research']; onImport: (rows: Array<{ sourceUrl: string; targetUrl?: string }>) => Promise<void> }) {
+  const [busy, setBusy] = React.useState(false);
+  async function handleFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setBusy(true);
+    const text = await file.text();
+    const rows = parseBacklinkFile(text);
+    await onImport(rows);
+    setBusy(false);
+    event.target.value = '';
+  }
+  return (
+    <section className="research-mode-panel">
+      <div className="research-mode-head">
+        <div><h2>Backlink sample</h2><p>Import the free Search Console external-links CSV. Google provides a sample, so totals are intentionally labeled as partial.</p></div>
+        <label className="secondary-button file-button"><FileUp size={14} />{busy ? 'Importing…' : 'Import CSV'}<input type="file" accept=".csv,.txt,text/csv,text/plain" disabled={busy} onChange={(event) => void handleFile(event)} /></label>
+      </div>
+      <div className="research-signal-strip">
+        <div><span>Sampled links</span><strong>{formatter.format(research?.backlinks.total || 0)}</strong><small>unique source and target pairs</small></div>
+        <div><span>Referring domains</span><strong>{formatter.format(research?.backlinks.domains || 0)}</strong><small>from the imported sample</small></div>
+        <div><span>Updated</span><strong className="date-value">{research?.backlinks.updatedAt ? formatDate(research.backlinks.updatedAt) : 'Not imported'}</strong><small>latest Search Console export</small></div>
+      </div>
+      <div className="backlink-columns">
+        <div><h3>Top referring domains</h3>{research?.backlinks.topDomains.map((row) => <article key={row.domain}><span>{row.domain}</span><strong>{row.links}</strong></article>)}</div>
+        <div><h3>Most-linked pages</h3>{research?.backlinks.topTargets.map((row) => <article key={row.url}><span>{shortUrl(row.url)}</span><strong>{row.links}</strong></article>)}</div>
+      </div>
+      {!research?.backlinks.total ? <div className="research-empty compact"><Link2 size={22} /><strong>No link sample imported</strong><p>The rest of Research works without this optional file.</p></div> : null}
+    </section>
+  );
+}
+
+function parseBacklinkFile(text: string) {
+  const rows = text.split(/\r?\n/).map(parseCsvRow).filter((row) => row.length);
+  const header = rows[0]?.map((value) => value.toLowerCase()) || [];
+  const sourceIndex = Math.max(0, header.findIndex((value) => /source|linking page|latest links|url/.test(value)));
+  const targetIndex = header.findIndex((value) => /target|linked page/.test(value));
+  const hasHeader = header.some((value) => /source|link|url|target/.test(value) && !/^https?:/.test(value));
+  return rows.slice(hasHeader ? 1 : 0).map((row) => ({ sourceUrl: row[sourceIndex] || '', targetUrl: targetIndex >= 0 ? row[targetIndex] : undefined })).filter((row) => /^https?:\/\//i.test(row.sourceUrl));
+}
+
+function parseCsvRow(line: string) {
+  const cells = []; let value = ''; let quoted = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    if (char === '"' && quoted && line[index + 1] === '"') { value += '"'; index += 1; }
+    else if (char === '"') quoted = !quoted;
+    else if (char === ',' && !quoted) { cells.push(value.trim()); value = ''; }
+    else value += char;
+  }
+  cells.push(value.trim());
+  return cells;
 }
 
 function CompetitorRow({

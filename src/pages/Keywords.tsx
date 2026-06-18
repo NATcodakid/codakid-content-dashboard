@@ -25,7 +25,7 @@ import { useDashboard } from '../data';
 import { ConnectCard, LoadingState } from '../components';
 import type { KpiDelta } from '../components';
 import { SearchClicksChart, CtrPositionScatter, RankTrendChart, RankSparkline, PositionBucketTrend } from '../charts';
-import { formatDate, formatDateRange, formatPercent, formatPosition, formatter, shortUrl } from '../lib';
+import { formatCompact, formatDate, formatDateRange, formatPercent, formatPosition, formatter, shortUrl } from '../lib';
 import type { CannibalizationOpportunity, ContentDecayOpportunity, Ga4Report, KeywordIdeas, PostSummary, SearchOpportunity, SearchTrendPoint, TrackedKeyword } from '../types';
 
 type KeywordTab = 'opportunities' | 'tracking' | 'research' | 'traffic';
@@ -634,11 +634,11 @@ function KeywordTrackingPanel({
           <thead>
             <tr>
               <th>Keyword</th>
+              <th>Demand</th>
+              <th>Opportunity</th>
+              <th>Rank trend</th>
               <th>Target</th>
-              <th className="num">Rank</th>
-              <th>Movement</th>
-              <th>Trend</th>
-              <th>Competitors</th>
+              <th>SERP features</th>
               <th>Controls</th>
             </tr>
           </thead>
@@ -683,48 +683,16 @@ function TrackedKeywordRow({
           <small>{item.cluster} · {item.intent} · {item.status}</small>
         </div>
       </td>
+      <td><div className="keyword-score-cell"><strong>{item.demand.score || '—'}</strong><span><i style={{ width: `${item.demand.score || 0}%` }} /></span><small>{item.demand.impressions ? `${formatCompact(item.demand.impressions)} GSC impressions` : 'No exact GSC query'}</small></div></td>
+      <td><div className="keyword-opportunity-cell"><strong>{item.opportunityScore || '—'}</strong><span className={`difficulty-badge ${item.difficulty.label.toLowerCase()}`}>{item.difficulty.label}</span><small title={item.difficulty.basis}>estimated from live signals</small></div></td>
+      <td><div className="rank-trend-cell"><div><strong>{item.latestSerp?.position ? `#${formatPosition(item.latestSerp.position)}` : '—'}</strong><span className={movementClass(movement)}>{movement == null ? (item.lastTrackedAt ? 'flat' : 'not tracked') : `${movement > 0 ? '+' : ''}${movement.toFixed(0)}`}</span></div><RankSparkline trend={item.trend} /></div></td>
       <td>
         <div className="target-map-control">
-          <input
-            list="keyword-target-pages"
-            value={targetUrl}
-            placeholder="Unknown target"
-            onChange={(event) => setTargetUrl(event.target.value)}
-            onBlur={() => {
-              if (targetUrl !== item.targetUrl) void onUpdate({ id: item.id, targetUrl });
-            }}
-          />
-          {targetUrl && (
-            <a href={targetUrl} target="_blank" rel="noreferrer" aria-label="Open target page">
-              <Link2 size={14} />
-            </a>
-          )}
+          <input list="keyword-target-pages" value={targetUrl} placeholder="Unknown target" onChange={(event) => setTargetUrl(event.target.value)} onBlur={() => { if (targetUrl !== item.targetUrl) void onUpdate({ id: item.id, targetUrl }); }} />
+          {targetUrl ? <a href={targetUrl} target="_blank" rel="noreferrer" aria-label="Open target page"><Link2 size={14} /></a> : null}
         </div>
       </td>
-      <td className="num">{item.latestSerp?.position ? `#${formatPosition(item.latestSerp.position)}` : '-'}</td>
-      <td>
-        <span className={movementClass(movement)}>
-          {movement === null || movement === undefined
-            ? item.lastTrackedAt
-              ? 'flat'
-              : 'not tracked'
-            : `${movement > 0 ? '+' : ''}${movement.toFixed(0)}`}
-        </span>
-        {item.latestSerp?.fetchedAt && <small className="table-subtle"> {formatDate(item.latestSerp.fetchedAt)}</small>}
-      </td>
-      <td>
-        <RankSparkline trend={item.trend} />
-      </td>
-      <td>
-        <div className="competitor-chip-row">
-          {(item.latestSerp?.competitors || []).slice(0, 3).map((competitor) => (
-            <span key={`${item.id}-${competitor.domain}-${competitor.position}`}>
-              #{competitor.position} {competitor.domain}
-            </span>
-          ))}
-          {!item.latestSerp?.competitors?.length && <span>Waiting</span>}
-        </div>
-      </td>
+      <td><div className="serp-feature-counts"><span>PAA {item.serpFeatures.peopleAlsoAsk}</span><span>Related {item.serpFeatures.relatedSearches}</span></div></td>
       <td>
         <div className="table-controls">
           <button className="icon-button small-icon-button" disabled={!serpConfigured} onClick={() => onTrack(item.keyword)} title="Track SERP">

@@ -1,13 +1,14 @@
 import React from 'react';
-import { Activity, Database, Settings, ShieldCheck, UserPlus } from 'lucide-react';
+import { Activity, BarChart3, Database, RefreshCw, Settings, ShieldCheck, UserPlus } from 'lucide-react';
 import { useDashboard } from '../data';
 import { PageHeading, PanelHeader } from '../components';
 import { GoogleSearchConsolePanel, InvitePanel } from '../auth';
-import { formatDate, formatter } from '../lib';
+import { formatDate, formatDateRange, formatter } from '../lib';
 import type { Diagnostics } from '../types';
 
 export function SettingsPage() {
-  const { user, googleStatus, isSyncingGsc, syncSearchConsole } = useDashboard();
+  const { user, googleStatus, ga4, isSyncingGsc, syncSearchConsole, syncGa4 } = useDashboard();
+  const [syncingGa4, setSyncingGa4] = React.useState(false);
   const [diagnostics, setDiagnostics] = React.useState<Diagnostics | null>(null);
   const [diagnosticsError, setDiagnosticsError] = React.useState('');
 
@@ -43,6 +44,24 @@ export function SettingsPage() {
               isSyncing={isSyncingGsc}
               onSync={() => void syncSearchConsole()}
             />
+            <div className="integration-subpanel">
+              <div className="integration-subpanel-copy">
+                <BarChart3 size={18} />
+                <div><strong>Google Analytics 4</strong><span>{ga4?.latest ? `Latest period ${formatDateRange(ga4.latest.startDate, ga4.latest.endDate)}` : ga4?.analyticsScopeReady ? 'Connected, waiting for first sync' : 'Analytics authorization required'}</span></div>
+              </div>
+              <button
+                type="button"
+                className="secondary-button"
+                disabled={syncingGa4 || !ga4?.analyticsScopeReady}
+                onClick={() => {
+                  setSyncingGa4(true);
+                  void syncGa4().finally(() => setSyncingGa4(false));
+                }}
+              >
+                <RefreshCw size={14} className={syncingGa4 ? 'spin' : ''} />
+                {syncingGa4 ? 'Syncing GA4…' : 'Sync GA4 now'}
+              </button>
+            </div>
           </div>
           <div className="panel">
             <PanelHeader icon={<UserPlus />} title="Invite Access" action="team" />

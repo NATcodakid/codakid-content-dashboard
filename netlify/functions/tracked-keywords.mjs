@@ -26,19 +26,28 @@ export async function handler(event) {
         order by status asc, priority desc, keyword asc
       `;
       const keywords = rows.map((row) => row.keyword);
-      const serpRows = keywords.length
-        ? await sql`
+      const [serpRows, gscRows] = await Promise.all([
+        keywords.length ? sql`
             select *
             from serp_snapshots
             where keyword = any(${keywords})
             order by keyword asc, fetched_at desc
-          `
-        : [];
+          ` : [],
+        sql`
+          select data, start_date, end_date, created_at
+          from google_search_console_snapshots
+          where dimensions = 'query'
+          order by created_at desc
+          limit 1
+        `,
+      ]);
       const serpByKeyword = groupSerpRows(serpRows);
+      const demand = buildDemandMap(gscRows[0]?.data?.rows || [], keywords);
       return json(
         200,
         {
-          keywords: rows.map((row) => publicKeyword(row, serpByKeyword.get(row.keyword) || [])),
+          period: gscRows[0] ? { startDate: gscRows[0].start_date, endDate: gscRows[0].end_date, updatedAt: gscRows[0].created_at } : null,
+          keywords: rows.map((row) => publicKeyword(row, serpByKeyword.get(row.keyword) || [], demand.get(row.keyword.toLowerCase()))),
         },
         { 'cache-control': 'private, no-store' },
       );
@@ -173,7 +182,7 @@ function groupSerpRows(rows) {
   return map;
 }
 
-function publicKeyword(row, serpRows) {
+function publicKeyword(row, serpRows, demand = null) {
   const latest = serpRows[0] || null;
   const previous = serpRows[1] || null;
   const latestPosition = latest?.codakid_position || null;
@@ -213,7 +222,54 @@ function publicKeyword(row, serpRows) {
       })),
     previousPosition,
     positionChange,
+    demand: {
+      score: demand?.score || 0,
+      clicks: demand?.clicks || 0,
+      impressions: demand?.impressions || 0,
+      ctr: demand?.ctr || 0,
+      gscPosition: demand?.position || 0,
+    },
+    difficulty: estimateDifficulty(latest, latestPosition),
+    opportunityScore: opportunityScore(demand, latestPosition),
+    serpFeatures: {
+      peopleAlsoAsk: (latest?.people_also_ask || []).length,
+      relatedSearches: (latest?.related_searches || []).length,
+    },
   };
+}
+
+function buildDemandMap(rows, keywords) {
+  const wanted = new Set(keywords.map((keyword) => keyword.toLowerCase()));
+  const matches = rows
+    .map((row) => ({
+      keyword: String(row.keys?.[0] || '').toLowerCase(),
+      clicks: Number(row.clicks || 0),
+      impressions: Number(row.impressions || 0),
+      ctr: Number(row.ctr || 0),
+      position: Number(row.position || 0),
+    }))
+    .filter((row) => wanted.has(row.keyword));
+  const maxLog = Math.max(1, ...matches.map((row) => Math.log10(row.impressions + 1)));
+  return new Map(matches.map((row) => [row.keyword, { ...row, score: Math.round((Math.log10(row.impressions + 1) / maxLog) * 100) }]));
+}
+
+function estimateDifficulty(latest, position) {
+  if (!latest) return { score: null, label: 'Waiting for SERP', basis: 'No live SERP snapshot yet' };
+  const competitors = (latest.organic || []).filter((result) => result.domain && result.domain !== 'codakid.com').length;
+  const rankPenalty = position ? Math.min(35, Number(position) * 3) : 35;
+  const score = Math.max(0, Math.min(100, Math.round(18 + competitors * 4 + rankPenalty)));
+  return {
+    score,
+    label: score >= 70 ? 'Hard' : score >= 45 ? 'Moderate' : 'Approachable',
+    basis: 'Estimate from the current top 10 and CodaKid position',
+  };
+}
+
+function opportunityScore(demand, position) {
+  if (!demand) return 0;
+  const rankGap = position ? Math.min(1, Math.max(0.15, Number(position) / 20)) : 1;
+  const ctrGap = demand.impressions ? Math.max(0.2, 1 - demand.ctr / 0.12) : 0.2;
+  return Math.round(Math.min(100, demand.score * 0.65 + rankGap * 20 + ctrGap * 15));
 }
 
 function competitorDomains(organic) {

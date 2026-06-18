@@ -20,7 +20,7 @@ import {
   ZAxis,
 } from 'recharts';
 import { formatCompact, formatter, formatDateRange, formatShortPeriod, formatPercent, formatPosition, chartPageLabel, periodDayCount, shortUrl, inboundBarColor } from './lib';
-import type { Cluster, Pillar, SearchOpportunity, SearchTrendPoint, SearchDailyPoint, TrackedKeyword, PageSpeedHistoryPoint } from './types';
+import type { Cluster, Pillar, SearchOpportunity, SearchTrendPoint, SearchDailyPoint, TrackedKeyword, PageSpeedHistoryPoint, Ga4Report, ResearchIntelligence } from './types';
 
 const PALETTE = ['#4f663c', '#a1b887', '#2d3b23', '#9a6b12', '#5e6b52', '#8b9f72', '#a94436', '#748b61'];
 const AXIS = { fontSize: 11, fill: '#7a876e' };
@@ -679,6 +679,43 @@ export function SearchDailyChart({ daily }: { daily: SearchDailyPoint[] }) {
           <i className="impressions" /> Impressions
         </span>
       </div>
+    </div>
+  );
+}
+
+export function TrafficHistoryChart({ daily }: { daily: NonNullable<Ga4Report['latest']>['dailyTrend'] }) {
+  const rows = daily.slice(-90);
+  if (rows.length < 8) return <p className="panel-note">Daily traffic history will appear after the next GA4 sync.</p>;
+  return (
+    <div className="chart-frame traffic-history-chart" role="img" aria-label="Daily sessions, views, and key events">
+      <ResponsiveContainer width="100%" height={280}>
+        <LineChart data={rows} margin={{ top: 12, right: 16, bottom: 4, left: 0 }}>
+          <XAxis dataKey="date" tickFormatter={formatDayLabel} tick={AXIS} minTickGap={26} axisLine={false} tickLine={false} />
+          <YAxis tickFormatter={(value) => formatCompact(Number(value))} tick={AXIS} width={42} axisLine={false} tickLine={false} />
+          <Tooltip contentStyle={{ border: '1px solid #dfe5da', borderRadius: 6, boxShadow: '0 8px 20px rgba(33,45,28,.1)' }} labelFormatter={(value) => formatDateRange(String(value), String(value))} formatter={(value, name) => [formatter.format(Number(value)), name === 'keyEvents' ? 'Key events' : String(name)]} />
+          <Legend iconType="circle" iconSize={7} />
+          <Line type="monotone" dataKey="views" stroke="#9aab8b" strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey="sessions" stroke="#314b2b" strokeWidth={2.5} dot={false} />
+          <Line type="monotone" dataKey="keyEvents" stroke="#9a6b12" strokeWidth={2} dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+export function ShareOfVoiceChart({ rows }: { rows: ResearchIntelligence['market']['shareOfVoice'] }) {
+  const data = rows.slice(0, 7).map((row) => ({ ...row, percent: Math.round(row.share * 1000) / 10 }));
+  if (data.length < 2) return <p className="panel-note">Run the weekly tracked-keyword sync to build a competitive visibility comparison.</p>;
+  return (
+    <div className="chart-frame share-voice-chart" role="img" aria-label="Search share of voice by domain">
+      <ResponsiveContainer width="100%" height={Math.max(240, data.length * 40)}>
+        <BarChart data={data} layout="vertical" margin={{ top: 8, right: 30, bottom: 8, left: 12 }}>
+          <XAxis type="number" domain={[0, 'dataMax']} tickFormatter={(value) => `${value}%`} tick={AXIS} axisLine={false} tickLine={false} />
+          <YAxis type="category" dataKey="domain" width={130} tick={AXIS} axisLine={false} tickLine={false} />
+          <Tooltip formatter={(value) => [`${Number(value).toFixed(1)}%`, 'Share of voice']} cursor={{ fill: '#f3f5f0' }} />
+          <Bar dataKey="percent" fill="#4f663c" radius={[0, 4, 4, 0]} maxBarSize={20} />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 }

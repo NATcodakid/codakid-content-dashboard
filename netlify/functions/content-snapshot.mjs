@@ -89,6 +89,10 @@ export async function loadContentSnapshot({ forceRefresh = false } = {}) {
     if (cached?.data?.kpis) {
       return formatCachedSnapshot(cached, `Serving cached crawl from the last ${SNAPSHOT_CACHE_HOURS} hours.`);
     }
+    const latest = await fetchLatestWordPressSnapshot();
+    if (latest?.data?.kpis) {
+      return formatCachedSnapshot(latest, 'Serving the latest saved crawl while a fresh crawl is pending.');
+    }
   }
 
   if (inFlightCrawl) {
@@ -99,7 +103,31 @@ export async function loadContentSnapshot({ forceRefresh = false } = {}) {
     inFlightCrawl = null;
   });
 
-  return inFlightCrawl;
+  return crawlWithDeadline(inFlightCrawl);
+}
+
+async function crawlWithDeadline(crawl) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(async () => {
+      const cached = await fetchLatestWordPressSnapshot();
+      if (cached?.data?.kpis) {
+        resolve(formatCachedSnapshot(cached, 'The live crawl is taking longer than expected; showing the latest saved crawl.'));
+        return;
+      }
+      resolve({
+        ...fallbackSnapshot,
+        source: 'bundled-fallback-snapshot',
+        sourceDetail: 'The live crawl is taking longer than expected.',
+      });
+    }, 18000);
+    crawl.then((snapshot) => {
+      clearTimeout(timer);
+      resolve(snapshot);
+    }, (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
+  });
 }
 
 async function runLiveCrawl(markedPillarUrls, forceRefresh) {

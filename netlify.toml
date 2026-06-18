@@ -27,6 +27,9 @@
 [functions."technical-audit"]
   timeout = 26
 
+[functions."ai-workbench"]
+  timeout = 26
+
 [functions."ga4-scheduled"]
   schedule = "@daily"
 
@@ -61,6 +64,21 @@
 [[redirects]]
   from = "/api/dashboard-history"
   to = "/.netlify/functions/dashboard-history"
+  status = 200
+
+[[redirects]]
+  from = "/api/seo-changes"
+  to = "/.netlify/functions/seo-changes"
+  status = 200
+
+[[redirects]]
+  from = "/api/alerts"
+  to = "/.netlify/functions/alerts"
+  status = 200
+
+[[redirects]]
+  from = "/api/research-intelligence"
+  to = "/.netlify/functions/research-intelligence"
   status = 200
 
 [[redirects]]

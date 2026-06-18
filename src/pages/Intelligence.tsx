@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Bot, Download, Lightbulb, ListChecks, Plus, RefreshCw, Search, Sparkles, Wand2 } from 'lucide-react';
+import { ArrowRight, Bot, Download, ExternalLink, Globe2, Lightbulb, ListChecks, Plus, RefreshCw, Search, Sparkles, Wand2 } from 'lucide-react';
 import { useDashboard } from '../data';
 import { LoadingState } from '../components';
 import { analystBriefMarkdown, contentIdeasMarkdown, downloadMarkdown } from '../export';
@@ -43,10 +43,13 @@ export function IntelligencePage() {
   }
 
   const latestRuns = aiWorkbench?.latestVisibilityRuns || [];
+  const visibilityHistory = aiWorkbench?.visibilityHistory || [];
   const ideas = aiWorkbench?.contentIdeas || [];
   const watchlist = aiWorkbench?.prompts || [];
   const promptCount = watchlist.length;
   const visibilityMentions = latestRuns.filter((run) => run.codakidMentioned).length;
+  const recentHistory = visibilityHistory.filter((run) => Date.now() - new Date(run.createdAt).getTime() <= 30 * 86400000);
+  const historicalMentionRate = recentHistory.length ? Math.round((recentHistory.filter((run) => run.codakidMentioned).length / recentHistory.length) * 100) : null;
   const periodLabel = searchOpportunities?.startDate
     ? `${searchOpportunities.startDate} – ${searchOpportunities.endDate}`
     : 'latest crawl + GSC';
@@ -168,7 +171,7 @@ export function IntelligencePage() {
                 <p>How CodaKid shows up in AI-style parent research answers</p>
               </div>
             </div>
-            <span className="ai-lab-station-meta">{latestRuns.length} runs saved</span>
+            <span className="ai-lab-station-meta">{historicalMentionRate == null ? `${latestRuns.length} latest runs` : `${historicalMentionRate}% mentioned · last 30 days`}</span>
           </div>
 
           <div className="ai-lab-prompt-bar">
@@ -190,7 +193,7 @@ export function IntelligencePage() {
               onClick={() => void runVisibility(promptText.trim() ? [promptText.trim()] : undefined)}
             >
               <Bot size={15} />
-              {promptText.trim() ? 'Run' : 'Watchlist'}
+              {busy === 'visibility' ? 'Checking…' : promptText.trim() ? 'Run' : 'Watchlist'}
             </button>
           </div>
 
@@ -210,7 +213,17 @@ export function IntelligencePage() {
             </div>
           ) : null}
 
-          <VisibilityFeed runs={latestRuns} />
+          <VisibilityFeed
+            runs={latestRuns}
+            onSave={(run) => saveActionItem({
+              fingerprint: `ai-visibility:${run.id}`,
+              type: 'ai-visibility',
+              source: run.sourceMode === 'web' ? 'openai-web-search' : 'openai',
+              title: run.codakidMentioned ? `Strengthen visibility for “${run.prompt}”` : `Build visibility for “${run.prompt}”`,
+              detail: run.recommendations?.[0] || 'Review cited sources and improve the most relevant CodaKid page for this parent question.',
+              priorityScore: run.codakidMentioned ? 55 : 78,
+            })}
+          />
         </article>
       </section>
 
@@ -277,7 +290,7 @@ export function IntelligencePage() {
   );
 }
 
-function VisibilityFeed({ runs }: { runs: AiVisibilityRun[] }) {
+function VisibilityFeed({ runs, onSave }: { runs: AiVisibilityRun[]; onSave: (run: AiVisibilityRun) => Promise<unknown> }) {
   if (!runs.length) {
     return (
       <div className="ai-lab-feed-empty">
@@ -295,17 +308,22 @@ function VisibilityFeed({ runs }: { runs: AiVisibilityRun[] }) {
           <div className="ai-lab-feed-body">
             <header>
               <strong>{run.prompt}</strong>
-              <span className={run.codakidMentioned ? 'hit' : 'miss'}>
-                {run.codakidMentioned ? 'Mentioned' : 'Not mentioned'}
-              </span>
+              <div className="ai-visibility-badges">
+                <span className={`source ${run.sourceMode === 'web' ? 'web' : ''}`}><Globe2 size={11} />{run.sourceMode === 'web' ? 'Web-grounded' : run.sourceMode === 'model' ? 'Model answer' : 'Internal fallback'}</span>
+                <span className={run.codakidMentioned ? 'hit' : 'miss'}>{run.codakidMentioned ? 'Mentioned' : 'Not mentioned'}</span>
+              </div>
             </header>
             <p>{run.answer}</p>
+            {run.sources?.length ? (
+              <div className="ai-visibility-sources">
+                {run.sources.slice(0, 4).map((source) => (
+                  <a key={source.url} href={source.url} target="_blank" rel="noreferrer"><ExternalLink size={11} />{source.title || sourceHost(source.url)}</a>
+                ))}
+              </div>
+            ) : null}
             <footer>
-              {formatDate(run.createdAt)}
-              {run.codakidSentiment ? ` · ${run.codakidSentiment}` : ''}
-              {run.competitors?.length
-                ? ` · ${run.competitors.map((competitor) => competitor.domain).join(', ')}`
-                : ''}
+              <span>{formatDate(run.createdAt)}{run.codakidSentiment ? ` · ${run.codakidSentiment}` : ''}{run.durationMs ? ` · ${(run.durationMs / 1000).toFixed(1)}s` : ''}</span>
+              <button type="button" onClick={() => void onSave(run)}><Plus size={12} /> Add action</button>
             </footer>
           </div>
         </article>
@@ -313,6 +331,8 @@ function VisibilityFeed({ runs }: { runs: AiVisibilityRun[] }) {
     </div>
   );
 }
+
+function sourceHost(url: string) { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return 'Source'; } }
 
 function ContentIdeaCard({
   idea,

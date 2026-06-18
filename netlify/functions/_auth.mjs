@@ -244,6 +244,11 @@ export async function ensureAuthSchema() {
     )
   `;
 
+  await sql`alter table ai_visibility_runs add column if not exists sources jsonb not null default '[]'::jsonb`;
+  await sql`alter table ai_visibility_runs add column if not exists source_mode text not null default 'internal'`;
+  await sql`alter table ai_visibility_runs add column if not exists duration_ms integer`;
+  await sql`alter table ai_visibility_runs add column if not exists error text not null default ''`;
+
   await sql`
     create table if not exists ai_content_ideas (
       id text primary key,
@@ -336,6 +341,24 @@ export async function ensureAuthSchema() {
   `;
 
   await sql`
+    create table if not exists seo_changes (
+      id text primary key,
+      page_url text not null,
+      page_title text not null default '',
+      change_type text not null default 'content',
+      summary text not null,
+      notes text not null default '',
+      before_state jsonb not null default '{}'::jsonb,
+      after_state jsonb not null default '{}'::jsonb,
+      status text not null default 'planned',
+      implemented_at timestamptz,
+      created_by text,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
     create table if not exists pagespeed_snapshots (
       id text primary key,
       url text not null,
@@ -392,6 +415,45 @@ export async function ensureAuthSchema() {
     )
   `;
 
+  await sql`
+    create table if not exists dashboard_alert_states (
+      user_id text not null references dashboard_users(id) on delete cascade,
+      fingerprint text not null,
+      status text not null default 'unread',
+      snoozed_until timestamptz,
+      updated_at timestamptz not null default now(),
+      primary key (user_id, fingerprint)
+    )
+  `;
+
+  await sql`
+    create table if not exists external_mentions (
+      id text primary key,
+      url text not null unique,
+      domain text not null default '',
+      title text not null default '',
+      snippet text not null default '',
+      search_query text not null default '',
+      source text not null default 'serper',
+      first_seen_at timestamptz not null default now(),
+      last_seen_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists backlink_records (
+      id text primary key,
+      source_url text not null,
+      target_url text not null default 'https://codakid.com/',
+      domain text not null default '',
+      source text not null default 'gsc-export',
+      import_batch text not null default '',
+      first_seen_at timestamptz not null default now(),
+      last_seen_at timestamptz not null default now(),
+      unique (source_url, target_url)
+    )
+  `;
+
   await sql`create index if not exists dashboard_sessions_user_id_idx on dashboard_sessions(user_id)`;
   await sql`create index if not exists dashboard_sessions_expires_at_idx on dashboard_sessions(expires_at)`;
   await sql`create index if not exists google_oauth_states_expires_at_idx on google_oauth_states(expires_at)`;
@@ -408,10 +470,16 @@ export async function ensureAuthSchema() {
   await sql`create index if not exists tracked_keywords_last_tracked_idx on tracked_keywords(last_tracked_at asc nulls first)`;
   await sql`create index if not exists wordpress_snapshots_created_idx on wordpress_snapshots(created_at desc)`;
   await sql`create index if not exists ga4_snapshots_property_dates_idx on ga4_snapshots(property_id, start_date, end_date, created_at desc)`;
+  await sql`create index if not exists seo_changes_page_idx on seo_changes(page_url, implemented_at desc, created_at desc)`;
+  await sql`create index if not exists seo_changes_status_idx on seo_changes(status, implemented_at desc)`;
   await sql`create index if not exists pagespeed_snapshots_url_created_idx on pagespeed_snapshots(url, strategy, created_at desc)`;
   await sql`create index if not exists domain_authority_snapshots_domain_created_idx on domain_authority_snapshots(domain, created_at desc)`;
   await sql`create index if not exists dashboard_audit_log_created_idx on dashboard_audit_log(created_at desc)`;
   await sql`create index if not exists dashboard_rate_limits_reset_idx on dashboard_rate_limits(reset_at)`;
+  await sql`create index if not exists dashboard_alert_states_status_idx on dashboard_alert_states(user_id, status, snoozed_until)`;
+  await sql`create index if not exists external_mentions_seen_idx on external_mentions(last_seen_at desc, domain)`;
+  await sql`create index if not exists backlink_records_domain_idx on backlink_records(domain, last_seen_at desc)`;
+  await sql`create index if not exists backlink_records_target_idx on backlink_records(target_url, last_seen_at desc)`;
   await seedCompetitors(sql);
   await seedAiVisibilityPrompts(sql);
   await seedTrackedKeywords(sql);

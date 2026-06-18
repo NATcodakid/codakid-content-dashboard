@@ -63,6 +63,7 @@ export function OverviewPage() {
   const [searchData, setSearchData] = useState<SearchOpportunities | null>(null);
   const [loadingPeriod, setLoadingPeriod] = useState(false);
   const [customizing, setCustomizing] = useState(false);
+  const [overviewView, setOverviewView] = useState<'today' | 'performance' | 'shortcuts'>('today');
 
   useEffect(() => {
     if (searchOpportunities) setSearchData(searchOpportunities);
@@ -138,7 +139,13 @@ export function OverviewPage() {
         </DashCard>
       )}
 
-      <section id="overview-content" className="dash-section overview-section overview-content-lead">
+      <OverviewSectionTabs active={overviewView} onChange={setOverviewView} />
+
+      <section
+        id="overview-content"
+        className="dash-section overview-section overview-content-lead"
+        hidden={overviewView !== 'today'}
+      >
         <div className="dash-section-head">
           <h2>Content health</h2>
           <Link className="dash-link" to="/pillars">
@@ -191,9 +198,13 @@ export function OverviewPage() {
         </div>
       </section>
 
-      <OverviewSectionTabs />
+      {overviewView === 'today' && actions.length > 0 ? <NextActionsBlock actions={actions} /> : null}
 
-      <section id="overview-performance" className="dash-section overview-section">
+      <section
+        id="overview-performance"
+        className="dash-section overview-section"
+        hidden={overviewView !== 'performance'}
+      >
         {gscReady && searchData ? (
           <div className="overview-hero">
             <p className="overview-hero-summary">
@@ -279,8 +290,6 @@ export function OverviewPage() {
           </div>
         ) : null}
 
-        {actions.length > 0 ? <NextActionsBlock actions={actions} /> : null}
-
         {gscReady && searchData ? (
           <>
             <div className="dash-section-head">
@@ -310,7 +319,11 @@ export function OverviewPage() {
         ) : null}
       </section>
 
-      <section id="overview-shortcuts" className="dash-section overview-section">
+      <section
+        id="overview-shortcuts"
+        className="dash-section overview-section"
+        hidden={overviewView !== 'shortcuts'}
+      >
         <HomeShortcuts
           layout={homeLayout}
           onLayoutChange={saveHomeLayout}
@@ -345,33 +358,18 @@ type HomeCard = {
   action?: ReactNode;
 };
 
-function OverviewSectionTabs() {
+function OverviewSectionTabs({
+  active,
+  onChange,
+}: {
+  active: 'today' | 'performance' | 'shortcuts';
+  onChange: (view: 'today' | 'performance' | 'shortcuts') => void;
+}) {
   const tabs = [
-    { id: 'overview-content', label: 'Content' },
-    { id: 'overview-performance', label: 'Performance' },
-    { id: 'overview-shortcuts', label: 'Shortcuts' },
+    { id: 'today' as const, label: 'Today' },
+    { id: 'performance' as const, label: 'Performance' },
+    { id: 'shortcuts' as const, label: 'Tools' },
   ];
-  const [active, setActive] = useState(tabs[0].id);
-
-  useEffect(() => {
-    const sections = tabs
-      .map((tab) => document.getElementById(tab.id))
-      .filter((section): section is HTMLElement => Boolean(section));
-    if (!sections.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible?.target.id) setActive(visible.target.id);
-      },
-      { rootMargin: '-18% 0px -62% 0px', threshold: [0, 0.2, 0.45] },
-    );
-
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <nav className="overview-section-tabs" aria-label="Overview sections">
@@ -380,10 +378,8 @@ function OverviewSectionTabs() {
           key={tab.id}
           type="button"
           className={active === tab.id ? 'active' : ''}
-          onClick={() => {
-            document.getElementById(tab.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            setActive(tab.id);
-          }}
+          aria-pressed={active === tab.id}
+          onClick={() => onChange(tab.id)}
         >
           {tab.label}
         </button>

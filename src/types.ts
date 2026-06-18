@@ -184,12 +184,29 @@ export type DashboardHistory = {
     users: number;
     views: number;
     engagementRate: number;
+    keyEvents?: number;
+    totalRevenue?: number;
+  }>;
+  ga4Daily: Array<{
+    date: string;
+    sessions: number;
+    users: number;
+    views: number;
+    keyEvents: number;
+    totalRevenue: number;
   }>;
   searchConsole: Array<{
     createdAt: string;
     startDate: string;
     endDate: string;
     dimensions: string;
+    clicks: number;
+    impressions: number;
+    ctr: number;
+    position: number;
+  }>;
+  searchDaily: Array<{
+    date: string;
     clicks: number;
     impressions: number;
     ctr: number;
@@ -248,6 +265,10 @@ export type AiVisibilityRun = {
   codakidSentiment: string;
   competitors: Array<{ domain: string; reason?: string }>;
   recommendations: string[];
+  sources: Array<{ url: string; title?: string }>;
+  sourceMode: 'web' | 'model' | 'internal' | string;
+  durationMs?: number | null;
+  error?: string;
   createdAt: string;
 };
 
@@ -276,6 +297,7 @@ export type AiWorkbench = {
   configured: boolean;
   prompts: AiVisibilityPrompt[];
   latestVisibilityRuns: AiVisibilityRun[];
+  visibilityHistory: AiVisibilityRun[];
   contentIdeas: AiContentIdea[];
 };
 
@@ -345,6 +367,67 @@ export type TrackedKeyword = {
   }>;
   previousPosition?: number | null;
   positionChange?: number | null;
+  demand: {
+    score: number;
+    clicks: number;
+    impressions: number;
+    ctr: number;
+    gscPosition: number;
+  };
+  difficulty: {
+    score: number | null;
+    label: string;
+    basis: string;
+  };
+  opportunityScore: number;
+  serpFeatures: {
+    peopleAlsoAsk: number;
+    relatedSearches: number;
+  };
+};
+
+export type AlertItem = {
+  fingerprint: string;
+  type: string;
+  severity: 'high' | 'medium' | 'low' | string;
+  title: string;
+  detail: string;
+  source: string;
+  createdAt: string;
+  to: string;
+  status: 'unread' | 'read' | string;
+};
+
+export type AlertReport = {
+  generatedAt: string;
+  summary: { total: number; unread: number; high: number };
+  alerts: AlertItem[];
+};
+
+export type ResearchIntelligence = {
+  generatedAt: string;
+  configured: boolean;
+  market: {
+    trackedSerps: number;
+    codakidShare: number;
+    latestAt?: string | null;
+    shareOfVoice: Array<{ domain: string; score: number; share: number }>;
+    serpFeatures: { peopleAlsoAsk: number; relatedSearches: number };
+  };
+  mentions: {
+    total: number;
+    newThisMonth: number;
+    latestAt?: string | null;
+    rows: Array<{ id: string; url: string; domain: string; title: string; snippet: string; firstSeenAt: string; lastSeenAt: string }>;
+  };
+  backlinks: {
+    total: number;
+    domains: number;
+    updatedAt?: string | null;
+    topDomains: Array<{ domain: string; links: number; lastSeenAt: string }>;
+    topTargets: Array<{ url: string; links: number; domains: number }>;
+  };
+  credits: { usedThisMonth: number; monthlyBudget: number };
 };
 
 export type KeywordInput = {
@@ -377,11 +460,15 @@ export type Ga4Report = {
       screenPageViews: number;
       engagementRate: number;
       averageSessionDuration: number;
+      keyEvents: number;
+      totalRevenue: number;
       deltas: {
         sessions: number | null;
         totalUsers: number | null;
         screenPageViews: number | null;
         engagementRate: number | null;
+        keyEvents: number | null;
+        totalRevenue: number | null;
       };
     };
     topPages: Array<{
@@ -392,8 +479,84 @@ export type Ga4Report = {
       sessions: number;
       users: number;
       engagementRate: number;
+      keyEvents: number;
+      totalRevenue: number;
+    }>;
+    dailyTrend: Array<{
+      date: string;
+      sessions: number;
+      users: number;
+      views: number;
+      keyEvents: number;
+      totalRevenue: number;
+    }>;
+    pageDaily: Array<{
+      path: string;
+      url: string;
+      date: string;
+      sessions: number;
+      users: number;
+      views: number;
+      keyEvents: number;
+      totalRevenue: number;
     }>;
   } | null;
+};
+
+export type SeoChangeMetric = {
+  before: number;
+  after: number;
+  beforeDaily: number;
+  afterDaily: number;
+  change: number | null;
+};
+
+export type SeoChange = {
+  id: string;
+  pageUrl: string;
+  pageTitle: string;
+  changeType: string;
+  summary: string;
+  notes: string;
+  status: 'planned' | 'implemented' | 'measuring' | 'complete' | string;
+  implementedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  impact: {
+    ready: boolean;
+    state: 'planned' | 'collecting' | 'measured' | string;
+    message: string;
+    implementationDate?: string;
+    beforePeriod?: { startDate: string; endDate: string; days: number; observedDays: number };
+    afterPeriod?: { startDate: string; endDate: string; days: number; observedDays: number };
+    metrics?: Record<'clicks' | 'impressions' | 'sessions' | 'views' | 'keyEvents' | 'totalRevenue', SeoChangeMetric>;
+    score?: number;
+  };
+};
+
+export type SeoChangesReport = {
+  generatedAt: string;
+  coverage: {
+    ga4StartDate: string;
+    ga4EndDate: string;
+    gscStartDate: string;
+    gscEndDate: string;
+    ga4Rows: number;
+    gscRows: number;
+  };
+  summary: { total: number; planned: number; measuring: number; measured: number; wins: number; medianImpact: number | null };
+  changes: SeoChange[];
+};
+
+export type SeoChangeInput = {
+  id?: string;
+  pageUrl?: string;
+  pageTitle?: string;
+  changeType?: string;
+  summary?: string;
+  notes?: string;
+  status?: string;
+  implementedAt?: string | null;
 };
 
 export type TechnicalAuditIssue = {

@@ -427,7 +427,7 @@ function scoreOpportunity({ impressions, ctr, position, missedClicks }) {
 
 function recommendationFor(type, { label, page, query, position, missedClicks }) {
   if (type === 'low-ctr-page') {
-    return `Rewrite the title/meta for this page. It has visibility but is under-clicking by roughly ${missedClicks} visits.`;
+    return `Rewrite the title/meta for this page. Based on its impressions and current CTR, it may be missing roughly ${Math.round(missedClicks).toLocaleString('en-US')} clicks in this reporting window.`;
   }
   if (type === 'striking-distance-query') {
     return `Strengthen the best matching page for "${label}" with a tighter section, FAQ, and internal links. Average position ${position.toFixed(1)}.`;

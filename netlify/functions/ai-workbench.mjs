@@ -18,7 +18,7 @@ export async function handler(event) {
     const sql = getSql();
 
     if (event.httpMethod === 'GET') {
-      const [promptRows, runRows, ideaRows] = await Promise.all([
+      const [promptRows, runRows, historyRows, ideaRows] = await Promise.all([
         sql`
           select *
           from ai_visibility_prompts
@@ -34,6 +34,12 @@ export async function handler(event) {
         `,
         sql`
           select *
+          from ai_visibility_runs
+          order by created_at desc
+          limit 240
+        `,
+        sql`
+          select *
           from ai_content_ideas
           where status <> 'archived'
           order by priority_score desc, created_at desc
@@ -45,6 +51,7 @@ export async function handler(event) {
         configured: Boolean(process.env.OPENAI_API_KEY),
         prompts: promptRows.map(publicPrompt),
         latestVisibilityRuns: runRows.map(publicVisibilityRun),
+        visibilityHistory: historyRows.map(publicVisibilityRun),
         contentIdeas: ideaRows.map(publicContentIdea),
       }, { 'cache-control': 'private, no-store' });
     }
@@ -142,46 +149,66 @@ async function aiVisibility(sql, user, body) {
     ? await upsertPrompts(sql, user, incomingPrompts)
     : await sql`select * from ai_visibility_prompts where status = 'active' order by cluster asc, prompt asc limit 6`;
 
-  const runs = [];
-  for (const prompt of promptRows.slice(0, 6)) {
-    const fallback = fallbackVisibility(prompt.prompt, body);
-    const result = await openAiJson({
-      fallback,
-      system: 'You simulate how an AI answer engine may answer parent research prompts. Be honest and data-grounded. Return JSON only.',
-      user: `For the prompt below, produce an AI-search visibility readout for CodaKid and competitors. Return JSON exactly like {"answer":"","codakidMentioned":false,"codakidSentiment":"positive|neutral|negative|unknown","competitors":[{"domain":"","reason":""}],"recommendations":[""]}.\nPrompt: ${prompt.prompt}\nContext:\n${JSON.stringify(trimContext(body), null, 2)}`,
-    });
-    const data = result.data || fallback;
-    const rows = await sql`
-      insert into ai_visibility_runs (
-        id,
-        prompt_id,
-        prompt,
-        model,
-        answer,
-        codakid_mentioned,
-        codakid_sentiment,
-        competitors,
-        recommendations,
-        created_by
-      )
-      values (
-        ${randomUUID()},
-        ${prompt.id},
-        ${prompt.prompt},
-        ${result.model || result.mode},
-        ${String(data.answer || '').slice(0, 4000)},
-        ${Boolean(data.codakidMentioned)},
-        ${String(data.codakidSentiment || 'unknown').slice(0, 40)},
-        ${JSON.stringify(Array.isArray(data.competitors) ? data.competitors.slice(0, 8) : [])},
-        ${JSON.stringify(Array.isArray(data.recommendations) ? data.recommendations.slice(0, 8) : [])},
-        ${user.email}
-      )
-      returning *
-    `;
-    runs.push(publicVisibilityRun(rows[0]));
-  }
+  const selectedPrompts = promptRows.slice(0, 6);
+  const context = slimVisibilityContext(body);
+  const fallbackResults = selectedPrompts.map((prompt) => ({
+    prompt: prompt.prompt,
+    ...fallbackVisibility(prompt.prompt, body),
+  }));
+  const result = await openAiJson({
+    fallback: { results: fallbackResults },
+    maxOutputTokens: 2400,
+    webSearch: true,
+    system: 'You are an AI visibility researcher for a kids coding education company. Search the live web before answering. Separate what the sources support from internal dashboard context. Return JSON only.',
+    user: `Research each parent prompt on the live web and report which brands and pages an answer engine is likely to surface today. Return JSON exactly like {"results":[{"prompt":"","answer":"","codakidMentioned":false,"codakidSentiment":"positive|neutral|negative|unknown","competitors":[{"domain":"","reason":""}],"recommendations":[""]}]}. Include one result per prompt in the same order. Do not mark CodaKid mentioned unless live sources or results support it.\nPrompts:\n${JSON.stringify(selectedPrompts.map((prompt) => prompt.prompt))}\nInternal context for comparison only:\n${JSON.stringify(context)}`,
+  });
+  const generated = Array.isArray(result.data?.results) ? result.data.results : fallbackResults;
+  const runs = await Promise.all(
+    selectedPrompts.map((prompt, index) =>
+      saveVisibilityRun(sql, user, prompt, generated[index] || fallbackResults[index], result),
+    ),
+  );
 
   return { configured: Boolean(process.env.OPENAI_API_KEY), runs };
+}
+
+async function saveVisibilityRun(sql, user, prompt, data, result) {
+  const rows = await sql`
+    insert into ai_visibility_runs (
+      id,
+      prompt_id,
+      prompt,
+      model,
+      answer,
+      codakid_mentioned,
+      codakid_sentiment,
+      competitors,
+      recommendations,
+      sources,
+      source_mode,
+      duration_ms,
+      error,
+      created_by
+    )
+    values (
+      ${randomUUID()},
+      ${prompt.id},
+      ${prompt.prompt},
+      ${result.mode === 'openai' ? result.model : result.mode},
+      ${String(data.answer || '').slice(0, 4000)},
+      ${Boolean(data.codakidMentioned)},
+      ${String(data.codakidSentiment || 'unknown').slice(0, 40)},
+      ${JSON.stringify(Array.isArray(data.competitors) ? data.competitors.slice(0, 8) : [])},
+      ${JSON.stringify(Array.isArray(data.recommendations) ? data.recommendations.slice(0, 8) : [])},
+      ${JSON.stringify(result.sources || [])},
+      ${result.sourceMode || 'internal'},
+      ${result.durationMs || null},
+      ${String(result.error || '').slice(0, 500)},
+      ${user.email}
+    )
+    returning *
+  `;
+  return publicVisibilityRun(rows[0]);
 }
 
 async function pageBrief(body) {
@@ -194,8 +221,9 @@ async function pageBrief(body) {
   return { mode: result.mode, model: result.model, brief: result.data };
 }
 
-async function openAiJson({ system, user, fallback }) {
-  if (!process.env.OPENAI_API_KEY) return { mode: 'fallback', model: '', data: fallback };
+async function openAiJson({ system, user, fallback, maxOutputTokens = 1800, webSearch = false }) {
+  if (!process.env.OPENAI_API_KEY) return { mode: 'fallback', model: '', data: fallback, sources: [], sourceMode: 'internal', error: 'OpenAI is not configured.' };
+  const startedAt = Date.now();
   try {
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
@@ -209,18 +237,65 @@ async function openAiJson({ system, user, fallback }) {
           { role: 'system', content: system },
           { role: 'user', content: user },
         ],
-        text: {
-          format: { type: 'json_object' },
-        },
+        ...(!webSearch ? { text: { format: { type: 'json_object' } } } : {}),
+        ...(webSearch ? { tools: [{ type: 'web_search' }], include: ['web_search_call.action.sources'] } : {}),
+        max_output_tokens: maxOutputTokens,
       }),
     });
-    if (!response.ok) return { mode: 'fallback', model: DEFAULT_MODEL, data: fallback };
+    if (!response.ok) {
+      const detail = await response.text();
+      return { mode: 'fallback', model: DEFAULT_MODEL, data: fallback, sources: [], sourceMode: 'internal', durationMs: Date.now() - startedAt, error: detail.slice(0, 500) };
+    }
     const payload = await response.json();
     const text = payload.output_text || extractOutputText(payload);
-    return { mode: 'openai', model: DEFAULT_MODEL, data: parseJson(text, fallback) };
-  } catch {
-    return { mode: 'fallback', model: DEFAULT_MODEL, data: fallback };
+    const sources = webSearch ? extractSources(payload) : [];
+    return {
+      mode: 'openai',
+      model: DEFAULT_MODEL,
+      data: parseJson(text, fallback),
+      sources,
+      sourceMode: webSearch && sources.length ? 'web' : 'model',
+      durationMs: Date.now() - startedAt,
+      error: '',
+    };
+  } catch (error) {
+    return { mode: 'fallback', model: DEFAULT_MODEL, data: fallback, sources: [], sourceMode: 'internal', durationMs: Date.now() - startedAt, error: error instanceof Error ? error.message : 'OpenAI request failed.' };
   }
+}
+
+function slimVisibilityContext(body) {
+  const snapshot = body.snapshot || {};
+  return {
+    generatedAt: snapshot.generatedAt,
+    siteKpis: snapshot.kpis,
+    pillars: snapshot.pillars?.slice(0, 5).map((pillar) => ({
+      title: pillar.title,
+      url: pillar.url,
+      cluster: pillar.cluster,
+      inboundCount: pillar.inboundCount,
+    })),
+    clusters: snapshot.clusters?.slice(0, 6),
+    competitors: body.competitors?.competitors?.slice(0, 8).map((competitor) => ({
+      domain: competitor.domain,
+      label: competitor.label,
+      category: competitor.category,
+      overlapScore: competitor.overlapScore,
+    })),
+    search: body.searchOpportunities
+      ? {
+          period: [body.searchOpportunities.startDate, body.searchOpportunities.endDate],
+          summary: body.searchOpportunities.summary,
+          topQueries: body.searchOpportunities.topQueries?.slice(0, 6),
+        }
+      : null,
+    auditSummary: body.technicalAudit?.summary,
+    ga4: body.ga4?.latest
+      ? {
+          period: [body.ga4.latest.startDate, body.ga4.latest.endDate],
+          summary: body.ga4.latest.summary,
+        }
+      : null,
+  };
 }
 
 async function upsertPrompts(sql, user, prompts) {
@@ -393,6 +468,10 @@ function publicVisibilityRun(row) {
     codakidSentiment: row.codakid_sentiment,
     competitors: row.competitors || [],
     recommendations: row.recommendations || [],
+    sources: row.sources || [],
+    sourceMode: row.source_mode || 'internal',
+    durationMs: row.duration_ms,
+    error: row.error || '',
     createdAt: row.created_at,
   };
 }
@@ -427,4 +506,26 @@ function extractOutputText(data) {
     ?.map((content) => content.text || '')
     ?.join('\n')
     ?.trim();
+}
+
+function extractSources(payload) {
+  const found = new Map();
+  const visit = (value) => {
+    if (!value) return;
+    if (Array.isArray(value)) {
+      value.forEach(visit);
+      return;
+    }
+    if (typeof value !== 'object') return;
+    const url = typeof value.url === 'string' ? value.url : '';
+    if (/^https?:\/\//i.test(url)) {
+      found.set(url, {
+        url,
+        title: String(value.title || value.name || '').slice(0, 240),
+      });
+    }
+    Object.values(value).forEach(visit);
+  };
+  visit(payload.output);
+  return [...found.values()].slice(0, 20);
 }

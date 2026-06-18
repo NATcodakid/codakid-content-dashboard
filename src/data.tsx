@@ -5,6 +5,7 @@ import type {
   ActionInput,
   ActionItem,
   ActionStatus,
+  AlertReport,
   AiAnalystBrief,
   AiResponse,
   AiWorkbench,
@@ -24,6 +25,9 @@ import type {
   PageBrief,
   SerpTracker,
   SearchOpportunities,
+  ResearchIntelligence,
+  SeoChangeInput,
+  SeoChangesReport,
   Snapshot,
   TechnicalAudit,
   TrackedKeyword,
@@ -41,6 +45,9 @@ type DashboardContextValue = {
   googleStatus: GoogleStatus | null;
   searchOpportunities: SearchOpportunities | null;
   ga4: Ga4Report | null;
+  seoChanges: SeoChangesReport | null;
+  alerts: AlertReport | null;
+  research: ResearchIntelligence | null;
   markedPillars: MarkedPillar[];
   actionItems: ActionItem[];
   trackedKeywords: TrackedKeyword[];
@@ -67,6 +74,12 @@ type DashboardContextValue = {
   archiveTrackedKeyword: (id: string) => Promise<void>;
   syncTrackedKeywords: () => Promise<void>;
   syncGa4: () => Promise<void>;
+  saveSeoChange: (item: SeoChangeInput) => Promise<void>;
+  updateSeoChange: (item: SeoChangeInput & { id: string }) => Promise<void>;
+  deleteSeoChange: (id: string) => Promise<void>;
+  updateAlert: (fingerprint: string, status: 'read' | 'dismissed' | 'snoozed' | 'unread', days?: number) => Promise<void>;
+  refreshMentions: () => Promise<void>;
+  importBacklinks: (rows: Array<{ sourceUrl: string; targetUrl?: string }>) => Promise<void>;
   saveCompetitor: (item: CompetitorInput) => Promise<void>;
   archiveCompetitor: (domain: string) => Promise<void>;
   refreshAuthority: () => Promise<void>;
@@ -109,6 +122,9 @@ export function DashboardProvider({
   const [googleStatus, setGoogleStatus] = React.useState<GoogleStatus | null>(null);
   const [searchOpportunities, setSearchOpportunities] = React.useState<SearchOpportunities | null>(null);
   const [ga4, setGa4] = React.useState<Ga4Report | null>(null);
+  const [seoChanges, setSeoChanges] = React.useState<SeoChangesReport | null>(null);
+  const [alerts, setAlerts] = React.useState<AlertReport | null>(null);
+  const [research, setResearch] = React.useState<ResearchIntelligence | null>(null);
   const [markedPillars, setMarkedPillars] = React.useState<MarkedPillar[]>([]);
   const [actionItems, setActionItems] = React.useState<ActionItem[]>([]);
   const [trackedKeywords, setTrackedKeywords] = React.useState<TrackedKeyword[]>([]);
@@ -171,6 +187,9 @@ export function DashboardProvider({
         historyResponse,
         authorityResponse,
         pageSpeedResponse,
+        seoChangesResponse,
+        alertsResponse,
+        researchResponse,
       ] =
         await Promise.all([
           fetch(snapshotUrl, { credentials: 'include' }),
@@ -188,6 +207,9 @@ export function DashboardProvider({
           fetch('/api/dashboard-history', { credentials: 'include' }).catch(() => null),
           fetch('/api/authority', { credentials: 'include' }).catch(() => null),
           fetch('/api/pagespeed', { credentials: 'include' }).catch(() => null),
+          fetch('/api/seo-changes', { credentials: 'include' }).catch(() => null),
+          fetch('/api/alerts', { credentials: 'include' }).catch(() => null),
+          fetch('/api/research-intelligence', { credentials: 'include' }).catch(() => null),
         ]);
 
       if (contentResponse.status === 401) {
@@ -213,11 +235,17 @@ export function DashboardProvider({
       const historyData = historyResponse?.ok ? ((await historyResponse.json()) as DashboardHistory) : null;
       const authorityData = authorityResponse?.ok ? ((await authorityResponse.json()) as DomainAuthorityReport) : null;
       const pageSpeedData = pageSpeedResponse?.ok ? ((await pageSpeedResponse.json()) as PageSpeedReport) : null;
+      const seoChangesData = seoChangesResponse?.ok ? ((await seoChangesResponse.json()) as SeoChangesReport) : null;
+      const alertsData = alertsResponse?.ok ? ((await alertsResponse.json()) as AlertReport) : null;
+      const researchData = researchResponse?.ok ? ((await researchResponse.json()) as ResearchIntelligence) : null;
       setSnapshot(content);
       setCompetitors(competitorData);
       setTechnicalAudit(technicalAuditData);
       setGoogleStatus(googleResponse?.ok ? ((await googleResponse.json()) as GoogleStatus) : null);
       setGa4(ga4Data);
+      setSeoChanges(seoChangesData);
+      setAlerts(alertsData);
+      setResearch(researchData);
       setSearchOpportunities(opportunityData);
       setActionItems(actionData);
       setTrackedKeywords(trackedKeywordData);
@@ -316,6 +344,15 @@ export function DashboardProvider({
     }
   }, []);
 
+  const refreshMeasurementData = React.useCallback(async () => {
+    const [historyResponse, changesResponse] = await Promise.all([
+      fetch('/api/dashboard-history', { credentials: 'include' }).catch(() => null),
+      fetch('/api/seo-changes', { credentials: 'include' }).catch(() => null),
+    ]);
+    if (historyResponse?.ok) setDashboardHistory((await historyResponse.json()) as DashboardHistory);
+    if (changesResponse?.ok) setSeoChanges((await changesResponse.json()) as SeoChangesReport);
+  }, []);
+
   const syncSearchConsole = React.useCallback(async () => {
     setIsSyncingGsc(true);
     try {
@@ -327,12 +364,14 @@ export function DashboardProvider({
         throw new Error(data.error || 'Search Console sync failed.');
       }
       await refreshGoogleStatus();
+      await refreshMeasurementData();
+      toast.success('Search Console history updated');
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Search Console sync failed.');
     } finally {
       setIsSyncingGsc(false);
     }
-  }, [refreshGoogleStatus]);
+  }, [refreshGoogleStatus, refreshMeasurementData]);
 
   const serverConfirmed = React.useMemo(() => {
     const set = new Set<string>();
@@ -555,10 +594,70 @@ export function DashboardProvider({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'GA4 sync failed.');
       setGa4(data as Ga4Report);
+      await refreshMeasurementData();
+      toast.success('GA4 history updated');
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'GA4 sync failed.');
     }
+  }, [refreshMeasurementData]);
+
+  const mutateSeoChange = React.useCallback(async (method: 'POST' | 'PATCH' | 'DELETE', item: SeoChangeInput) => {
+    try {
+      const response = await apiFetch('/api/seo-changes', {
+        method,
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(item),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not save SEO change.');
+      setSeoChanges(data as SeoChangesReport);
+      toast.success(method === 'DELETE' ? 'Change removed' : 'SEO change saved');
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : 'Could not save SEO change.';
+      setError(message);
+      toast.error(message);
+    }
   }, []);
+
+  const saveSeoChange = React.useCallback((item: SeoChangeInput) => mutateSeoChange('POST', item), [mutateSeoChange]);
+  const updateSeoChange = React.useCallback((item: SeoChangeInput & { id: string }) => mutateSeoChange('PATCH', item), [mutateSeoChange]);
+  const deleteSeoChange = React.useCallback((id: string) => mutateSeoChange('DELETE', { id }), [mutateSeoChange]);
+
+  const updateAlert = React.useCallback(async (fingerprint: string, status: 'read' | 'dismissed' | 'snoozed' | 'unread', days = 7) => {
+    try {
+      const response = await apiFetch('/api/alerts', {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ fingerprint, status, days }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not update alert.');
+      setAlerts(data as AlertReport);
+    } catch (caught) {
+      toast.error(caught instanceof Error ? caught.message : 'Could not update alert.');
+    }
+  }, []);
+
+  const mutateResearch = React.useCallback(async (action: 'refresh-mentions' | 'import-backlinks', extra: Record<string, unknown> = {}) => {
+    try {
+      const response = await apiFetch('/api/research-intelligence', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action, ...extra }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Research update failed.');
+      setResearch(data as ResearchIntelligence);
+      toast.success(action === 'refresh-mentions' ? 'External mentions refreshed' : 'Backlink sample imported');
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : 'Research update failed.';
+      setError(message);
+      toast.error(message);
+    }
+  }, []);
+
+  const refreshMentions = React.useCallback(() => mutateResearch('refresh-mentions'), [mutateResearch]);
+  const importBacklinks = React.useCallback((rows: Array<{ sourceUrl: string; targetUrl?: string }>) => mutateResearch('import-backlinks', { rows }), [mutateResearch]);
 
   const refreshCompetitors = React.useCallback(async () => {
     const response = await fetch('/api/competitors', { credentials: 'include' });
@@ -655,6 +754,9 @@ export function DashboardProvider({
     googleStatus,
     searchOpportunities,
     ga4,
+    seoChanges,
+    alerts,
+    research,
     markedPillars,
     actionItems,
     trackedKeywords,
@@ -681,6 +783,12 @@ export function DashboardProvider({
     archiveTrackedKeyword,
     syncTrackedKeywords,
     syncGa4,
+    saveSeoChange,
+    updateSeoChange,
+    deleteSeoChange,
+    updateAlert,
+    refreshMentions,
+    importBacklinks,
     saveCompetitor,
     archiveCompetitor,
     refreshAuthority,

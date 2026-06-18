@@ -147,6 +147,7 @@ export async function syncSearchAnalytics() {
     ['query'],
     ['page', 'query'],
     ['date'],
+    ['page', 'date'],
   ];
   const snapshots = [];
 
@@ -155,7 +156,7 @@ export async function syncSearchAnalytics() {
       startDate,
       endDate,
       dimensions,
-      rowLimit: dimensions.length > 1 ? 2500 : 500,
+      rowLimit: dimensions.join(',') === 'page,date' ? 10000 : dimensions.length > 1 ? 2500 : 500,
       searchType: 'web',
     };
     const data = await gscFetch(`/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query`, {

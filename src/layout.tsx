@@ -1,19 +1,19 @@
 import React from 'react';
-import { NavLink, Outlet, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useSearchParams } from 'react-router-dom';
 import {
   ArrowsClockwise,
+  Bell,
   ChartLineUp,
+  Check,
+  ClockCountdown,
   FileMagnifyingGlass,
   GearSix,
   GlobeHemisphereWest,
-  Graph,
   Lightning,
-  MapTrifold,
   NewspaperClipping,
-  ShareNetwork,
   SignOut,
-  Sparkle,
   Stack,
+  X,
   type Icon,
 } from '@phosphor-icons/react';
 import { useDashboard } from './data';
@@ -27,6 +27,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/pillars': 'Pillars',
   '/audit': 'Audit',
   '/links': 'Links',
+  '/changes': 'Change Impact',
   '/actions': 'Actions',
   '/gameplan': 'Gameplan',
   '/intelligence': 'AI Lab',
@@ -40,36 +41,23 @@ type NavItemDef = {
   to: string;
   label: string;
   icon: Icon;
-  end?: boolean;
   badge?: BadgeKey;
+  routes: string[];
 };
 
-const NAV_GROUPS: { label: string; items: NavItemDef[] }[] = [
-  {
-    label: 'Performance',
-    items: [
-      { to: '/', label: 'Overview', icon: ChartLineUp, end: true },
-      { to: '/keywords', label: 'Keywords', icon: FileMagnifyingGlass },
-      { to: '/reports', label: 'Reports', icon: NewspaperClipping },
-    ],
-  },
-  {
-    label: 'Content',
-    items: [
-      { to: '/pillars', label: 'Pillars', icon: Stack },
-      { to: '/audit', label: 'Audit', icon: Graph, badge: 'audit' },
-      { to: '/links', label: 'Links', icon: ShareNetwork },
-    ],
-  },
-  {
-    label: 'Strategy',
-    items: [
-      { to: '/actions', label: 'Actions', icon: Lightning, badge: 'actions' },
-      { to: '/gameplan', label: 'Gameplan', icon: MapTrifold },
-      { to: '/intelligence', label: 'AI Lab', icon: Sparkle },
-      { to: '/competitors', label: 'Competitors', icon: GlobeHemisphereWest },
-    ],
-  },
+const PRIMARY_NAV: NavItemDef[] = [
+  { to: '/', label: 'Overview', icon: ChartLineUp, routes: ['/'] },
+  { to: '/keywords', label: 'Performance', icon: FileMagnifyingGlass, routes: ['/keywords'] },
+  { to: '/pillars', label: 'Content', icon: Stack, routes: ['/pillars', '/pages', '/audit', '/links', '/changes'] },
+  { to: '/competitors', label: 'Research', icon: GlobeHemisphereWest, routes: ['/competitors', '/intelligence'] },
+  { to: '/actions', label: 'Roadmap', icon: Lightning, badge: 'actions', routes: ['/actions', '/gameplan'] },
+  { to: '/reports', label: 'Reports', icon: NewspaperClipping, routes: ['/reports'] },
+];
+
+const WORKSPACE_TABS = [
+  { routes: ['/pillars', '/pages', '/audit', '/links', '/changes'], items: [['/pillars', 'Pillars'], ['/audit', 'Site health'], ['/links', 'Internal links'], ['/changes', 'Change impact']] },
+  { routes: ['/competitors', '/intelligence'], items: [['/competitors', 'Competitors'], ['/intelligence', 'AI visibility']] },
+  { routes: ['/actions', '/gameplan'], items: [['/actions', 'Work queue'], ['/gameplan', 'SEO plan']] },
 ];
 
 function NavItemIcon({ icon: IconComponent, active }: { icon: Icon; active: boolean }) {
@@ -96,12 +84,15 @@ export function DashboardLayout() {
     googleStatus,
     technicalAudit,
     actionItems,
+    alerts,
     isLoading,
     error,
     refresh,
+    updateAlert,
     onLogout,
   } = useDashboard();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [alertsOpen, setAlertsOpen] = React.useState(false);
   const location = useLocation();
 
   const pageTitle = React.useMemo(() => {
@@ -114,6 +105,7 @@ export function DashboardLayout() {
   const crawlUpdated = snapshot?.generatedAt ? formatDate(snapshot.generatedAt) : null;
   const openActions = actionItems.filter((item) => item.status !== 'done' && item.status !== 'dismissed').length;
   const auditHigh = technicalAudit?.summary.high || 0;
+  const activeTabs = WORKSPACE_TABS.find((workspace) => workspace.routes.some((route) => routeMatches(location.pathname, route)))?.items || [];
 
   const badgeCounts: Record<BadgeKey, number> = {
     actions: openActions,
@@ -159,32 +151,19 @@ export function DashboardLayout() {
         </div>
 
         <nav className="nav-list" aria-label="Dashboard navigation">
-          {NAV_GROUPS.map((group) => (
-            <div className="nav-group" key={group.label}>
-              <span className="nav-group-label">{group.label}</span>
-              {group.items.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.end}
-                  className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
-                >
-                  {({ isActive }) => (
-                    <>
-                      <NavItemIcon icon={item.icon} active={isActive} />
-                      <span className="nav-item-label">{item.label}</span>
-                      {item.badge ? (
-                        <NavBadge
-                          count={badgeCounts[item.badge]}
-                          tone={item.badge === 'audit' && auditHigh > 0 ? 'danger' : 'default'}
-                        />
-                      ) : null}
-                    </>
-                  )}
-                </NavLink>
-              ))}
-            </div>
-          ))}
+          <div className="nav-group primary-workspaces">
+            <span className="nav-group-label">Workspaces</span>
+            {PRIMARY_NAV.map((item) => {
+              const active = item.routes.some((route) => routeMatches(location.pathname, route));
+              return (
+                <Link key={item.to} to={item.to} className={active ? 'nav-item active' : 'nav-item'}>
+                  <NavItemIcon icon={item.icon} active={active} />
+                  <span className="nav-item-label">{item.label}</span>
+                  {item.badge ? <NavBadge count={badgeCounts[item.badge]} tone={item.badge === 'audit' && auditHigh > 0 ? 'danger' : 'default'} /> : null}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
         <footer className="sidebar-footer">
@@ -224,10 +203,39 @@ export function DashboardLayout() {
       <main className="main">
         <header className="topbar">
           <div className="topbar-title">
-            <h1>{pageTitle}</h1>
             {crawlUpdated ? <span className="topbar-meta">Crawl updated {crawlUpdated}</span> : null}
           </div>
+          <button
+            type="button"
+            className="topbar-alert-button"
+            onClick={() => setAlertsOpen(true)}
+            aria-label={`Open alerts${alerts?.summary.unread ? `, ${alerts.summary.unread} unread` : ''}`}
+          >
+            <Bell size={18} weight={alerts?.summary.unread ? 'fill' : 'regular'} />
+            <span>Alerts</span>
+            {alerts?.summary.unread ? <b>{alerts.summary.unread > 99 ? '99+' : alerts.summary.unread}</b> : null}
+          </button>
         </header>
+
+        {activeTabs.length ? (
+          <nav className="workspace-tabs" aria-label={`${pageTitle} workspace`}>
+            {activeTabs.map(([to, label]) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) => (
+                  isActive
+                  || routeMatches(location.pathname, to)
+                  || (to === '/pillars' && location.pathname.startsWith('/pages'))
+                    ? 'active'
+                    : ''
+                )}
+              >
+                {label}
+              </NavLink>
+            ))}
+          </nav>
+        ) : null}
 
         {googleMessage && (
           <div className="success-banner" onClick={dismissGoogleMessage} role="status">
@@ -240,6 +248,42 @@ export function DashboardLayout() {
           <Outlet />
         </div>
       </main>
+      {alertsOpen ? (
+        <div className="alert-drawer-layer" role="presentation" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setAlertsOpen(false);
+        }}>
+          <aside className="alert-drawer" aria-label="Alert inbox">
+            <header>
+              <div><h2>Alerts</h2><p>{alerts?.summary.unread || 0} unread · {alerts?.summary.high || 0} high priority</p></div>
+              <button type="button" className="icon-button" onClick={() => setAlertsOpen(false)} title="Close alerts"><X size={17} /></button>
+            </header>
+            <div className="alert-drawer-list">
+              {alerts?.alerts.length ? alerts.alerts.map((alert) => (
+                <article key={alert.fingerprint} className={`alert-inbox-row ${alert.severity} ${alert.status}`}>
+                  <i aria-hidden />
+                  <div>
+                    <div className="alert-inbox-meta"><span>{alert.source}</span><span>{formatDate(alert.createdAt)}</span></div>
+                    <Link to={alert.to} onClick={() => { void updateAlert(alert.fingerprint, 'read'); setAlertsOpen(false); }}>{alert.title}</Link>
+                    <p>{alert.detail}</p>
+                    <footer>
+                      {alert.status === 'unread' ? <button type="button" onClick={() => void updateAlert(alert.fingerprint, 'read')}><Check size={12} /> Read</button> : null}
+                      <button type="button" onClick={() => void updateAlert(alert.fingerprint, 'snoozed', 7)}><ClockCountdown size={12} /> 7 days</button>
+                      <button type="button" onClick={() => void updateAlert(alert.fingerprint, 'dismissed')}><X size={12} /> Dismiss</button>
+                    </footer>
+                  </div>
+                </article>
+              )) : (
+                <div className="alert-inbox-empty"><Check size={24} /><strong>All clear</strong><p>No current performance or data-health alerts.</p></div>
+              )}
+            </div>
+          </aside>
+        </div>
+      ) : null}
     </div>
   );
+}
+
+function routeMatches(pathname: string, route: string) {
+  if (route === '/') return pathname === '/';
+  return pathname === route || pathname.startsWith(`${route}/`);
 }

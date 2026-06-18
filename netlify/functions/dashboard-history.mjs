@@ -19,7 +19,7 @@ export async function handler(event) {
         limit 80
       `,
       sql`
-        select start_date, end_date, data, created_at
+        select start_date, end_date, dimensions, data, created_at
         from ga4_snapshots
         order by created_at asc
         limit 80
@@ -61,7 +61,7 @@ export async function handler(event) {
         medium: row.medium_count,
         byType: row.summary?.byType || {},
       })),
-      ga4: ga4Rows.map((row) => {
+      ga4: ga4Rows.filter((row) => row.dimensions === 'summary').map((row) => {
         const summary = row.data?.summary || summarizeGa4Rows(row.data?.rows || []);
         return {
           createdAt: row.created_at,
@@ -71,8 +71,11 @@ export async function handler(event) {
           users: summary.totalUsers || summary.users || 0,
           views: summary.screenPageViews || summary.views || 0,
           engagementRate: summary.engagementRate || 0,
+          keyEvents: summary.keyEvents || 0,
+          totalRevenue: summary.totalRevenue || 0,
         };
       }),
+      ga4Daily: latestRows(ga4Rows, 'date').flatMap((row) => normalizeGa4Daily(row.data)),
       searchConsole: gscRows.map((row) => {
         const totals = summarizeGscRows(row.data?.rows || []);
         return {
@@ -86,6 +89,7 @@ export async function handler(event) {
           position: totals.position,
         };
       }),
+      searchDaily: latestRows(gscRows, 'date').flatMap((row) => normalizeGscDaily(row.data)),
       serp: serpRows.map((row) => ({
         keyword: row.keyword,
         position: row.codakid_position,
@@ -102,6 +106,41 @@ export async function handler(event) {
   } catch (error) {
     return errorResponse(error);
   }
+}
+
+function latestRows(rows, dimensions) {
+  const match = [...rows].reverse().find((row) => row.dimensions === dimensions);
+  return match ? [match] : [];
+}
+
+function normalizeGa4Daily(data) {
+  const headers = (data?.metricHeaders || []).map((header) => header.name);
+  return (data?.rows || []).map((row) => {
+    const values = Object.fromEntries(headers.map((name, index) => [name, Number(row.metricValues?.[index]?.value || 0)]));
+    return {
+      date: gaDate(row.dimensionValues?.[0]?.value),
+      sessions: values.sessions || 0,
+      users: values.totalUsers || 0,
+      views: values.screenPageViews || 0,
+      keyEvents: values.keyEvents || 0,
+      totalRevenue: values.totalRevenue || 0,
+    };
+  });
+}
+
+function normalizeGscDaily(data) {
+  return (data?.rows || []).map((row) => ({
+    date: row.keys?.[0] || '',
+    clicks: Number(row.clicks || 0),
+    impressions: Number(row.impressions || 0),
+    ctr: Number(row.ctr || 0),
+    position: Number(row.position || 0),
+  }));
+}
+
+function gaDate(value) {
+  const text = String(value || '');
+  return /^\d{8}$/.test(text) ? `${text.slice(0, 4)}-${text.slice(4, 6)}-${text.slice(6, 8)}` : text;
 }
 
 function summarizeGscRows(rows) {

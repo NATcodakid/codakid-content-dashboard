@@ -22,6 +22,7 @@ const GameplanPage = React.lazy(() => import('./pages/Gameplan').then((module) =
 const LinksPage = React.lazy(() => import('./pages/Links').then((module) => ({ default: module.LinksPage })));
 const CompetitorsPage = React.lazy(() => import('./pages/Competitors').then((module) => ({ default: module.CompetitorsPage })));
 const SettingsPage = React.lazy(() => import('./pages/Settings').then((module) => ({ default: module.SettingsPage })));
+const ChangesPage = React.lazy(() => import('./pages/Changes').then((module) => ({ default: module.ChangesPage })));
 
 function App() {
   const [authStatus, setAuthStatus] = React.useState<'checking' | 'authenticated' | 'unauthenticated'>('checking');
@@ -89,6 +90,7 @@ function App() {
           <Route path="pages/:slug" element={<RouteFallback><PageWorkspacePage /></RouteFallback>} />
           <Route path="gameplan" element={<RouteFallback><GameplanPage /></RouteFallback>} />
           <Route path="links" element={<RouteFallback><LinksPage /></RouteFallback>} />
+          <Route path="changes" element={<RouteFallback><ChangesPage /></RouteFallback>} />
           <Route path="competitors" element={<RouteFallback><CompetitorsPage /></RouteFallback>} />
           <Route path="settings" element={<RouteFallback><SettingsPage /></RouteFallback>} />
           <Route path="*" element={<Navigate to="/" replace />} />

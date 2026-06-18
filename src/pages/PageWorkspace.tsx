@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Activity, ArrowUpRight, Bot, ClipboardList, Download, Eye, GitBranch, Plus, RefreshCw, Search, Star, TrendingUp } from 'lucide-react';
+import { Activity, ArrowUpRight, Bot, CalendarCheck, ClipboardList, Download, Eye, GitBranch, Plus, RefreshCw, Search, Star, TrendingUp } from 'lucide-react';
 import { HealthMeter, KpiCard, LoadingState, PageHeading, PanelHeader } from '../components';
 import { useDashboard } from '../data';
 import { downloadMarkdown, pageBriefMarkdown } from '../export';
@@ -13,6 +13,7 @@ export function PageWorkspacePage() {
     snapshot,
     searchOpportunities,
     ga4,
+    seoChanges,
     trackedKeywords,
     technicalAudit,
     competitors,
@@ -58,6 +59,7 @@ export function PageWorkspacePage() {
     .slice(0, 12);
   const pageSearch = (searchOpportunities?.topPages || []).find((row) => matchesPage(row, page.url));
   const ga4Page = ga4?.latest?.topPages.find((row) => normalizeUrl(row.url || row.path) === normalized || row.path === pagePath);
+  const pageChanges = (seoChanges?.changes || []).filter((change) => normalizeUrl(change.pageUrl) === normalized).slice(0, 4);
   const keywordRows = trackedKeywords
     .filter((keyword) => normalizeUrl(keyword.targetUrl) === normalized || keyword.cluster === page.cluster)
     .slice(0, 8);
@@ -115,10 +117,11 @@ export function PageWorkspacePage() {
       />
 
       <div className="dash-stack">
-        <section className="kpi-grid kpi-grid-3">
+        <section className="kpi-grid">
           <KpiCard icon={<Activity />} label="SEO Health" value={page.health} note={page.status} tone={page.health >= 70 ? 'success' : 'warning'} />
           <KpiCard icon={<GitBranch />} label="Internal Links" value={`${page.inboundCount}/${page.outboundCount}`} note="inbound / outbound" />
           <KpiCard icon={<Eye />} label="Views" value={ga4Page?.views ?? '—'} note={ga4Page ? `${formatter.format(ga4Page.sessions)} sessions` : 'GA4 page match pending'} />
+          <KpiCard icon={<CalendarCheck />} label="Key Events" value={ga4Page ? formatter.format(Math.round(ga4Page.keyEvents || 0)) : '—'} note={ga4Page?.totalRevenue ? `$${formatter.format(Math.round(ga4Page.totalRevenue))} revenue` : 'latest GA4 period'} tone="success" />
         </section>
 
         <section className="page-workspace-grid">
@@ -185,6 +188,23 @@ export function PageWorkspacePage() {
               {!issues.length && !linkGaps.length && <p className="panel-note">No urgent issues were found for this page in the latest crawl.</p>}
             </div>
           </div>
+        </section>
+
+        <section className="panel page-change-history">
+          <PanelHeader icon={<CalendarCheck />} title="Change History" action={`${pageChanges.length} logged`} />
+          {pageChanges.length ? (
+            <div className="page-change-list">
+              {pageChanges.map((change) => (
+                <article key={change.id}>
+                  <div><strong>{change.summary}</strong><span>{change.implementedAt ? `Implemented ${new Date(change.implementedAt).toLocaleDateString()}` : 'Planned'}</span></div>
+                  <span className={change.impact.ready && (change.impact.score || 0) > 0 ? 'positive' : ''}>
+                    {change.impact.ready ? `${(change.impact.score || 0) > 0 ? '+' : ''}${change.impact.score}% impact` : change.impact.state}
+                  </span>
+                </article>
+              ))}
+            </div>
+          ) : <p className="panel-note">No measured changes have been logged for this page.</p>}
+          <Link className="secondary-button" to={`/changes?url=${encodeURIComponent(page.url)}`}><Plus size={15} /> Log a change</Link>
         </section>
 
         <section className="dashboard-grid">
