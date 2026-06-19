@@ -422,11 +422,13 @@ function NextActionsBlock({ actions }: { actions: ReturnType<typeof buildFocusAc
 function AnalysisPerformanceStrip({ analysis }: { analysis: AnalysisOverview }) {
   const current = analysis.performance.current;
   const deltas = analysis.performance.deltas;
+  const gscAvailable = analysis.sources.find((source) => source.name === 'Search Console')?.status !== 'missing';
+  const ga4Available = analysis.sources.find((source) => source.name === 'Google Analytics')?.status !== 'missing';
   const items = [
-    { label: 'Organic clicks', value: formatter.format(current.clicks), delta: deltas.clicks, source: 'Search Console' },
-    { label: 'Impressions', value: formatCompact(current.impressions), delta: deltas.impressions, source: 'Search Console' },
-    { label: 'Sessions', value: formatter.format(current.sessions), delta: deltas.sessions, source: 'Google Analytics' },
-    { label: 'Key events', value: formatter.format(Math.round(current.keyEvents)), delta: deltas.keyEvents, source: 'Google Analytics' },
+    { label: 'Organic clicks', value: formatter.format(current.clicks), delta: deltas.clicks, source: 'Search Console', available: gscAvailable },
+    { label: 'Impressions', value: formatCompact(current.impressions), delta: deltas.impressions, source: 'Search Console', available: gscAvailable },
+    { label: 'Sessions', value: formatter.format(current.sessions), delta: deltas.sessions, source: 'Google Analytics', available: ga4Available },
+    { label: 'Key events', value: formatter.format(Math.round(current.keyEvents)), delta: deltas.keyEvents, source: 'Google Analytics', available: ga4Available },
   ];
   return (
     <section className="analysis-pulse" aria-label="Aligned performance pulse">
@@ -438,9 +440,9 @@ function AnalysisPerformanceStrip({ analysis }: { analysis: AnalysisOverview }) 
         {items.map((item) => (
           <article key={item.label}>
             <span>{item.label}</span>
-            <strong>{item.value}</strong>
-            <small className={Number(item.delta) > 0.001 ? 'up' : Number(item.delta) < -0.001 ? 'down' : ''}>{item.delta == null ? 'Prior coverage incomplete' : `${formatAnalysisDelta(item.delta)} vs prior`}</small>
-            <em>{item.source} · measured</em>
+            <strong>{item.available ? item.value : '—'}</strong>
+            <small className={item.available && Number(item.delta) > 0.001 ? 'up' : item.available && Number(item.delta) < -0.001 ? 'down' : ''}>{!item.available ? 'Daily page data unavailable' : item.delta == null ? 'Prior coverage incomplete' : `${formatAnalysisDelta(item.delta)} vs prior`}</small>
+            <em>{item.source} · {item.available ? 'measured' : 'not connected'}</em>
           </article>
         ))}
       </div>
