@@ -174,6 +174,8 @@ export function IntelligencePage() {
             <span className="ai-lab-station-meta">{historicalMentionRate == null ? `${latestRuns.length} latest runs` : `${historicalMentionRate}% mentioned · last 30 days`}</span>
           </div>
 
+          <VisibilityConfidence runs={visibilityHistory} />
+
           <div className="ai-lab-prompt-bar">
             <Search size={18} />
             <input
@@ -286,6 +288,24 @@ export function IntelligencePage() {
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+function VisibilityConfidence({ runs }: { runs: AiVisibilityRun[] }) {
+  const recent = runs.filter((run) => Date.now() - new Date(run.createdAt).getTime() <= 30 * 86400000);
+  const prompts = new Set(recent.map((run) => run.prompt.toLowerCase()));
+  const webRuns = recent.filter((run) => run.sourceMode === 'web');
+  const mentions = recent.filter((run) => run.codakidMentioned).length;
+  const citations = recent.reduce((total, run) => total + (run.sources?.length || 0), 0);
+  const repeated = [...prompts].filter((prompt) => recent.filter((run) => run.prompt.toLowerCase() === prompt).length >= 2).length;
+  const confidence = recent.length >= 20 && repeated >= Math.max(3, prompts.size / 2) ? 'Good sample' : recent.length >= 8 ? 'Directional sample' : 'Early sample';
+  return (
+    <div className="ai-visibility-confidence">
+      <div><span>Confidence</span><strong>{confidence}</strong><small>AI answers vary; repeated runs improve reliability.</small></div>
+      <div><span>Mention rate</span><strong>{recent.length ? Math.round((mentions / recent.length) * 100) : 0}%</strong><small>{mentions} of {recent.length} saved runs</small></div>
+      <div><span>Web-grounded</span><strong>{recent.length ? Math.round((webRuns.length / recent.length) * 100) : 0}%</strong><small>{citations} citations captured</small></div>
+      <div><span>Repeated prompts</span><strong>{repeated}/{prompts.size}</strong><small>30-day prompt coverage</small></div>
     </div>
   );
 }

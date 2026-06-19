@@ -454,6 +454,18 @@ export async function ensureAuthSchema() {
     )
   `;
 
+  await sql`
+    create table if not exists analysis_snapshots (
+      id text primary key,
+      scope text not null,
+      window_days integer not null,
+      snapshot_date date not null default current_date,
+      data jsonb not null default '{}'::jsonb,
+      created_at timestamptz not null default now(),
+      unique (scope, window_days, snapshot_date)
+    )
+  `;
+
   await sql`create index if not exists dashboard_sessions_user_id_idx on dashboard_sessions(user_id)`;
   await sql`create index if not exists dashboard_sessions_expires_at_idx on dashboard_sessions(expires_at)`;
   await sql`create index if not exists google_oauth_states_expires_at_idx on google_oauth_states(expires_at)`;
@@ -480,6 +492,7 @@ export async function ensureAuthSchema() {
   await sql`create index if not exists external_mentions_seen_idx on external_mentions(last_seen_at desc, domain)`;
   await sql`create index if not exists backlink_records_domain_idx on backlink_records(domain, last_seen_at desc)`;
   await sql`create index if not exists backlink_records_target_idx on backlink_records(target_url, last_seen_at desc)`;
+  await sql`create index if not exists analysis_snapshots_scope_date_idx on analysis_snapshots(scope, window_days, snapshot_date desc)`;
   await seedCompetitors(sql);
   await seedAiVisibilityPrompts(sql);
   await seedTrackedKeywords(sql);

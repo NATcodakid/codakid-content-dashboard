@@ -384,6 +384,12 @@ function rowToOpportunity(row, options) {
     position,
     priorityScore: scoreOpportunity({ impressions, ctr, position, missedClicks }),
     opportunityType: options.type,
+    evidence: {
+      measurement: 'measured',
+      source: 'Google Search Console',
+      modeledClickUpside: missedClicks,
+      modelBasis: 'Directional CTR benchmark by average position; not a forecast.',
+    },
     recommendation: recommendationFor(options.type, { label, page, query, position, missedClicks }),
   };
 }
@@ -427,7 +433,7 @@ function scoreOpportunity({ impressions, ctr, position, missedClicks }) {
 
 function recommendationFor(type, { label, page, query, position, missedClicks }) {
   if (type === 'low-ctr-page') {
-    return `Rewrite the title/meta for this page. Based on its impressions and current CTR, it may be missing roughly ${Math.round(missedClicks).toLocaleString('en-US')} clicks in this reporting window.`;
+    return 'Test a clearer title and description. CTR is below the directional benchmark for this position; measure the result in Change Impact.';
   }
   if (type === 'striking-distance-query') {
     return `Strengthen the best matching page for "${label}" with a tighter section, FAQ, and internal links. Average position ${position.toFixed(1)}.`;

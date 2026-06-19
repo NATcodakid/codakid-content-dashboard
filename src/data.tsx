@@ -5,6 +5,8 @@ import type {
   ActionInput,
   ActionItem,
   ActionStatus,
+  AnalysisFilters,
+  AnalysisOverview,
   AlertReport,
   AiAnalystBrief,
   AiResponse,
@@ -48,6 +50,8 @@ type DashboardContextValue = {
   seoChanges: SeoChangesReport | null;
   alerts: AlertReport | null;
   research: ResearchIntelligence | null;
+  analysisOverview: AnalysisOverview | null;
+  analysisFilters: AnalysisFilters;
   markedPillars: MarkedPillar[];
   actionItems: ActionItem[];
   trackedKeywords: TrackedKeyword[];
@@ -80,6 +84,7 @@ type DashboardContextValue = {
   updateAlert: (fingerprint: string, status: 'read' | 'dismissed' | 'snoozed' | 'unread', days?: number) => Promise<void>;
   refreshMentions: () => Promise<void>;
   importBacklinks: (rows: Array<{ sourceUrl: string; targetUrl?: string }>) => Promise<void>;
+  setAnalysisFilters: (filters: AnalysisFilters) => void;
   saveCompetitor: (item: CompetitorInput) => Promise<void>;
   archiveCompetitor: (domain: string) => Promise<void>;
   refreshAuthority: () => Promise<void>;
@@ -125,6 +130,8 @@ export function DashboardProvider({
   const [seoChanges, setSeoChanges] = React.useState<SeoChangesReport | null>(null);
   const [alerts, setAlerts] = React.useState<AlertReport | null>(null);
   const [research, setResearch] = React.useState<ResearchIntelligence | null>(null);
+  const [analysisOverview, setAnalysisOverview] = React.useState<AnalysisOverview | null>(null);
+  const [analysisFilters, setAnalysisFiltersState] = React.useState<AnalysisFilters>(readAnalysisFilters);
   const [markedPillars, setMarkedPillars] = React.useState<MarkedPillar[]>([]);
   const [actionItems, setActionItems] = React.useState<ActionItem[]>([]);
   const [trackedKeywords, setTrackedKeywords] = React.useState<TrackedKeyword[]>([]);
@@ -270,6 +277,16 @@ export function DashboardProvider({
   React.useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  React.useEffect(() => {
+    let active = true;
+    void fetch(`/api/analysis-overview?scope=${analysisFilters.scope}&days=${analysisFilters.days}`, { credentials: 'include' })
+      .then(async (response) => {
+        if (active && response.ok) setAnalysisOverview((await response.json()) as AnalysisOverview);
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, [analysisFilters.days, analysisFilters.scope]);
 
   const regenerateAi = React.useCallback(async () => {
     if (snapshot) {
@@ -659,6 +676,11 @@ export function DashboardProvider({
   const refreshMentions = React.useCallback(() => mutateResearch('refresh-mentions'), [mutateResearch]);
   const importBacklinks = React.useCallback((rows: Array<{ sourceUrl: string; targetUrl?: string }>) => mutateResearch('import-backlinks', { rows }), [mutateResearch]);
 
+  const setAnalysisFilters = React.useCallback((filters: AnalysisFilters) => {
+    setAnalysisFiltersState(filters);
+    try { window.localStorage.setItem('codakid-analysis-filters', JSON.stringify(filters)); } catch { /* local preference only */ }
+  }, []);
+
   const refreshCompetitors = React.useCallback(async () => {
     const response = await fetch('/api/competitors', { credentials: 'include' });
     if (response.ok) setCompetitors((await response.json()) as CompetitorSnapshot);
@@ -757,6 +779,8 @@ export function DashboardProvider({
     seoChanges,
     alerts,
     research,
+    analysisOverview,
+    analysisFilters,
     markedPillars,
     actionItems,
     trackedKeywords,
@@ -789,6 +813,7 @@ export function DashboardProvider({
     updateAlert,
     refreshMentions,
     importBacklinks,
+    setAnalysisFilters,
     saveCompetitor,
     archiveCompetitor,
     refreshAuthority,
@@ -798,6 +823,17 @@ export function DashboardProvider({
   };
 
   return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;
+}
+
+function readAnalysisFilters(): AnalysisFilters {
+  try {
+    const saved = JSON.parse(window.localStorage.getItem('codakid-analysis-filters') || '{}') as Partial<AnalysisFilters>;
+    const scope = saved.scope === 'site' || saved.scope === 'pillars' ? saved.scope : 'blog';
+    const days = saved.days === 7 || saved.days === 90 ? saved.days : 28;
+    return { scope, days };
+  } catch {
+    return { scope: 'blog', days: 28 };
+  }
 }
 
 function upsertActionItem(items: ActionItem[], next: ActionItem) {

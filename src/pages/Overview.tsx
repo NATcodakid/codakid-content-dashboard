@@ -14,7 +14,6 @@ import {
 } from '../charts';
 import {
   buildFocusActions,
-  computeSeoHealth,
   formatCompact,
   formatDate,
   formatDateRange,
@@ -33,6 +32,7 @@ import {
 } from '../lib';
 import type {
   ActionItem,
+  AnalysisOverview,
   AiWorkbench,
   CompetitorSnapshot,
   DashboardHistory,
@@ -55,6 +55,7 @@ export function OverviewPage() {
     actionItems,
     aiWorkbench,
     dashboardHistory,
+    analysisOverview,
     homeLayout,
     isLoading,
     runAiWorkbench,
@@ -91,8 +92,7 @@ export function OverviewPage() {
   if (isLoading && !snapshot) return <LoadingState label="Building your content map" />;
   if (!snapshot) return null;
 
-  const health = computeSeoHealth(snapshot);
-  const topFactor = [...health.factors].sort((a, b) => a.score - b.score)[0] || null;
+  const health = analysisOverview?.health || { score: 0, label: 'Collecting data', components: [] };
   const actions = buildFocusActions(snapshot, searchData).slice(0, 3);
   const gscReady = Boolean(searchData?.available);
   const buckets = positionBuckets(searchData);
@@ -147,27 +147,30 @@ export function OverviewPage() {
         hidden={overviewView !== 'today'}
       >
         <div className="dash-section-head">
-          <h2>Content health</h2>
+          <h2>SEO readiness</h2>
           <Link className="dash-link" to="/pillars">
             Pillars <ArrowUpRight size={14} />
           </Link>
         </div>
-        <p className="dash-section-note">Live crawl · {crawlDate}</p>
+        <p className="dash-section-note">
+          {analysisOverview ? `${analysisOverview.filters.days}-day ${analysisOverview.filters.scope} view · ${formatDateRange(analysisOverview.filters.startDate, analysisOverview.filters.endDate)}` : `Live crawl · ${crawlDate}`}
+        </p>
 
         <div className="overview-health-compact">
           <DashCard className="dash-health-card">
             <div className="dash-health dash-health-compact">
-              <ScoreGauge score={health.score} tone={health.band.tone} size={120} />
+              <ScoreGauge score={health.score} tone={health.score >= 80 ? 'success' : health.score >= 60 ? 'default' : health.score >= 40 ? 'warning' : 'danger'} size={120} />
               <div>
-                <span className={`dash-status ${health.band.tone}`}>{health.band.label}</span>
-                <h3>Site health</h3>
-                <p className="dash-health-copy">Links, freshness, and pillar coverage.</p>
-                {topFactor ? (
-                  <div className="overview-top-factor">
-                    <span>Needs attention: {topFactor.label}</span>
-                    <strong>{topFactor.score}</strong>
-                  </div>
-                ) : null}
+                <span className={`dash-status ${health.score >= 80 ? 'success' : health.score >= 60 ? 'default' : health.score >= 40 ? 'warning' : 'danger'}`}>{health.label}</span>
+                <h3>Unified readiness</h3>
+                <p className="dash-health-copy">One documented score across technical, content, links, and search.</p>
+                <div className="overview-health-components">
+                  {health.components.map((component) => (
+                    <div key={component.id} title={`${component.weight}% weight · ${component.source}`}>
+                      <span>{component.label}</span><i><b style={{ width: `${component.score}%` }} /></i><strong>{component.score}</strong>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </DashCard>
@@ -198,6 +201,8 @@ export function OverviewPage() {
         </div>
       </section>
 
+      {overviewView === 'today' && analysisOverview ? <AnalysisPerformanceStrip analysis={analysisOverview} /> : null}
+
       {overviewView === 'today' && actions.length > 0 ? <NextActionsBlock actions={actions} /> : null}
 
       <section
@@ -205,6 +210,7 @@ export function OverviewPage() {
         className="dash-section overview-section"
         hidden={overviewView !== 'performance'}
       >
+        {analysisOverview ? <PageMovementPanel winners={analysisOverview.winners} losers={analysisOverview.losers} days={analysisOverview.filters.days} /> : null}
         {gscReady && searchData ? (
           <div className="overview-hero">
             <p className="overview-hero-summary">
@@ -411,6 +417,71 @@ function NextActionsBlock({ actions }: { actions: ReturnType<typeof buildFocusAc
       </ul>
     </div>
   );
+}
+
+function AnalysisPerformanceStrip({ analysis }: { analysis: AnalysisOverview }) {
+  const current = analysis.performance.current;
+  const deltas = analysis.performance.deltas;
+  const items = [
+    { label: 'Organic clicks', value: formatter.format(current.clicks), delta: deltas.clicks, source: 'Search Console' },
+    { label: 'Impressions', value: formatCompact(current.impressions), delta: deltas.impressions, source: 'Search Console' },
+    { label: 'Sessions', value: formatter.format(current.sessions), delta: deltas.sessions, source: 'Google Analytics' },
+    { label: 'Key events', value: formatter.format(Math.round(current.keyEvents)), delta: deltas.keyEvents, source: 'Google Analytics' },
+  ];
+  return (
+    <section className="analysis-pulse" aria-label="Aligned performance pulse">
+      <header>
+        <div><h2>Performance pulse</h2><p>{formatDateRange(analysis.filters.startDate, analysis.filters.endDate)} compared with the preceding {analysis.filters.days} days</p></div>
+        <span>{analysis.confidence.label} · {analysis.confidence.score}/100</span>
+      </header>
+      <div className="analysis-pulse-grid">
+        {items.map((item) => (
+          <article key={item.label}>
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
+            <small className={Number(item.delta) > 0.001 ? 'up' : Number(item.delta) < -0.001 ? 'down' : ''}>{item.delta == null ? 'Prior coverage incomplete' : `${formatAnalysisDelta(item.delta)} vs prior`}</small>
+            <em>{item.source} · measured</em>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PageMovementPanel({
+  winners,
+  losers,
+  days,
+}: {
+  winners: AnalysisOverview['winners'];
+  losers: AnalysisOverview['losers'];
+  days: number;
+}) {
+  const groups = [{ title: 'Pages gaining clicks', rows: winners, tone: 'up' }, { title: 'Pages losing clicks', rows: losers, tone: 'down' }];
+  return (
+    <section className="movement-panel">
+      <div className="dash-section-head"><div><h2>Page movement</h2><p>Measured Search Console change against the preceding {days} days</p></div><Link className="dash-link" to="/changes">Change impact <ArrowUpRight size={14} /></Link></div>
+      <div className="movement-columns">
+        {groups.map((group) => (
+          <div key={group.title}>
+            <h3>{group.title}</h3>
+            {group.rows.length ? group.rows.slice(0, 5).map((row) => (
+              <article key={row.url}>
+                <div><strong>{shortUrl(row.url)}</strong><span>{row.clicks} clicks · was {row.previousClicks}</span></div>
+                <b className={group.tone}>{formatAnalysisDelta(row.clickChange)}</b>
+              </article>
+            )) : <p className="dash-empty">Not enough comparable movement yet.</p>}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function formatAnalysisDelta(value: number | null) {
+  if (value == null || !Number.isFinite(value) || Math.abs(value) < 0.001) return '0%';
+  const amount = Math.round(value * 100);
+  return `${amount > 0 ? '+' : ''}${amount}%`;
 }
 
 function HomeShortcuts({

@@ -100,7 +100,7 @@ function KeywordsHero({
                 </div>
                 <div>
                   <dt>CTR</dt>
-                  <dd>{Math.round((avgCtr || 0) * 100)}%</dd>
+                  <dd>{formatPercent(avgCtr || 0)}</dd>
                   {ctrDeltaValue ? <small className={deltaClass(ctrDeltaValue)}>{ctrDeltaValue.display}</small> : null}
                 </div>
               </>
@@ -352,6 +352,7 @@ export function KeywordsPage() {
 
       {tab === 'tracking' && (
         <>
+          <RankMovementSummary keywords={trackedKeywords} />
           <section className="keywords-charts-grid">
             <div className="keywords-panel">
               <div className="keywords-section-head">
@@ -509,6 +510,22 @@ export function KeywordsPage() {
       {tab === 'traffic' && <Ga4Panel report={ga4} onSync={() => void syncGa4()} />}
       </div>
     </div>
+  );
+}
+
+function RankMovementSummary({ keywords }: { keywords: TrackedKeyword[] }) {
+  const comparable = keywords.filter((keyword) => keyword.latestSerp?.position && keyword.previousPosition);
+  const winners = comparable.filter((keyword) => Number(keyword.positionChange || 0) > 0).sort((a, b) => Number(b.positionChange || 0) - Number(a.positionChange || 0));
+  const losers = comparable.filter((keyword) => Number(keyword.positionChange || 0) < 0).sort((a, b) => Number(a.positionChange || 0) - Number(b.positionChange || 0));
+  return (
+    <section className="rank-movement-summary">
+      <header><div><h2>Weekly movement</h2><p>Serper positions compared with the previous saved run</p></div><span>{comparable.length} comparable keywords</span></header>
+      <div>
+        <article><span>Winners</span><strong>{winners.length}</strong><p>{winners[0] ? `${winners[0].keyword} gained ${winners[0].positionChange} positions` : 'A second weekly run creates this comparison.'}</p></article>
+        <article><span>Losers</span><strong>{losers.length}</strong><p>{losers[0] ? `${losers[0].keyword} lost ${Math.abs(Number(losers[0].positionChange))} positions` : 'No measured ranking losses yet.'}</p></article>
+        <article><span>Stable</span><strong>{Math.max(0, comparable.length - winners.length - losers.length)}</strong><p>Keywords with no position change between saved runs.</p></article>
+      </div>
+    </section>
   );
 }
 

@@ -36,6 +36,9 @@
 [functions."pagespeed-scheduled"]
   schedule = "@weekly"
 
+[functions."analysis-overview-scheduled"]
+  schedule = "@daily"
+
 [[redirects]]
   from = "/api/content-snapshot"
   to = "/.netlify/functions/content-snapshot"
@@ -79,6 +82,11 @@
 [[redirects]]
   from = "/api/research-intelligence"
   to = "/.netlify/functions/research-intelligence"
+  status = 200
+
+[[redirects]]
+  from = "/api/analysis-overview"
+  to = "/.netlify/functions/analysis-overview"
   status = 200
 
 [[redirects]]

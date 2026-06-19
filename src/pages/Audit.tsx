@@ -47,6 +47,7 @@ export function AuditPage() {
   }
   const topActions = issues.slice(0, 3);
   const issueTypes = Object.keys(technicalAudit?.summary.byType || {});
+  const lifecycle = auditLifecycle(technicalAudit?.trend);
 
   return (
     <>
@@ -57,10 +58,16 @@ export function AuditPage() {
 
       <div className="dash-stack">
         <section className="kpi-grid kpi-grid-3">
-          <KpiCard icon={<Gauge />} label="Audit Health" value={technicalAudit?.healthScore ?? '—'} note={technicalAudit?.trend?.length ? `${technicalAudit.trend.length} saved snapshots` : 'saved to Neon'} tone={(technicalAudit?.healthScore || 0) >= 75 ? 'success' : 'warning'} delta={healthDelta(technicalAudit?.trend)} />
+          <KpiCard icon={<Gauge />} label="Technical Audit" value={technicalAudit?.healthScore ?? '—'} note="technical subscore · saved to Neon" tone={(technicalAudit?.healthScore || 0) >= 75 ? 'success' : 'warning'} delta={healthDelta(technicalAudit?.trend)} />
           <KpiCard icon={<FileWarning />} label="Issues" value={technicalAudit?.summary.total || 0} note="from latest crawl" tone="warning" />
           <KpiCard icon={<AlertTriangle />} label="High Priority" value={technicalAudit?.summary.high || 0} note="fix first" tone="danger" />
           <KpiCard icon={<Link2Off />} label="Broken + Gaps" value={(technicalAudit?.summary.byType?.['broken-internal-link'] || 0) + (technicalAudit?.summary.byType?.['link-gap'] || 0)} note="internal links to repair" />
+        </section>
+
+        <section className="audit-lifecycle-strip">
+          <div><span>New issue types</span><strong>{lifecycle.newTypes.length}</strong><small>{lifecycle.newTypes.length ? lifecycle.newTypes.map((type) => ISSUE_LABELS[type] || type).join(', ') : 'None since the prior crawl'}</small></div>
+          <div><span>Improving types</span><strong>{lifecycle.improvedTypes.length}</strong><small>{lifecycle.improvedTypes.length ? lifecycle.improvedTypes.map((type) => ISSUE_LABELS[type] || type).join(', ') : 'No measured reductions yet'}</small></div>
+          <div><span>Recurring types</span><strong>{lifecycle.recurringTypes.length}</strong><small>Present in both latest saved crawls</small></div>
         </section>
 
         {technicalAudit?.trend?.length ? (
@@ -170,6 +177,18 @@ export function AuditPage() {
       </div>
     </>
   );
+}
+
+function auditLifecycle(trend: TechnicalAudit['trend']) {
+  const rows = trend || [];
+  const current = rows[rows.length - 1]?.byType || {};
+  const previous = rows[rows.length - 2]?.byType || {};
+  const types = new Set([...Object.keys(current), ...Object.keys(previous)]);
+  return {
+    newTypes: [...types].filter((type) => Number(current[type] || 0) > 0 && Number(previous[type] || 0) === 0),
+    improvedTypes: [...types].filter((type) => Number(current[type] || 0) < Number(previous[type] || 0)),
+    recurringTypes: [...types].filter((type) => Number(current[type] || 0) > 0 && Number(previous[type] || 0) > 0),
+  };
 }
 
 function AuditTrend({ trend }: { trend: NonNullable<ReturnType<typeof useDashboard>['technicalAudit']>['trend'] }) {

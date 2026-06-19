@@ -430,6 +430,72 @@ export type ResearchIntelligence = {
   credits: { usedThisMonth: number; monthlyBudget: number };
 };
 
+export type AnalysisScope = 'blog' | 'site' | 'pillars';
+
+export type AnalysisFilters = {
+  scope: AnalysisScope;
+  days: 7 | 28 | 90;
+};
+
+export type AnalysisSource = {
+  name: string;
+  updatedAt: string | null;
+  status: 'current' | 'stale' | 'missing' | string;
+  coverage: string;
+  measurement: string;
+};
+
+export type AnalysisPageMovement = {
+  url: string;
+  clicks: number;
+  previousClicks: number;
+  clickDelta: number;
+  clickChange: number;
+  sessions: number;
+  previousSessions: number;
+  sessionDelta: number;
+  sessionChange: number;
+};
+
+export type ContentLifecycleRow = AnalysisPageMovement & {
+  title: string;
+  cluster: string;
+  stage: 'Growing' | 'Stable' | 'Decaying' | 'Stale' | 'Consolidate' | 'Protect' | 'Unmeasured' | string;
+  reason: string;
+  ageDays: number;
+  health: number;
+};
+
+export type AnalysisOverview = {
+  generatedAt: string;
+  filters: AnalysisFilters & {
+    startDate: string;
+    endDate: string;
+    previousStartDate: string;
+    previousEndDate: string;
+  };
+  coverage: { knownBlogUrls: number; scopedUrls: number | null; gscPages: number; ga4Pages: number };
+  confidence: { score: number; label: string; currentSources: number; totalSources: number; missingSources: number };
+  sources: AnalysisSource[];
+  health: {
+    score: number;
+    label: string;
+    components: Array<{ id: string; label: string; score: number; weight: number; source: string }>;
+  };
+  performance: {
+    current: { clicks: number; impressions: number; ctr: number; position: number; sessions: number; views: number; keyEvents: number; revenue: number };
+    previous: { clicks: number; impressions: number; ctr: number; position: number; sessions: number; views: number; keyEvents: number; revenue: number };
+    deltas: { clicks: number | null; impressions: number | null; ctr: number | null; position: number | null; sessions: number | null; views: number | null; keyEvents: number | null; revenue: number | null };
+  };
+  winners: AnalysisPageMovement[];
+  losers: AnalysisPageMovement[];
+  lifecycle: ContentLifecycleRow[];
+  lifecycleSummary: Record<string, number>;
+  rankingMovers: Array<{ keyword: string; position: number; previousPosition: number; change: number; url: string; fetchedAt: string }>;
+  history: Array<{ date: string; score: number; clicks: number; sessions: number }>;
+  methodology: { health: string; scope: string; comparisons: string };
+};
+
 export type KeywordInput = {
   id?: string;
   keyword?: string;
@@ -604,6 +670,12 @@ export type SearchOpportunity = {
   priorityScore: number;
   opportunityType: string;
   recommendation: string;
+  evidence?: {
+    measurement: string;
+    source: string;
+    modeledClickUpside: number;
+    modelBasis: string;
+  };
 };
 
 export type ContentDecayOpportunity = {

@@ -191,8 +191,8 @@ async function runPageDaily(range) {
         stringFilter: { matchType: 'CONTAINS', value: '/' },
       },
     },
-    limit: 10000,
-    orderBys: [{ dimension: { dimensionName: 'date' } }],
+    limit: 100000,
+    orderBys: [{ dimension: { dimensionName: 'date' }, desc: true }],
   };
   const baseMetrics = [
       { name: 'sessions' },

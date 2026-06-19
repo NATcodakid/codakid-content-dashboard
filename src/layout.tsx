@@ -6,6 +6,7 @@ import {
   ChartLineUp,
   Check,
   ClockCountdown,
+  Database,
   FileMagnifyingGlass,
   GearSix,
   GlobeHemisphereWest,
@@ -85,14 +86,18 @@ export function DashboardLayout() {
     technicalAudit,
     actionItems,
     alerts,
+    analysisOverview,
+    analysisFilters,
     isLoading,
     error,
     refresh,
     updateAlert,
+    setAnalysisFilters,
     onLogout,
   } = useDashboard();
   const [searchParams, setSearchParams] = useSearchParams();
   const [alertsOpen, setAlertsOpen] = React.useState(false);
+  const [dataTrustOpen, setDataTrustOpen] = React.useState(false);
   const location = useLocation();
 
   const pageTitle = React.useMemo(() => {
@@ -205,16 +210,47 @@ export function DashboardLayout() {
           <div className="topbar-title">
             {crawlUpdated ? <span className="topbar-meta">Crawl updated {crawlUpdated}</span> : null}
           </div>
-          <button
-            type="button"
-            className="topbar-alert-button"
-            onClick={() => setAlertsOpen(true)}
-            aria-label={`Open alerts${alerts?.summary.unread ? `, ${alerts.summary.unread} unread` : ''}`}
-          >
-            <Bell size={18} weight={alerts?.summary.unread ? 'fill' : 'regular'} />
-            <span>Alerts</span>
-            {alerts?.summary.unread ? <b>{alerts.summary.unread > 99 ? '99+' : alerts.summary.unread}</b> : null}
-          </button>
+          <div className="topbar-analysis-controls">
+            <label className="analysis-scope-control">
+              <span>Scope</span>
+              <select
+                value={analysisFilters.scope}
+                onChange={(event) => setAnalysisFilters({ ...analysisFilters, scope: event.target.value as typeof analysisFilters.scope })}
+              >
+                <option value="blog">Blog</option>
+                <option value="pillars">Pillars</option>
+                <option value="site">Entire site</option>
+              </select>
+            </label>
+            <div className="analysis-window-control" aria-label="Analysis window">
+              {([7, 28, 90] as const).map((days) => (
+                <button
+                  key={days}
+                  type="button"
+                  className={analysisFilters.days === days ? 'active' : ''}
+                  aria-pressed={analysisFilters.days === days}
+                  onClick={() => setAnalysisFilters({ ...analysisFilters, days })}
+                >
+                  {days}d
+                </button>
+              ))}
+            </div>
+            <button type="button" className="topbar-data-button" onClick={() => setDataTrustOpen(true)}>
+              <Database size={17} />
+              <span>{analysisOverview?.confidence.label || 'Data status'}</span>
+              {analysisOverview ? <b>{analysisOverview.confidence.score}</b> : null}
+            </button>
+            <button
+              type="button"
+              className="topbar-alert-button"
+              onClick={() => setAlertsOpen(true)}
+              aria-label={`Open alerts${alerts?.summary.unread ? `, ${alerts.summary.unread} unread` : ''}`}
+            >
+              <Bell size={18} weight={alerts?.summary.unread ? 'fill' : 'regular'} />
+              <span>Alerts</span>
+              {alerts?.summary.unread ? <b>{alerts.summary.unread > 99 ? '99+' : alerts.summary.unread}</b> : null}
+            </button>
+          </div>
         </header>
 
         {activeTabs.length ? (
@@ -276,6 +312,42 @@ export function DashboardLayout() {
                 <div className="alert-inbox-empty"><Check size={24} /><strong>All clear</strong><p>No current performance or data-health alerts.</p></div>
               )}
             </div>
+          </aside>
+        </div>
+      ) : null}
+      {dataTrustOpen ? (
+        <div className="alert-drawer-layer" role="presentation" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setDataTrustOpen(false);
+        }}>
+          <aside className="alert-drawer data-trust-drawer" aria-label="Data confidence">
+            <header>
+              <div>
+                <h2>Data confidence</h2>
+                <p>{analysisOverview?.confidence.score || 0}/100 · {analysisOverview?.confidence.label || 'Loading sources'}</p>
+              </div>
+              <button type="button" className="icon-button" onClick={() => setDataTrustOpen(false)} title="Close data confidence"><X size={17} /></button>
+            </header>
+            <div className="data-trust-summary">
+              <strong>{analysisOverview?.filters.days || analysisFilters.days}-day {analysisFilters.scope} analysis</strong>
+              <p>{analysisOverview?.methodology.scope}</p>
+            </div>
+            <div className="data-trust-list">
+              {(analysisOverview?.sources || []).map((source) => (
+                <article key={source.name} className={`data-trust-row ${source.status}`}>
+                  <i aria-hidden />
+                  <div>
+                    <header><strong>{source.name}</strong><span>{source.status}</span></header>
+                    <p>{source.coverage}</p>
+                    <small>{source.measurement} · {source.updatedAt ? `updated ${formatDate(source.updatedAt)}` : 'not connected'}</small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <footer className="data-trust-method">
+              <strong>How the score works</strong>
+              <p>{analysisOverview?.methodology.health}</p>
+              <p>{analysisOverview?.methodology.comparisons}</p>
+            </footer>
           </aside>
         </div>
       ) : null}

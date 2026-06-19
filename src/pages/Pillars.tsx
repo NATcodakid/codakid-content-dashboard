@@ -8,9 +8,10 @@ import { buildPillarClusterMap, formatContentAge, formatDate, normalizeUrl, pill
 import type { PostSummary } from '../types';
 
 export function PillarsPage() {
-  const { snapshot, markedPillars, isLoading, isPillar, markPillar, unmarkPillar } = useDashboard();
+  const { snapshot, markedPillars, analysisOverview, isLoading, isPillar, markPillar, unmarkPillar } = useDashboard();
   const [query, setQuery] = React.useState('');
   const [cluster, setCluster] = React.useState('All');
+  const [view, setView] = React.useState<'pillars' | 'inventory'>('pillars');
 
   if (isLoading && !snapshot) return <LoadingState label="Building the pillar map" />;
   if (!snapshot) return null;
@@ -54,6 +55,12 @@ export function PillarsPage() {
         description="Cornerstone pages your cluster links into. Promote any post — it's saved for the team."
       />
 
+      <nav className="content-view-tabs" aria-label="Content views">
+        <button type="button" className={view === 'pillars' ? 'active' : ''} onClick={() => setView('pillars')}>Pillar management</button>
+        <button type="button" className={view === 'inventory' ? 'active' : ''} onClick={() => setView('inventory')}>Content lifecycle</button>
+      </nav>
+
+      {view === 'pillars' ? (
       <div className="dash-stack">
       <section className="kpi-grid kpi-grid-3" aria-label="Pillar KPIs">
         <KpiCard icon={<Star />} label="Confirmed Pillars" value={confirmedPosts.length} note="saved to your workspace" tone="success" />
@@ -222,7 +229,44 @@ export function PillarsPage() {
         )}
       </section>
       </div>
+      ) : <ContentLifecyclePanel rows={analysisOverview?.lifecycle || []} summary={analysisOverview?.lifecycleSummary || {}} />}
     </>
+  );
+}
+
+function ContentLifecyclePanel({ rows, summary }: { rows: import('../types').ContentLifecycleRow[]; summary: Record<string, number> }) {
+  const [stage, setStage] = React.useState('All');
+  const [query, setQuery] = React.useState('');
+  const stages = ['All', 'Decaying', 'Consolidate', 'Stale', 'Growing', 'Protect', 'Stable', 'Unmeasured'];
+  const filtered = rows.filter((row) => (stage === 'All' || row.stage === stage) && (!query || `${row.title} ${row.cluster}`.toLowerCase().includes(query.toLowerCase())));
+  return (
+    <section className="lifecycle-workspace">
+      <header className="lifecycle-summary">
+        <div><h2>Content lifecycle</h2><p>Every status combines crawl quality with measured Search Console movement.</p></div>
+        <dl>{['Decaying', 'Growing', 'Protect', 'Consolidate', 'Unmeasured'].map((name) => <div key={name}><dt>{name}</dt><dd>{summary[name] || 0}</dd></div>)}</dl>
+      </header>
+      <div className="lifecycle-toolbar">
+        <div className="search-field"><Search size={15} /><input type="search" placeholder="Search content…" value={query} onChange={(event) => setQuery(event.target.value)} /></div>
+        <select value={stage} onChange={(event) => setStage(event.target.value)} aria-label="Filter lifecycle stage">{stages.map((name) => <option key={name}>{name}</option>)}</select>
+        <span>{filtered.length} pages</span>
+      </div>
+      <div className="table-wrap">
+        <table className="lifecycle-table">
+          <thead><tr><th>Page</th><th>Stage</th><th>Clicks</th><th>Change</th><th>Health</th><th>Updated</th></tr></thead>
+          <tbody>{filtered.slice(0, 100).map((row) => (
+            <tr key={row.url}>
+              <td><Link className="table-link" to={`/pages/${encodeURIComponent(slugFromUrl(row.url))}`}>{row.title}</Link><small>{row.cluster} · {row.reason}</small></td>
+              <td><span className={`lifecycle-badge ${row.stage.toLowerCase()}`}>{row.stage}</span></td>
+              <td>{row.clicks}</td>
+              <td className={row.clickChange > 0.01 ? 'positive' : row.clickChange < -0.01 ? 'negative' : ''}>{row.previousClicks ? `${row.clickChange > 0 ? '+' : ''}${Math.round(row.clickChange * 100)}%` : 'New'}</td>
+              <td>{row.health}</td>
+              <td>{row.ageDays > 365 ? `${Math.round(row.ageDays / 365)}y ago` : `${row.ageDays}d ago`}</td>
+            </tr>
+          ))}</tbody>
+        </table>
+      </div>
+      {!rows.length ? <p className="dash-empty">The lifecycle inventory will appear after the aligned analysis feed has loaded.</p> : null}
+    </section>
   );
 }
 
