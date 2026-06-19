@@ -266,8 +266,8 @@ function buildSources({ wordpress, gsc, ga4, audit, serpRows, aiRows, gscDaily, 
   const latestAi = aiRows[0]?.created_at || null;
   return [
     source('WordPress', wordpress?.created_at, 48, scope === 'site' ? `${wordpress?.data?.kpis?.postsCrawled || 0} blog posts; site-wide pages are not crawled` : `${allowed.size} scoped URLs`, 'Measured'),
-    source('Search Console', gscDaily.length ? gsc?.created_at : null, 72, `${gscDaily.length} page-day rows · observed ${minDate(gscDaily) || '—'} to ${maxDate(gscDaily) || '—'}`, 'Measured'),
-    source('Google Analytics', ga4Daily.length ? ga4?.created_at : null, 72, `${ga4Daily.length} page-day rows · observed ${minDate(ga4Daily) || '—'} to ${maxDate(ga4Daily) || '—'}`, 'Measured'),
+    source('Search Console', gscDaily.length ? `${maxDate(gscDaily)}T00:00:00Z` : null, 72, `${gscDaily.length} page-day rows · observed ${minDate(gscDaily) || '—'} to ${maxDate(gscDaily) || '—'}`, 'Measured'),
+    source('Google Analytics', ga4Daily.length ? `${maxDate(ga4Daily)}T00:00:00Z` : null, 72, `${ga4Daily.length} page-day rows · observed ${minDate(ga4Daily) || '—'} to ${maxDate(ga4Daily) || '—'}`, 'Measured'),
     source('Technical crawl', audit?.created_at, 168, `${audit?.issue_count || 0} findings`, 'Measured'),
     source('Serper', latestSerp, 192, `${serpRows.length} tracked keywords`, 'Measured sample'),
     source('OpenAI visibility', latestAi, 192, `${aiRows.length} saved prompt runs`, 'Sampled'),
