@@ -60,6 +60,31 @@ export function databaseEnvStatus() {
   };
 }
 
+export async function startSourceSyncRun(source, authMode = '') {
+  await ensureAuthSchema();
+  const id = randomUUID();
+  const sql = getSql();
+  await sql`
+    insert into source_sync_runs (id, source, auth_mode)
+    values (${id}, ${String(source).slice(0, 80)}, ${String(authMode).slice(0, 80)})
+  `;
+  return id;
+}
+
+export async function finishSourceSyncRun(id, { status = 'success', rowsSaved = 0, detail = {}, error = '' } = {}) {
+  if (!id) return;
+  const sql = getSql();
+  await sql`
+    update source_sync_runs
+    set status = ${String(status).slice(0, 40)},
+        rows_saved = ${Math.max(0, Number(rowsSaved || 0))},
+        detail = ${JSON.stringify(detail || {})},
+        error = ${String(error || '').slice(0, 1000)},
+        completed_at = now()
+    where id = ${id}
+  `;
+}
+
 function isPostgresUrl(value) {
   if (!value) return false;
   try {
@@ -466,6 +491,62 @@ export async function ensureAuthSchema() {
     )
   `;
 
+  await sql`
+    create table if not exists source_sync_runs (
+      id text primary key,
+      source text not null,
+      status text not null default 'running',
+      auth_mode text not null default '',
+      rows_saved integer not null default 0,
+      detail jsonb not null default '{}'::jsonb,
+      error text not null default '',
+      started_at timestamptz not null default now(),
+      completed_at timestamptz
+    )
+  `;
+
+  await sql`
+    create table if not exists cannibalization_scans (
+      id text primary key,
+      source_start_date date,
+      source_end_date date,
+      candidate_count integer not null default 0,
+      conflict_count integer not null default 0,
+      model text not null default '',
+      summary jsonb not null default '{}'::jsonb,
+      error text not null default '',
+      created_by text,
+      created_at timestamptz not null default now()
+    )
+  `;
+
+  await sql`
+    create table if not exists cannibalization_recommendations (
+      id text primary key,
+      fingerprint text not null unique,
+      scan_id text references cannibalization_scans(id) on delete set null,
+      source_urls jsonb not null default '[]'::jsonb,
+      winner_url text not null default '',
+      intent_label text not null default '',
+      shared_queries jsonb not null default '[]'::jsonb,
+      evidence jsonb not null default '{}'::jsonb,
+      recommendation text not null default 'review',
+      severity text not null default 'medium',
+      confidence integer not null default 0,
+      reasoning text not null default '',
+      preserve_notes jsonb not null default '[]'::jsonb,
+      status text not null default 'new',
+      owner text not null default '',
+      notes text not null default '',
+      reviewed_by text,
+      reviewed_at timestamptz,
+      first_seen_at timestamptz not null default now(),
+      last_seen_at timestamptz not null default now(),
+      resolved_at timestamptz,
+      updated_at timestamptz not null default now()
+    )
+  `;
+
   await sql`create index if not exists dashboard_sessions_user_id_idx on dashboard_sessions(user_id)`;
   await sql`create index if not exists dashboard_sessions_expires_at_idx on dashboard_sessions(expires_at)`;
   await sql`create index if not exists google_oauth_states_expires_at_idx on google_oauth_states(expires_at)`;
@@ -493,6 +574,10 @@ export async function ensureAuthSchema() {
   await sql`create index if not exists backlink_records_domain_idx on backlink_records(domain, last_seen_at desc)`;
   await sql`create index if not exists backlink_records_target_idx on backlink_records(target_url, last_seen_at desc)`;
   await sql`create index if not exists analysis_snapshots_scope_date_idx on analysis_snapshots(scope, window_days, snapshot_date desc)`;
+  await sql`create index if not exists source_sync_runs_source_started_idx on source_sync_runs(source, started_at desc)`;
+  await sql`create index if not exists cannibalization_scans_created_idx on cannibalization_scans(created_at desc)`;
+  await sql`create index if not exists cannibalization_recommendations_status_idx on cannibalization_recommendations(status, severity, confidence desc)`;
+  await sql`create index if not exists cannibalization_recommendations_seen_idx on cannibalization_recommendations(last_seen_at desc)`;
   await seedCompetitors(sql);
   await seedAiVisibilityPrompts(sql);
   await seedTrackedKeywords(sql);

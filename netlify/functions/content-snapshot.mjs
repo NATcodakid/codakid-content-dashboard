@@ -361,6 +361,7 @@ export async function buildSnapshot(markedPillarUrls = new Set()) {
         modified: post.modified,
         inboundCount: post.inboundCount,
         outboundCount: post.outboundCount,
+        excerpt: post.excerpt,
         wordCount: post.wordCount,
         titleLength: post.titleLength,
         excerptLength: post.excerptLength,

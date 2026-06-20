@@ -178,8 +178,39 @@ export function DashboardProvider({
     setError(null);
     try {
       const snapshotUrl = options?.forceCrawl ? '/api/content-snapshot?refresh=1' : '/api/content-snapshot';
+      const contentPromise = fetch(snapshotUrl, { credentials: 'include' });
+      const secondaryPromise = fetchDashboardModules([
+        '/api/competitors',
+        '/api/google/search-console/status',
+        '/api/ga4',
+        '/api/search-opportunities',
+        '/api/technical-audit',
+        '/api/pillars',
+        '/api/action-items',
+        '/api/tracked-keywords',
+        '/api/serp-tracker',
+        '/api/ai-workbench',
+        '/api/dashboard-layout',
+        '/api/dashboard-history',
+        '/api/authority',
+        '/api/pagespeed',
+        '/api/seo-changes',
+        '/api/alerts',
+        '/api/research-intelligence',
+      ]);
+
+      const contentResponse = await contentPromise;
+      if (contentResponse.status === 401) {
+        onUnauthorized();
+        return;
+      }
+      if (!contentResponse.ok) throw new Error('Content snapshot failed to load.');
+
+      const content = (await contentResponse.json()) as Snapshot;
+      setSnapshot(content);
+      setIsLoading(false);
+
       const [
-        contentResponse,
         competitorResponse,
         googleResponse,
         ga4Response,
@@ -197,36 +228,8 @@ export function DashboardProvider({
         seoChangesResponse,
         alertsResponse,
         researchResponse,
-      ] =
-        await Promise.all([
-          fetch(snapshotUrl, { credentials: 'include' }),
-          fetch('/api/competitors', { credentials: 'include' }),
-          fetch('/api/google/search-console/status', { credentials: 'include' }).catch(() => null),
-          fetch('/api/ga4', { credentials: 'include' }).catch(() => null),
-          fetch('/api/search-opportunities', { credentials: 'include' }).catch(() => null),
-          fetch('/api/technical-audit', { credentials: 'include' }).catch(() => null),
-          fetch('/api/pillars', { credentials: 'include' }).catch(() => null),
-          fetch('/api/action-items', { credentials: 'include' }).catch(() => null),
-          fetch('/api/tracked-keywords', { credentials: 'include' }).catch(() => null),
-          fetch('/api/serp-tracker', { credentials: 'include' }).catch(() => null),
-          fetch('/api/ai-workbench', { credentials: 'include' }).catch(() => null),
-          fetch('/api/dashboard-layout', { credentials: 'include' }).catch(() => null),
-          fetch('/api/dashboard-history', { credentials: 'include' }).catch(() => null),
-          fetch('/api/authority', { credentials: 'include' }).catch(() => null),
-          fetch('/api/pagespeed', { credentials: 'include' }).catch(() => null),
-          fetch('/api/seo-changes', { credentials: 'include' }).catch(() => null),
-          fetch('/api/alerts', { credentials: 'include' }).catch(() => null),
-          fetch('/api/research-intelligence', { credentials: 'include' }).catch(() => null),
-        ]);
-
-      if (contentResponse.status === 401) {
-        onUnauthorized();
-        return;
-      }
-      if (!contentResponse.ok) throw new Error('Content snapshot failed to load.');
-
-      const content = (await contentResponse.json()) as Snapshot;
-      const competitorData = competitorResponse.ok ? ((await competitorResponse.json()) as CompetitorSnapshot) : null;
+      ] = await secondaryPromise;
+      const competitorData = competitorResponse?.ok ? ((await competitorResponse.json()) as CompetitorSnapshot) : null;
       const opportunityData = opportunitiesResponse?.ok ? ((await opportunitiesResponse.json()) as SearchOpportunities) : null;
       const technicalAuditData = technicalAuditResponse?.ok ? ((await technicalAuditResponse.json()) as TechnicalAudit) : null;
       const actionData = actionsResponse?.ok
@@ -245,7 +248,6 @@ export function DashboardProvider({
       const seoChangesData = seoChangesResponse?.ok ? ((await seoChangesResponse.json()) as SeoChangesReport) : null;
       const alertsData = alertsResponse?.ok ? ((await alertsResponse.json()) as AlertReport) : null;
       const researchData = researchResponse?.ok ? ((await researchResponse.json()) as ResearchIntelligence) : null;
-      setSnapshot(content);
       setCompetitors(competitorData);
       setTechnicalAudit(technicalAuditData);
       setGoogleStatus(googleResponse?.ok ? ((await googleResponse.json()) as GoogleStatus) : null);
@@ -266,7 +268,7 @@ export function DashboardProvider({
         const data = (await pillarsResponse.json()) as { pillars: MarkedPillar[] };
         setMarkedPillars(data.pillars || []);
       }
-      await loadAi(content, { competitorData, opportunityData, actionData, trackedKeywordData, ga4Data });
+      void loadAi(content, { competitorData, opportunityData, actionData, trackedKeywordData, ga4Data });
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Dashboard failed to load.');
     } finally {
@@ -823,6 +825,23 @@ export function DashboardProvider({
   };
 
   return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;
+}
+
+async function fetchDashboardModules(paths: string[], concurrency = 5): Promise<Array<Response | null>> {
+  const results: Array<Response | null> = new Array(paths.length).fill(null);
+  let nextIndex = 0;
+  await Promise.all(Array.from({ length: Math.min(concurrency, paths.length) }, async () => {
+    while (nextIndex < paths.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      try {
+        results[index] = await fetch(paths[index], { credentials: 'include' });
+      } catch {
+        results[index] = null;
+      }
+    }
+  }));
+  return results;
 }
 
 function readAnalysisFilters(): AnalysisFilters {

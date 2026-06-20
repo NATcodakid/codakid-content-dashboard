@@ -47,7 +47,7 @@ export function SettingsPage() {
             <div className="integration-subpanel">
               <div className="integration-subpanel-copy">
                 <BarChart3 size={18} />
-                <div><strong>Google Analytics 4</strong><span>{ga4?.latest ? `Latest period ${formatDateRange(ga4.latest.startDate, ga4.latest.endDate)}` : ga4?.analyticsScopeReady ? 'Connected, waiting for first sync' : 'Analytics authorization required'}</span></div>
+                <div><strong>Google Analytics 4</strong><span>{ga4?.latest ? `Latest period ${formatDateRange(ga4.latest.startDate, ga4.latest.endDate)}` : ga4?.analyticsScopeReady ? `Automatic ${googleStatus?.authenticationMode === 'service-account' ? 'service account' : 'Google'} connection · waiting for first sync` : 'Analytics authorization required'}</span></div>
               </div>
               <button
                 type="button"
@@ -94,6 +94,8 @@ export function SettingsPage() {
 
 function DiagnosticsGrid({ diagnostics }: { diagnostics: Diagnostics }) {
   const latestGsc = diagnostics.searchConsole[0];
+  const gscSync = diagnostics.sourceSyncs?.find((run) => run.source === 'search-console');
+  const ga4Sync = diagnostics.sourceSyncs?.find((run) => run.source === 'ga4');
   return (
     <div className="diagnostics-grid">
       <DiagnosticCard
@@ -114,7 +116,7 @@ function DiagnosticsGrid({ diagnostics }: { diagnostics: Diagnostics }) {
         icon={<Settings />}
         label="Search Console"
         value={latestGsc ? `${formatter.format(latestGsc.rowCount)} ${latestGsc.dimensions} rows` : 'No import yet'}
-        detail={latestGsc ? `Latest import ${formatDate(latestGsc.createdAt)}` : 'Apps Script or OAuth needs to import rows'}
+        detail={gscSync ? `${gscSync.authMode === 'service-account' ? 'Automatic service account' : gscSync.authMode} · ${gscSync.status} ${formatDate(gscSync.completedAt || gscSync.startedAt)}` : latestGsc ? `Latest import ${formatDate(latestGsc.createdAt)}` : 'Waiting for the first automatic sync'}
         ok={Boolean(latestGsc)}
       />
       <DiagnosticCard
@@ -128,8 +130,15 @@ function DiagnosticsGrid({ diagnostics }: { diagnostics: Diagnostics }) {
         icon={<Activity />}
         label="GA4"
         value={diagnostics.env.ga4PropertyConfigured ? 'Property set' : 'Missing ID'}
-        detail="Analytics data syncs after Google is reconnected with GA4 scope"
-        ok={diagnostics.env.ga4PropertyConfigured}
+        detail={ga4Sync ? `${ga4Sync.authMode === 'service-account' ? 'Automatic service account' : ga4Sync.authMode} · ${ga4Sync.status} ${formatDate(ga4Sync.completedAt || ga4Sync.startedAt)}` : diagnostics.env.googleServiceAccountConfigured ? 'Automatic service account ready' : 'Analytics authorization required'}
+        ok={diagnostics.env.ga4PropertyConfigured && diagnostics.env.googleServiceAccountConfigured}
+      />
+      <DiagnosticCard
+        icon={<Activity />}
+        label="Cannibalization"
+        value={`${formatter.format(diagnostics.cannibalization.active || 0)} active conflicts`}
+        detail={diagnostics.cannibalization.latest ? `${diagnostics.cannibalization.high || 0} high priority · scanned ${formatDate(diagnostics.cannibalization.latest)}` : 'Waiting for the first intent scan'}
+        ok={Boolean(diagnostics.cannibalization.latest)}
       />
     </div>
   );

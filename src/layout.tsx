@@ -29,6 +29,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/audit': 'Audit',
   '/links': 'Links',
   '/changes': 'Change Impact',
+  '/cannibalization': 'Cannibalization',
   '/actions': 'Actions',
   '/gameplan': 'Gameplan',
   '/intelligence': 'AI Lab',
@@ -49,14 +50,14 @@ type NavItemDef = {
 const PRIMARY_NAV: NavItemDef[] = [
   { to: '/', label: 'Overview', icon: ChartLineUp, routes: ['/'] },
   { to: '/keywords', label: 'Performance', icon: FileMagnifyingGlass, routes: ['/keywords'] },
-  { to: '/pillars', label: 'Content', icon: Stack, routes: ['/pillars', '/pages', '/audit', '/links', '/changes'] },
+  { to: '/pillars', label: 'Content', icon: Stack, routes: ['/pillars', '/pages', '/audit', '/links', '/changes', '/cannibalization'] },
   { to: '/competitors', label: 'Research', icon: GlobeHemisphereWest, routes: ['/competitors', '/intelligence'] },
   { to: '/actions', label: 'Roadmap', icon: Lightning, badge: 'actions', routes: ['/actions', '/gameplan'] },
   { to: '/reports', label: 'Reports', icon: NewspaperClipping, routes: ['/reports'] },
 ];
 
 const WORKSPACE_TABS = [
-  { routes: ['/pillars', '/pages', '/audit', '/links', '/changes'], items: [['/pillars', 'Pillars'], ['/audit', 'Site health'], ['/links', 'Internal links'], ['/changes', 'Change impact']] },
+  { routes: ['/pillars', '/pages', '/audit', '/links', '/changes', '/cannibalization'], items: [['/pillars', 'Pillars'], ['/cannibalization', 'Cannibalization'], ['/audit', 'Site health'], ['/links', 'Internal links'], ['/changes', 'Change impact']] },
   { routes: ['/competitors', '/intelligence'], items: [['/competitors', 'Competitors'], ['/intelligence', 'AI visibility']] },
   { routes: ['/actions', '/gameplan'], items: [['/actions', 'Work queue'], ['/gameplan', 'SEO plan']] },
 ];
@@ -118,13 +119,15 @@ export function DashboardLayout() {
   };
 
   const syncLive = Boolean(googleStatus?.connected && snapshot);
-  const syncLabel = syncLive
-    ? crawlUpdated
-      ? `Crawl · ${crawlUpdated}`
-      : 'Connected'
-    : googleStatus?.connected
-      ? 'Crawl pending'
-      : 'GSC not connected';
+  const syncLabel = !googleStatus
+    ? 'Loading data sources'
+    : syncLive
+      ? crawlUpdated
+        ? `Crawl · ${crawlUpdated}`
+        : 'Connected'
+      : googleStatus.connected
+        ? 'Crawl pending'
+        : 'GSC not connected';
 
   const googleMessage = React.useMemo(() => {
     if (searchParams.get('google') === 'connected') {

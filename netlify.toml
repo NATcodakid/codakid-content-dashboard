@@ -39,6 +39,19 @@
 [functions."analysis-overview-scheduled"]
   schedule = "@daily"
 
+[functions."cannibalization-scheduled"]
+  schedule = "@weekly"
+  timeout = 26
+
+[functions."cannibalization"]
+  timeout = 26
+
+[functions."google-search-console-sync"]
+  timeout = 26
+
+[functions."google-search-console-scheduled"]
+  timeout = 26
+
 [[redirects]]
   from = "/api/content-snapshot"
   to = "/.netlify/functions/content-snapshot"
@@ -87,6 +100,11 @@
 [[redirects]]
   from = "/api/analysis-overview"
   to = "/.netlify/functions/analysis-overview"
+  status = 200
+
+[[redirects]]
+  from = "/api/cannibalization"
+  to = "/.netlify/functions/cannibalization"
   status = 200
 
 [[redirects]]

@@ -3,11 +3,13 @@ import {
   audit,
   ensureAuthSchema,
   errorResponse,
+  finishSourceSyncRun,
   getSql,
   json,
   requireAdmin,
   requireCsrf,
   requireUser,
+  startSourceSyncRun,
 } from './_auth.mjs';
 import {
   ga4Configured,
@@ -27,7 +29,7 @@ export async function handler(event) {
     if (event.httpMethod === 'POST') {
       requireCsrf(event);
       const user = await requireAdmin(event);
-      const payload = await syncGa4();
+      const payload = await syncGa4Tracked();
       await audit(event, user, 'ga4.sync', ga4PropertyId(), {
         summaryRows: payload.summary?.rows?.length || 0,
         pageRows: payload.topPages?.length || 0,
@@ -49,7 +51,24 @@ export async function scheduled() {
     console.info('GA4 scheduled sync skipped: Google Analytics access is not connected.');
     return;
   }
-  await syncGa4();
+  await syncGa4Tracked();
+}
+
+async function syncGa4Tracked() {
+  const connection = await googleConnectionStatus();
+  const runId = await startSourceSyncRun('ga4', connection.authenticationMode || '');
+  try {
+    const payload = await syncGa4();
+    const rowsSaved = (payload.summary?.rows?.length || 0) + (payload.topPages?.length || 0) + (payload.latest?.pageDaily?.length || 0);
+    await finishSourceSyncRun(runId, {
+      rowsSaved,
+      detail: { propertyId: payload.propertyId, startDate: payload.latest?.startDate, endDate: payload.latest?.endDate },
+    });
+    return payload;
+  } catch (error) {
+    await finishSourceSyncRun(runId, { status: 'failed', error: error instanceof Error ? error.message : String(error) }).catch(() => undefined);
+    throw error;
+  }
 }
 
 async function ga4StatusPayload() {
@@ -82,11 +101,14 @@ export async function syncGa4() {
   ]);
 
   const sql = getSql();
-  await saveGa4Snapshot(sql, propertyId, current, 'summary', summary);
-  await saveGa4Snapshot(sql, propertyId, previous, 'summary', previousSummary);
-  await saveGa4Snapshot(sql, propertyId, current, 'pagePath,pageTitle', pages);
-  await saveGa4Snapshot(sql, propertyId, historyRange, 'date', daily);
-  await saveGa4Snapshot(sql, propertyId, historyRange, 'pagePath,date', pageDaily);
+  await Promise.all([
+    saveGa4Snapshot(sql, propertyId, current, 'summary', summary),
+    saveGa4Snapshot(sql, propertyId, previous, 'summary', previousSummary),
+    saveGa4Snapshot(sql, propertyId, current, 'pagePath,pageTitle', pages),
+    saveGa4Snapshot(sql, propertyId, historyRange, 'date', daily),
+    saveGa4Snapshot(sql, propertyId, historyRange, 'pagePath,date', pageDaily),
+  ]);
+  await sql`delete from ga4_snapshots where created_at < now() - interval '180 days'`;
 
   return {
     configured: true,
@@ -191,7 +213,7 @@ async function runPageDaily(range) {
         stringFilter: { matchType: 'CONTAINS', value: '/' },
       },
     },
-    limit: 100000,
+    limit: 30000,
     orderBys: [{ dimension: { dimensionName: 'date' }, desc: true }],
   };
   const baseMetrics = [
@@ -231,7 +253,6 @@ async function saveGa4Snapshot(sql, propertyId, range, dimensions, data) {
       ${JSON.stringify(data)}
     )
   `;
-  await sql`delete from ga4_snapshots where created_at < now() - interval '180 days'`;
 }
 
 function buildPayload(propertyId, range, summary, previousSummary, pages, updatedAt = new Date().toISOString(), daily = null, pageDaily = null) {

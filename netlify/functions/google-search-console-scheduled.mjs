@@ -1,10 +1,7 @@
-import { syncSearchAnalytics, syncSearchConsoleProperties } from './_google.mjs';
-import { ensureAuthSchema } from './_auth.mjs';
+import { scheduled } from './google-search-console-sync.mjs';
 
 export default async () => {
-  await ensureAuthSchema();
-  await syncSearchConsoleProperties();
-  await syncSearchAnalytics();
+  await scheduled();
 
   return new Response('Search Console sync complete', { status: 200 });
 };

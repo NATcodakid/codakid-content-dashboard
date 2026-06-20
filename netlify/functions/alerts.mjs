@@ -46,7 +46,7 @@ export async function handler(event) {
 
 async function buildAlertPayload(userId) {
   const sql = getSql();
-  const [auditRows, wpRows, gscRows, ga4Rows, rankRows, aiRows, actionRows, stateRows] = await Promise.all([
+  const [auditRows, wpRows, gscRows, ga4Rows, rankRows, aiRows, actionRows, cannibalizationRows, stateRows] = await Promise.all([
     sql`select high_count, medium_count, health_score, created_at from technical_audit_snapshots order by created_at desc limit 1`,
     sql`select post_count, created_at from wordpress_snapshots where ok = true order by created_at desc limit 1`,
     sql`select data, start_date, end_date, created_at from google_search_console_snapshots where dimensions = 'page' order by created_at desc limit 2`,
@@ -76,6 +76,13 @@ async function buildAlertPayload(userId) {
       from dashboard_action_items
       where status in ('todo', 'in_progress') and due_date < current_date
     `,
+    sql`
+      select count(*)::int as high_conflicts
+      from cannibalization_recommendations
+      where resolved_at is null
+        and severity = 'high'
+        and recommendation <> 'keep-separate'
+    `,
     sql`select fingerprint, status, snoozed_until from dashboard_alert_states where user_id = ${userId}`,
   ]);
 
@@ -86,6 +93,18 @@ async function buildAlertPayload(userId) {
   }
   if (Number(actionRows[0]?.overdue || 0) > 0) {
     alerts.push(makeAlert('actions:overdue', 'workflow', 'high', `${actionRows[0].overdue} overdue action${Number(actionRows[0].overdue) === 1 ? '' : 's'}`, 'These tasks passed their due date and still need an owner or resolution.', 'Work queue', new Date().toISOString(), '/actions'));
+  }
+  if (Number(cannibalizationRows[0]?.high_conflicts || 0) > 0) {
+    alerts.push(makeAlert(
+      'cannibalization:high',
+      'content-intent',
+      'high',
+      `${cannibalizationRows[0].high_conflicts} high-impact intent conflicts`,
+      'Multiple CodaKid pages are competing for the same Search Console queries. Review consolidation and differentiation evidence before editing WordPress.',
+      'Intent cannibalization',
+      new Date().toISOString(),
+      '/cannibalization',
+    ));
   }
 
   addFreshnessAlert(alerts, 'wordpress', 'WordPress crawl', wpRows[0]?.created_at, 48, '/audit');

@@ -23,6 +23,7 @@ const LinksPage = React.lazy(() => import('./pages/Links').then((module) => ({ d
 const CompetitorsPage = React.lazy(() => import('./pages/Competitors').then((module) => ({ default: module.CompetitorsPage })));
 const SettingsPage = React.lazy(() => import('./pages/Settings').then((module) => ({ default: module.SettingsPage })));
 const ChangesPage = React.lazy(() => import('./pages/Changes').then((module) => ({ default: module.ChangesPage })));
+const CannibalizationPage = React.lazy(() => import('./pages/Cannibalization').then((module) => ({ default: module.CannibalizationPage })));
 
 function App() {
   const [authStatus, setAuthStatus] = React.useState<'checking' | 'authenticated' | 'unauthenticated'>('checking');
@@ -91,6 +92,7 @@ function App() {
           <Route path="gameplan" element={<RouteFallback><GameplanPage /></RouteFallback>} />
           <Route path="links" element={<RouteFallback><LinksPage /></RouteFallback>} />
           <Route path="changes" element={<RouteFallback><ChangesPage /></RouteFallback>} />
+          <Route path="cannibalization" element={<RouteFallback><CannibalizationPage /></RouteFallback>} />
           <Route path="competitors" element={<RouteFallback><CompetitorsPage /></RouteFallback>} />
           <Route path="settings" element={<RouteFallback><SettingsPage /></RouteFallback>} />
           <Route path="*" element={<Navigate to="/" replace />} />

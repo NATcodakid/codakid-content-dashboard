@@ -1,10 +1,11 @@
 import { databaseEnvStatus, errorResponse, getSql, json, requireAdmin } from './_auth.mjs';
+import { googleServiceAccountConfigured } from './_google.mjs';
 
 export async function handler(event) {
   try {
     await requireAdmin(event);
     const sql = getSql();
-    const [wpRows, gscRows, serpRows, actionRows, userRows, auditRows] = await Promise.all([
+    const [wpRows, gscRows, serpRows, actionRows, userRows, auditRows, syncRows, cannibalizationRows] = await Promise.all([
       sql`
         select post_count, source, ok, error, created_at
         from wordpress_snapshots
@@ -41,6 +42,18 @@ export async function handler(event) {
         order by created_at desc
         limit 8
       `,
+      sql`
+        select distinct on (source) source, status, auth_mode, rows_saved, error, started_at, completed_at
+        from source_sync_runs
+        order by source, started_at desc
+      `,
+      sql`
+        select
+          count(*) filter (where resolved_at is null and recommendation <> 'keep-separate')::int as active,
+          count(*) filter (where resolved_at is null and severity = 'high')::int as high,
+          max(last_seen_at) as latest
+        from cannibalization_recommendations
+      `,
     ]);
 
     return json(
@@ -53,6 +66,7 @@ export async function handler(event) {
           serperConfigured: Boolean(process.env.SERPER_API_KEY || process.env.SERPER_DEV_API_KEY),
           ga4PropertyConfigured: Boolean(process.env.GA4_PROPERTY_ID || process.env.GOOGLE_ANALYTICS_PROPERTY_ID),
           googleOauthConfigured: Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
+          googleServiceAccountConfigured: googleServiceAccountConfigured(),
           gscImportSecretConfigured: Boolean(process.env.GSC_IMPORT_SECRET),
         },
         wordpress: wpRows[0] || null,
@@ -66,6 +80,16 @@ export async function handler(event) {
         actions: actionRows[0] || { total: 0, open: 0, done: 0 },
         users: userRows[0] || { total: 0, admins: 0, active: 0 },
         recentActivity: auditRows,
+        sourceSyncs: syncRows.map((row) => ({
+          source: row.source,
+          status: row.status,
+          authMode: row.auth_mode,
+          rowsSaved: Number(row.rows_saved || 0),
+          error: row.error,
+          startedAt: row.started_at,
+          completedAt: row.completed_at,
+        })),
+        cannibalization: cannibalizationRows[0] || { active: 0, high: 0, latest: null },
       },
       { 'cache-control': 'private, no-store' },
     );

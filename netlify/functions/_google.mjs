@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID } from 'node:crypto';
+import { createCipheriv, createDecipheriv, createHash, createSign, randomBytes, randomUUID } from 'node:crypto';
 import { HttpError, getSql, hashToken } from './_auth.mjs';
 
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -9,9 +9,21 @@ const GA4_API_BASE = 'https://analyticsdata.googleapis.com/v1beta';
 const GSC_SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
 const GA4_SCOPE = 'https://www.googleapis.com/auth/analytics.readonly';
 const USER_SCOPE = 'openid email';
+const SERVICE_ACCOUNT_SCOPES = `${GSC_SCOPE} ${GA4_SCOPE}`;
+
+let serviceAccountCredentialsCache;
+let serviceAccountTokenCache;
 
 export function googleOAuthConfigured() {
   return Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+}
+
+export function googleServiceAccountConfigured() {
+  try {
+    return Boolean(getServiceAccountCredentials());
+  } catch {
+    return false;
+  }
 }
 
 export function getRedirectUri(event) {
@@ -91,12 +103,20 @@ export async function googleConnectionStatus() {
     order by selected desc, site_url asc
   `;
 
+  const serviceAccount = getServiceAccountCredentials({ optional: true });
+  const configuredSite = configuredGscSiteUrl();
+  const serviceProperty = configuredSite && !properties.some((row) => row.site_url === configuredSite)
+    ? [{ site_url: configuredSite, permission_level: 'serviceAccount', selected: true, last_seen_at: null }]
+    : [];
   return {
-    configured: googleOAuthConfigured(),
-    connected: Boolean(rows[0]),
-    analyticsScopeReady: hasScope(rows[0]?.scope, GA4_SCOPE),
-    connection: rows[0] || null,
-    properties,
+    configured: Boolean(serviceAccount) || googleOAuthConfigured(),
+    connected: Boolean(serviceAccount) || Boolean(rows[0]),
+    authenticationMode: serviceAccount ? 'service-account' : rows[0] ? 'oauth' : 'none',
+    analyticsScopeReady: Boolean(serviceAccount) || hasScope(rows[0]?.scope, GA4_SCOPE),
+    connection: serviceAccount
+      ? { google_email: serviceAccount.client_email, scope: SERVICE_ACCOUNT_SCOPES, service_account: true }
+      : rows[0] || null,
+    properties: [...serviceProperty, ...properties],
     redirectUri: process.env.URL ? `${process.env.URL.replace(/\/$/, '')}/api/google/oauth/callback` : 'https://codakidblogdashboard.netlify.app/api/google/oauth/callback',
   };
 }
@@ -137,8 +157,14 @@ export async function syncSearchAnalytics() {
     order by site_url asc
     limit 1
   `;
-  const siteUrl = selectedRows[0]?.site_url;
+  const siteUrl = configuredGscSiteUrl() || selectedRows[0]?.site_url;
   if (!siteUrl) throw new HttpError(400, 'No Search Console property selected.');
+
+  await sql`
+    insert into google_search_console_properties (site_url, permission_level, selected, last_seen_at)
+    values (${siteUrl}, ${googleServiceAccountConfigured() ? 'serviceAccount' : ''}, true, now())
+    on conflict (site_url) do update set selected = true, last_seen_at = now()
+  `;
 
   const endDate = dateDaysAgo(3);
   const startDate = dateDaysAgo(93);
@@ -149,14 +175,13 @@ export async function syncSearchAnalytics() {
     ['date'],
     ['page', 'date'],
   ];
-  const snapshots = [];
-
-  for (const dimensions of dimensionsToFetch) {
+  const snapshots = await Promise.all(dimensionsToFetch.map(async (dimensions) => {
+    const dimensionKey = dimensions.join(',');
     const body = {
       startDate,
       endDate,
       dimensions,
-      rowLimit: dimensions.join(',') === 'page,date' ? 25000 : dimensions.length > 1 ? 2500 : 500,
+      rowLimit: dimensionKey === 'page,date' ? 25000 : dimensionKey === 'page,query' ? 15000 : 5000,
       searchType: 'web',
     };
     const data = await gscFetch(`/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query`, {
@@ -166,10 +191,10 @@ export async function syncSearchAnalytics() {
 
     await sql`
       insert into google_search_console_snapshots (id, site_url, start_date, end_date, dimensions, data)
-      values (${randomUUID()}, ${siteUrl}, ${startDate}, ${endDate}, ${dimensions.join(',')}, ${JSON.stringify(data)})
+      values (${randomUUID()}, ${siteUrl}, ${startDate}, ${endDate}, ${dimensionKey}, ${JSON.stringify(data)})
     `;
-    snapshots.push({ dimensions, rowCount: data.rows?.length || 0 });
-  }
+    return { dimensions, rowCount: data.rows?.length || 0 };
+  }));
 
   return { siteUrl, startDate, endDate, snapshots };
 }
@@ -241,6 +266,8 @@ async function googleFetch(url, options = {}, fallbackMessage = 'Google API requ
 }
 
 async function getValidAccessToken() {
+  if (googleServiceAccountConfigured()) return getServiceAccountAccessToken();
+
   const sql = getSql();
   const rows = await sql`
     select id, access_token_encrypted, refresh_token_encrypted, expires_at
@@ -266,6 +293,75 @@ async function getValidAccessToken() {
     where id = ${connection.id}
   `;
   return tokenData.access_token;
+}
+
+async function getServiceAccountAccessToken() {
+  if (serviceAccountTokenCache?.token && serviceAccountTokenCache.expiresAt > Date.now() + 60000) {
+    return serviceAccountTokenCache.token;
+  }
+
+  const credentials = getServiceAccountCredentials();
+  const now = Math.floor(Date.now() / 1000);
+  const header = encodeJwtPart({ alg: 'RS256', typ: 'JWT' });
+  const claim = encodeJwtPart({
+    iss: credentials.client_email,
+    scope: SERVICE_ACCOUNT_SCOPES,
+    aud: credentials.token_uri || GOOGLE_TOKEN_URL,
+    iat: now,
+    exp: now + 3600,
+  });
+  const signer = createSign('RSA-SHA256');
+  signer.update(`${header}.${claim}`);
+  signer.end();
+  const assertion = `${header}.${claim}.${signer.sign(credentials.private_key, 'base64url')}`;
+  const response = await fetch(credentials.token_uri || GOOGLE_TOKEN_URL, {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion,
+    }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.access_token) {
+    throw new HttpError(response.status || 500, data.error_description || data.error || 'Google service account authentication failed.');
+  }
+  serviceAccountTokenCache = {
+    token: data.access_token,
+    expiresAt: Date.now() + Number(data.expires_in || 3600) * 1000,
+  };
+  return serviceAccountTokenCache.token;
+}
+
+function getServiceAccountCredentials({ optional = false } = {}) {
+  if (serviceAccountCredentialsCache) return serviceAccountCredentialsCache;
+  const raw = String(process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '').trim();
+  if (!raw) {
+    if (optional) return null;
+    throw new HttpError(500, 'GOOGLE_SERVICE_ACCOUNT_JSON is not configured.');
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed.type !== 'service_account' || !parsed.client_email || !parsed.private_key) {
+      throw new Error('Required service account fields are missing.');
+    }
+    serviceAccountCredentialsCache = {
+      ...parsed,
+      private_key: String(parsed.private_key).replace(/\\n/g, '\n'),
+    };
+    return serviceAccountCredentialsCache;
+  } catch (error) {
+    if (optional) return null;
+    throw new HttpError(500, `GOOGLE_SERVICE_ACCOUNT_JSON is invalid: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+function encodeJwtPart(value) {
+  return Buffer.from(JSON.stringify(value)).toString('base64url');
+}
+
+function configuredGscSiteUrl() {
+  return String(process.env.GSC_SITE_URL || '').trim();
 }
 
 async function exchangeCodeForToken(event, code) {

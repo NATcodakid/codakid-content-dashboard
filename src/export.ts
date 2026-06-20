@@ -12,6 +12,24 @@ export function downloadMarkdown(filename: string, markdown: string) {
   URL.revokeObjectURL(url);
 }
 
+export function downloadCsv(filename: string, rows: Array<Record<string, string | number | boolean | null | undefined>>) {
+  if (!rows.length) return;
+  const headers = Array.from(new Set(rows.flatMap((row) => Object.keys(row))));
+  const csv = [
+    headers.map(csvCell).join(','),
+    ...rows.map((row) => headers.map((header) => csvCell(row[header])).join(',')),
+  ].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename.endsWith('.csv') ? filename : `${filename}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 export function analystBriefMarkdown(brief: AiAnalystBrief) {
   return [
     `# ${brief.headline}`,
@@ -75,4 +93,9 @@ function section(title: string, rows?: string[]) {
   const visibleRows = (rows || []).filter(Boolean);
   if (!visibleRows.length) return '';
   return [`## ${title}`, ...visibleRows.map((row) => `- ${row}`)].join('\n');
+}
+
+function csvCell(value: string | number | boolean | null | undefined) {
+  const text = value == null ? '' : String(value);
+  return `"${text.replace(/"/g, '""')}"`;
 }

@@ -241,7 +241,7 @@ export function GoogleSearchConsolePanel({
           <strong>Google Search Console</strong>
           <span>
             {status?.connected
-              ? `Connected${status.connection?.google_email ? ` as ${status.connection.google_email}` : ''}`
+              ? `${status.authenticationMode === 'service-account' ? 'Automatic service account' : 'Connected'}${status.connection?.google_email ? ` · ${status.connection.google_email}` : ''}`
               : hasSearchConsoleData
                 ? 'Imported by Google Apps Script'
                 : 'OAuth or Apps Script connection'}
@@ -251,7 +251,7 @@ export function GoogleSearchConsolePanel({
           {hasSearchConsoleData ? 'Connected' : status?.configured ? 'Ready' : 'Needs import'}
         </span>
       </div>
-      {status?.connected && !status.analyticsScopeReady && (
+      {status?.connected && status.authenticationMode !== 'service-account' && !status.analyticsScopeReady && (
         <p className="panel-note">
           GA4 reporting needs one more Google reconnect after deploy so Analytics read-only access is approved.
         </p>

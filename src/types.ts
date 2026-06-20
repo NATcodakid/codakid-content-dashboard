@@ -8,6 +8,7 @@ export type Pillar = {
   modified: string;
   inboundCount: number;
   outboundCount: number;
+  excerpt?: string;
   relatedPostCount: number;
   missingRelatedLinks: Array<{ title: string; url: string; cluster: string; date: string }>;
   pillarScore: number;
@@ -313,6 +314,7 @@ export type PageBrief = {
 export type GoogleStatus = {
   configured: boolean;
   connected: boolean;
+  authenticationMode?: 'service-account' | 'oauth' | 'none' | string;
   analyticsScopeReady?: boolean;
   imported?: boolean;
   redirectUri: string;
@@ -320,6 +322,7 @@ export type GoogleStatus = {
     google_email?: string;
     expires_at?: string;
     updated_at?: string;
+    service_account?: boolean;
   } | null;
   properties: Array<{
     site_url: string;
@@ -852,6 +855,7 @@ export type Diagnostics = {
     serperConfigured: boolean;
     ga4PropertyConfigured: boolean;
     googleOauthConfigured: boolean;
+    googleServiceAccountConfigured: boolean;
     gscImportSecretConfigured: boolean;
   };
   wordpress: {
@@ -887,6 +891,88 @@ export type Diagnostics = {
     email: string;
     created_at: string;
   }>;
+  sourceSyncs: Array<{
+    source: string;
+    status: string;
+    authMode: string;
+    rowsSaved: number;
+    error: string;
+    startedAt: string;
+    completedAt?: string | null;
+  }>;
+  cannibalization: {
+    active: number;
+    high: number;
+    latest?: string | null;
+  };
+};
+
+export type CannibalizationPageEvidence = {
+  url: string;
+  title: string;
+  excerpt?: string;
+  cluster: string;
+  clicks: number;
+  impressions: number;
+  position: number;
+  sessions: number;
+  views: number;
+  inboundCount: number;
+  health: number;
+  pillarScore: number;
+  confirmedPillar: boolean;
+  modified: string;
+};
+
+export type CannibalizationRecommendation = {
+  id: string;
+  fingerprint: string;
+  sourceUrls: string[];
+  winnerUrl: string;
+  intentLabel: string;
+  sharedQueries: Array<{ query: string; impressions: number; clicks: number }>;
+  evidence: {
+    period?: { startDate: string; endDate: string };
+    pages?: CannibalizationPageEvidence[];
+    sharedQueryCount?: number;
+    sharedImpressions?: number;
+    sharedClicks?: number;
+    titleSimilarity?: number;
+    averagePositionGap?: number;
+    overlapScore?: number;
+  };
+  recommendation: 'redirect' | 'merge-redirect' | 'differentiate' | 'canonical' | 'internal-link' | 'keep-separate' | 'review' | string;
+  severity: 'high' | 'medium' | 'low' | string;
+  confidence: number;
+  reasoning: string;
+  preserveNotes: string[];
+  status: 'new' | 'reviewed' | 'approved' | 'rejected' | 'deferred' | 'resolved' | string;
+  owner: string;
+  notes: string;
+  reviewedBy?: string;
+  reviewedAt?: string | null;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  resolvedAt?: string | null;
+};
+
+export type CannibalizationReport = {
+  generatedAt: string;
+  configured: boolean;
+  scan: null | {
+    id: string;
+    startDate: string;
+    endDate: string;
+    candidateCount: number;
+    conflictCount: number;
+    model: string;
+    summary: Record<string, number>;
+    error: string;
+    createdAt: string;
+  };
+  summary: { total: number; high: number; redirects: number; review: number; approved: number; resolved: number };
+  recommendations: CannibalizationRecommendation[];
+  trend: Array<{ id: string; startDate: string; endDate: string; candidateCount: number; conflictCount: number; model: string; summary: Record<string, number>; error: string; createdAt: string }>;
 };
 
 export type DomainAuthorityEntry = {

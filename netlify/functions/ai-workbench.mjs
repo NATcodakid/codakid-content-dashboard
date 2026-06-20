@@ -221,12 +221,13 @@ async function pageBrief(body) {
   return { mode: result.mode, model: result.model, brief: result.data };
 }
 
-async function openAiJson({ system, user, fallback, maxOutputTokens = 1800, webSearch = false }) {
+export async function openAiJson({ system, user, fallback, maxOutputTokens = 1800, webSearch = false, timeoutMs = 22000 }) {
   if (!process.env.OPENAI_API_KEY) return { mode: 'fallback', model: '', data: fallback, sources: [], sourceMode: 'internal', error: 'OpenAI is not configured.' };
   const startedAt = Date.now();
   try {
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
+      signal: AbortSignal.timeout(timeoutMs),
       headers: {
         authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         'content-type': 'application/json',

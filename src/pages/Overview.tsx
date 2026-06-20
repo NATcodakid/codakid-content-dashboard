@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, ArrowRight, ArrowUpRight, Bot, Eye, FileText, Gauge, GripVertical, Lightbulb, Search, Settings2, Star, X } from 'lucide-react';
+import { AlertTriangle, ArrowRight, ArrowUpRight, Bot, Eye, FileText, Gauge, GitMerge, GripVertical, Lightbulb, Search, Settings2, Star, X } from 'lucide-react';
 import { useDashboard } from '../data';
 import { LoadingState, DashCard, DashMetric, PageHeading, SearchPeriodNav } from '../components';
 import {
@@ -33,6 +33,7 @@ import {
 import type {
   ActionItem,
   AnalysisOverview,
+  CannibalizationReport,
   AiWorkbench,
   CompetitorSnapshot,
   DashboardHistory,
@@ -65,10 +66,21 @@ export function OverviewPage() {
   const [loadingPeriod, setLoadingPeriod] = useState(false);
   const [customizing, setCustomizing] = useState(false);
   const [overviewView, setOverviewView] = useState<'today' | 'performance' | 'shortcuts'>('today');
+  const [cannibalization, setCannibalization] = useState<CannibalizationReport | null>(null);
 
   useEffect(() => {
     if (searchOpportunities) setSearchData(searchOpportunities);
   }, [searchOpportunities]);
+
+  useEffect(() => {
+    let active = true;
+    void fetch('/api/cannibalization', { credentials: 'include' })
+      .then(async (response) => {
+        if (active && response.ok) setCannibalization((await response.json()) as CannibalizationReport);
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, []);
 
   const loadPeriod = useCallback(async (startDate: string, endDate: string) => {
     setLoadingPeriod(true);
@@ -202,6 +214,8 @@ export function OverviewPage() {
       </section>
 
       {overviewView === 'today' && analysisOverview ? <AnalysisPerformanceStrip analysis={analysisOverview} /> : null}
+
+      {overviewView === 'today' && cannibalization?.scan ? <CannibalizationSignal report={cannibalization} /> : null}
 
       {overviewView === 'today' && actions.length > 0 ? <NextActionsBlock actions={actions} /> : null}
 
@@ -416,6 +430,20 @@ function NextActionsBlock({ actions }: { actions: ReturnType<typeof buildFocusAc
         ))}
       </ul>
     </div>
+  );
+}
+
+function CannibalizationSignal({ report }: { report: CannibalizationReport }) {
+  return (
+    <section className="cannibalization-signal">
+      <div><GitMerge size={18} /><div><h2>Intent conflicts</h2><p>Pages competing for the same Search Console demand.</p></div></div>
+      <dl>
+        <div><dt>Active</dt><dd>{report.summary.total}</dd></div>
+        <div><dt>High priority</dt><dd>{report.summary.high}</dd></div>
+        <div><dt>Redirect candidates</dt><dd>{report.summary.redirects}</dd></div>
+      </dl>
+      <Link className="dash-link" to="/cannibalization">Review conflicts <ArrowUpRight size={14} /></Link>
+    </section>
   );
 }
 
