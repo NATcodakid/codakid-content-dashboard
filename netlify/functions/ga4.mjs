@@ -276,7 +276,8 @@ function buildPayload(propertyId, range, summary, previousSummary, pages, update
     },
     topPages: normalizePageRows(pages),
     dailyTrend: normalizeDailyRows(daily),
-    pageDaily: normalizePageDailyRows(pageDaily),
+    // Keep the full page-day history in Neon; send a bounded recent sample to browsers.
+    pageDaily: normalizePageDailyRows(pageDaily).slice(0, 4000),
   };
 }
 
