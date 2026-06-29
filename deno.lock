@@ -12,6 +12,7 @@
     "packageJson": {
       "dependencies": [
         "npm:@neondatabase/serverless@^1.1.0",
+        "npm:@phosphor-icons/react@^2.1.10",
         "npm:@types/react-dom@^18.3.1",
         "npm:@types/react@^18.3.12",
         "npm:@vitejs/plugin-react@^6.0.2",

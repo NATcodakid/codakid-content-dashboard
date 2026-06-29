@@ -127,6 +127,13 @@ function DiagnosticsGrid({ diagnostics }: { diagnostics: Diagnostics }) {
         ok={diagnostics.env.serperConfigured}
       />
       <DiagnosticCard
+        icon={<BarChart3 />}
+        label="PageSpeed"
+        value={diagnostics.pageSpeed.total ? `${formatter.format(diagnostics.pageSpeed.total)} tests saved` : 'No tests yet'}
+        detail={diagnostics.pageSpeed.latest ? `Avg mobile score ${diagnostics.pageSpeed.averagePerformance ?? '—'} · tested ${formatDate(diagnostics.pageSpeed.latest)}` : 'Run Core Web Vitals from the Audit page'}
+        ok={Boolean(diagnostics.pageSpeed.latest)}
+      />
+      <DiagnosticCard
         icon={<Activity />}
         label="GA4"
         value={diagnostics.env.ga4PropertyConfigured ? 'Property set' : 'Missing ID'}

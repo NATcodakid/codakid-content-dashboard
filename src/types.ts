@@ -875,6 +875,12 @@ export type Diagnostics = {
     total: number;
     latest?: string | null;
   };
+  pageSpeed: {
+    total: number;
+    mobile: number;
+    averagePerformance: number | null;
+    latest?: string | null;
+  };
   actions: {
     total: number;
     open: number;
@@ -1036,6 +1042,15 @@ export type PageSpeedHistoryPoint = {
 export type PageSpeedReport = {
   configured: boolean;
   generatedAt: string;
+  latest?: {
+    resultCount: number;
+    mobileCount: number;
+    averagePerformance: number | null;
+    averageSeo: number | null;
+    averageAccessibility: number | null;
+    averageBestPractices: number | null;
+    updatedAt?: string | null;
+  } | null;
   candidates: PageSpeedCandidate[];
   results: PageSpeedResult[];
   history?: PageSpeedHistoryPoint[];

@@ -5,7 +5,7 @@ export async function handler(event) {
   try {
     await requireAdmin(event);
     const sql = getSql();
-    const [wpRows, gscRows, serpRows, actionRows, userRows, auditRows, syncRows, cannibalizationRows] = await Promise.all([
+    const [wpRows, gscRows, serpRows, pageSpeedRows, actionRows, userRows, auditRows, syncRows, cannibalizationRows] = await Promise.all([
       sql`
         select post_count, source, ok, error, created_at
         from wordpress_snapshots
@@ -21,6 +21,14 @@ export async function handler(event) {
       sql`
         select count(*)::int as total, max(fetched_at) as latest
         from serp_snapshots
+      `,
+      sql`
+        select
+          count(*)::int as total,
+          count(*) filter (where strategy = 'mobile')::int as mobile,
+          round(avg(performance))::int as average_performance,
+          max(created_at) as latest
+        from pagespeed_snapshots
       `,
       sql`
         select
@@ -77,6 +85,12 @@ export async function handler(event) {
           createdAt: row.created_at,
         })),
         serp: serpRows[0] || { total: 0, latest: null },
+        pageSpeed: {
+          total: Number(pageSpeedRows[0]?.total || 0),
+          mobile: Number(pageSpeedRows[0]?.mobile || 0),
+          averagePerformance: pageSpeedRows[0]?.average_performance == null ? null : Number(pageSpeedRows[0].average_performance),
+          latest: pageSpeedRows[0]?.latest || null,
+        },
         actions: actionRows[0] || { total: 0, open: 0, done: 0 },
         users: userRows[0] || { total: 0, admins: 0, active: 0 },
         recentActivity: auditRows,

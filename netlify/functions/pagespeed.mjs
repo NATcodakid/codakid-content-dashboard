@@ -50,13 +50,15 @@ export async function handler(event) {
       order by day asc
       limit 60
     `;
+    const results = cached.map(publicResult);
     return json(
       200,
       {
         configured: pageSpeedConfigured(),
         generatedAt: new Date().toISOString(),
         candidates,
-        results: cached.map(publicResult),
+        latest: buildLatestSummary(results),
+        results,
         history: historyRows.map((row) => ({
           date: row.day,
           performance: row.performance,
@@ -173,6 +175,32 @@ function publicResult(row) {
     overallCategory: row.overall_category,
     updatedAt: row.created_at,
   };
+}
+
+function buildLatestSummary(results) {
+  if (!results.length) return null;
+  const mobile = results.filter((result) => result.strategy === 'mobile');
+  const scoped = mobile.length ? mobile : results;
+  const latestTime = Math.max(
+    ...scoped
+      .map((result) => (result.updatedAt ? new Date(result.updatedAt).getTime() : 0))
+      .filter((time) => Number.isFinite(time)),
+  );
+  return {
+    resultCount: results.length,
+    mobileCount: mobile.length,
+    averagePerformance: average(scoped.map((result) => result.performance)),
+    averageSeo: average(scoped.map((result) => result.seo)),
+    averageAccessibility: average(scoped.map((result) => result.accessibility)),
+    averageBestPractices: average(scoped.map((result) => result.bestPractices)),
+    updatedAt: latestTime > 0 ? new Date(latestTime).toISOString() : null,
+  };
+}
+
+function average(values) {
+  const numericValues = values.filter((value) => value != null && Number.isFinite(Number(value))).map(Number);
+  if (!numericValues.length) return null;
+  return Math.round(numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length);
 }
 
 function pct(score) {
